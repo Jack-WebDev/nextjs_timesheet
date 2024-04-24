@@ -1,3 +1,6 @@
+
+"use client"
+
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -23,7 +26,7 @@ export function AddUser() {
 	const [department, setDepartment] = useState("");
 
 	const handleSave = async () => {
-		 await axios.post(`api/users/`, {
+		 await axios.post(`http://localhost:3000/api/users`, {
 			name,
 			surname,
 			email,

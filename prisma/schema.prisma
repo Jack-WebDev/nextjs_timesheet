@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,45 +7,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id          String      @id @default(uuid()) // Assuming the id is a UUID
-  Name        String      // User's name
-  Surname     String      // User's surname
-  Email       String      @unique    // User's email (unique constraint)
-  Password    String?     // User's password (nullable)
-  Department  String      // User's department
-  Status      String      // User's status
-  Role        String      @default("Employee") // Default role is "Employee"
-  createdAt   DateTime    @default(now())     // Creation timestamp
+  id         String   @id @default(uuid())
+  Name       String
+  Surname    String
+  Email      String   @unique
+  Password   String?
+  Department String
+  Status     String
+  Role       String   @default("Employee")
+  createdAt  DateTime @default(now())
 }
 
 model Project {
-  id             String      @id @default(uuid()) // Assuming the id is a UUID
-  Project_Name   String      @unique             // Project name (unique constraint)
-  department     Department? @relation(fields: [Department_Id], references: [id]) // Department relation
-  Department_Id  String?     // Foreign key to Department table
+  id            String      @id @default(uuid())
+  Project_Name  String      @unique
+  Department_Id String?
+  department    Department? @relation(fields: [Department_Id], references: [id])
 }
 
 model Department {
-  id              String      @id @default(uuid()) // Assuming the id is a UUID
-  Department_Name String      @unique             // Department name (unique constraint)
-  projects        Project[]                        // Projects associated with this department
+  id              String    @id @default(uuid())
+  Department_Name String    @unique
+  projects        Project[]
 }
 
 model Timesheet {
-  id                String      @id @default(uuid()) // Assuming the id is a UUID
-  Full_Name         String      // Full name of the person
-  Project_Name      String      // Name of the project
-  Task_performed    String?     // Task performed (nullable)
-  Week              String      // Week identifier (e.g., "2024-04")
-  Monday            String?     // Hours worked on Monday (nullable)
-  Tuesday           String?     // Hours worked on Tuesday (nullable)
-  Wednesday         String?     // Hours worked on Wednesday (nullable)
-  Thursday          String?     // Hours worked on Thursday (nullable)
-  Friday            String?     // Hours worked on Friday (nullable)
-  Total_hours       Float       @default(0.0)   // Total hours worked (decimal)
-  Approval_Status   String      @default("Pending") // Approval status (default to "Pending")
-  createdAt         DateTime    @default(now())  // Creation timestamp
-  updatedAt         DateTime    @updatedAt       // Last update timestamp
+  id              String   @id @default(uuid())
+  Full_Name       String
+  Project_Name    String
+  Task_performed  String?
+  Week            String
+  Monday          Int?
+  Tuesday         Int?
+  Wednesday       Int?
+  Thursday        Int?
+  Friday          Int?
+  Total_hours     Float    @default(0.0)
+  Approval_Status String   @default("Pending")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

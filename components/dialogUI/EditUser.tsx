@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -32,12 +34,13 @@ export function EditUser({ id }: User) {
 	}, []);
 
 	const fetchUsers = async () => {
-		 await axios.get("api/users/");
+		const response = await axios.get<User[]>("http://localhost:3000/api/users");
+		const users = response.data
 	};
 
 	const handleSave = async () => {
 		try {
-			await axios.put(`api/users/${id}`, {
+			await axios.put(`http://localhost:3000/api/users/${id}`, {
 				name,
 				surname,
 				email,

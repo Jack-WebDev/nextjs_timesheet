@@ -1,8 +1,9 @@
+import UserTable from "@/components/tableUI/UserTable";
 
 export default function Employees() {
   return (
     <div>
-      <h1>Employees</h1>
+      <UserTable/>
     </div>
   )
 }

@@ -1,18 +1,20 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {EditUser} from "../dialogUI/EditUser"
-import {AddUser} from "../dialogUI/AddUser"
-import {toast} from "react-toastify"
+import { EditUser } from "../dialogUI/EditUser";
+import { AddUser } from "../dialogUI/AddUser";
+import { toast } from "react-toastify";
 import { FaTrashAlt } from "react-icons/fa";
 
-
-
 type User = {
+	[x: string]: any;
+
 	id: string;
 	Name: string;
 	Surname: string;
 	Email: string;
-    Password:string,
+	Password: string;
 	Department: string;
 	Status: string;
 	Role: string;
@@ -29,17 +31,20 @@ const UserTable: React.FC = () => {
 
 	const fetchUsers = async () => {
 		try {
-			const response = await axios.get<User[]>("api/users/");
-			setUsers(response.data);
-			setFilteredUsers(response.data);
+			const response = await axios.get<User[]>(
+				"http://localhost:3000/api/users"
+			);
+			const users = response.data;
+			setUsers(users);
+			setFilteredUsers(users);
 		} catch (error) {
-			toast.error("An error occured while fetching users. Please try again")
+			toast.error("An error occured while fetching users. Please try again");
 		}
 	};
 
 	const handleDelete = async (id: any) => {
 		await axios.delete(`api/users/${id}`);
-        fetchUsers()
+		fetchUsers();
 	};
 
 	const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,8 +59,6 @@ const UserTable: React.FC = () => {
 		setFilteredUsers(filtered);
 	};
 
-
-
 	return (
 		<div className="w-1/2 mx-auto mt-12 border border-black p-8 rounded-2xl ">
 			<div className="flex items-center justify-between mb-12">
@@ -66,8 +69,7 @@ const UserTable: React.FC = () => {
 					value={filter}
 					onChange={handleFilterChange}
 				/>
-				<AddUser/>
-
+				<AddUser />
 			</div>
 			<table className="w-full">
 				<thead className="relative -top-4">
@@ -91,8 +93,11 @@ const UserTable: React.FC = () => {
 							<td>{user.Status}</td>
 							<td>{user.Role}</td>
 							<td className="flex items-center justify-center gap-4">
-								<EditUser id={user.id}/>
-								<FaTrashAlt className="cursor-pointer" onClick={() => handleDelete(user.id)}/>
+								<EditUser id={user.id} />
+								<FaTrashAlt
+									className="cursor-pointer"
+									onClick={() => handleDelete(user.id)}
+								/>
 							</td>
 						</tr>
 					))}

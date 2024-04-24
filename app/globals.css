@@ -66,3 +66,65 @@ width: 50%;
 }
 
 
+
+.date-range-selector {
+	display: flex;
+	justify-content: center;
+}
+
+.date-range-selector button span::before {
+	border-color: var(--primary-color);
+}
+
+.react-datepicker__month-container
+	.react-datepicker__month
+	.react-datepicker__week
+	.react-datepicker__day--keyboard-selected {
+	background-color: var(--primary-color);
+	color: #fff;
+}
+
+.react-datepicker__month-container
+	.react-datepicker__month
+	.react-datepicker__week
+	.react-datepicker__day--in-range {
+	background-color: var(--secondary-color);
+	color: #fff;
+}
+
+div[role="dialog"] {
+	background-color: white;
+	border-radius: 10px;
+}
+
+select {
+	width: 14vw;
+	border: 1px solid;
+	border-radius: 10px;
+	padding-inline: 10px;
+	height: 120%;
+}
+
+.project_dropdown {
+	width: 13%;
+}
+
+.task_input {
+	width: 15%;
+}
+
+.task_input:focus {
+	border: none;
+	outline: 2px solid var(--primary-color);
+}
+
+.hour_input:focus {
+	border: none;
+	outline: 2px solid var(--primary-color);
+}
+
+.project-card {
+	width: 70%;
+}
+
+

@@ -1,8 +1,10 @@
 
+import DepartmentTable from "@/components/tableUI/DepartmentTable"
+
 export default function Departments() {
   return (
     <div>
-      <h1>Department Page</h1>
+      <DepartmentTable />
     </div>
   )
 }

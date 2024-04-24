@@ -26,7 +26,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 			return NextResponse.json({ message: "Invalid Password" });
 		}
 
-		return NextResponse.json({ message: user }, { status: 200 });
+		return NextResponse.json(user , { status: 200 });
 	} catch (error) {
 		return NextResponse.json({ message: error }, { status: 500 });
 	}

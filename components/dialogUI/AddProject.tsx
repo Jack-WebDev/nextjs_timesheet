@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -37,7 +39,7 @@ export function AddProject() {
 
 	const fetchdepartments = async () => {
 		try {
-			const response = await axios.get<Department[]>("api/departments/");
+			const response = await axios.get<Department[]>("http://localhost:3000/api/departments/");
 			setDepartments(response.data);
 		} catch (error) {
 			toast.error("An error occured while fetching departments. Please reload your page");
@@ -45,7 +47,7 @@ export function AddProject() {
 	};
 
 	const handleSave = async () => {
-		await axios.post<Project>(`api/projects/`, {
+		await axios.post<Project>(`http://localhost:3000/api/projects/`, {
 			Project_Name: Project_Name,
 			Department_Id: department_id
 

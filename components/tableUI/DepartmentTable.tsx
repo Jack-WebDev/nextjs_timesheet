@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { EditDepartment } from "../dialogUI/EditDepartment";
@@ -8,7 +10,7 @@ import {toast} from "react-toastify"
 type Department = {
 	id: string;
 	Department_Name: string;
-	Total_Projects: string;
+	projects: string[]
 };
 
 const departmentTable: React.FC = () => {
@@ -18,13 +20,14 @@ const departmentTable: React.FC = () => {
 	);
 	const [filter, setFilter] = useState<string>("");
 
+
 	useEffect(() => {
 		fetchDepartments();
 	}, []);
 
 	const fetchDepartments = async () => {
 		try {
-			const response = await axios.get<Department[]>("api/departments/");
+			const response = await axios.get<Department[]>("http://localhost:3000/api/departments");
 			setdepartments(response.data);
 			setfilteredDepartments(response.data);
 		} catch (error) {
@@ -33,7 +36,7 @@ const departmentTable: React.FC = () => {
 	};
 
 	const handleDelete = async (id: any) => {
-		 await axios.delete(`api/departments/${id}`);
+		 await axios.delete(`http://localhost:3000/api/departments/${id}`);
 		fetchDepartments();
 	};
 
@@ -72,7 +75,7 @@ const departmentTable: React.FC = () => {
 					{filteredDepartments.map((department) => (
 						<tr key={department.id}>
 							<td>{department.Department_Name}</td>
-							<td>{department.Total_Projects}</td>
+							<td>{department.projects.length}</td>
 							<td className="flex items-center justify-center gap-4">
 								<EditDepartment id={department.id} />
 								<FaTrashAlt className="cursor-pointer" onClick={() => handleDelete(department.id)}/>

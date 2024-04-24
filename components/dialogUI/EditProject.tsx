@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -27,18 +29,17 @@ export function EditProject({ id }: User) {
 	}, []);
 
 	const fetchProjects = async () => {
-		await axios.get("api/projects/");
+		await axios.get("http://localhost:3000/api/projects");
 	};
 
 	const handleSave = async () => {
 		try {
-			await axios.put(`api/projects/${id}`, {
+			await axios.put(`http://localhost:3000/api/projects/${id}`, {
 				Project_Name: project
 
 			});
 			window.location.reload()
 		} catch (error) {
-			console.log(error)
 			toast.error("An error occured while saving data. Please try again.")
 		}
 

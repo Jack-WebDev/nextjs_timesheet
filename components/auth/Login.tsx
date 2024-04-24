@@ -42,6 +42,9 @@ export function LoginForm() {
 		try {
 			const res = await axios.post("api/login", values);
 			const userData = await res.data;
+			console.log(userData)
+			const fullName = `${userData.Name} ${userData.Surname}`
+			localStorage.setItem("user",fullName)
 
 			await login(userData);
 

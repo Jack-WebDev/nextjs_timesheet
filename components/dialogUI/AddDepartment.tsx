@@ -1,3 +1,6 @@
+
+"use client"
+
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -18,7 +21,7 @@ export function AddDepartment() {
 
 
 	const handleSave = async () => {
-		await axios.post(`api/departments/`, {
+		await axios.post(`http://localhost:3000/api/departments`, {
 			Department_Name,
 
 		});

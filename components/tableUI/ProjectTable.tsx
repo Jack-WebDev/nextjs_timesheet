@@ -1,3 +1,6 @@
+
+"use client"
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { EditProject } from "../dialogUI/EditProject";
@@ -9,7 +12,7 @@ type Project = {
 	id: string;
 	Project_Name: string;
 
-	Department_Name: string;
+	Department_Name: string
 };
 
 const ProjectTable: React.FC = () => {
@@ -23,7 +26,7 @@ const ProjectTable: React.FC = () => {
 
 	const fetchprojects = async () => {
 		try {
-			const response = await axios.get<Project[]>("api/projects/");
+			const response = await axios.get<Project[]>("http://localhost:3000/api/projects");
 			setprojects(response.data);
 			setFilteredprojects(response.data);
 		} catch (error) {
@@ -32,7 +35,7 @@ const ProjectTable: React.FC = () => {
 	};
 
 	const handleDelete = async (id: any) => {
-		await axios.delete(`api/projects/${id}`);
+		await axios.delete(`http://localhost:3000/api/projects/${id}`);
 		fetchprojects();
 	};
 
