@@ -101,7 +101,7 @@ export default function page() {
 					<CardHeader>
 						<CardTitle className="flex items-center gap-x-4 text-secondary font-bold">
 							<FaTasks fill="#d69436" fontSize={"2rem"} />
-							Timesheet Approvals
+							Pending Timesheet Approvals
 						</CardTitle>
 					</CardHeader>
 					<CardContent>

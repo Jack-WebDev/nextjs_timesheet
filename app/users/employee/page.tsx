@@ -59,7 +59,7 @@ const Timesheet = () => {
 						<PopoverTrigger className="flex items-center gap-4 text-[#dda83a] font-semibold">
 							{name} <FaChevronDown />
 						</PopoverTrigger>
-						<PopoverContent className="flex items-center gap-4 w-fit">
+						<PopoverContent className="flex items-center gap-4 w-fit border-2 border-primary">
 							<form action={logOut}>
 								<button type="submit">Log Out</button>
 							</form>

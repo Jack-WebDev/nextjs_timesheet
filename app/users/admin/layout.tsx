@@ -22,7 +22,7 @@ export default async function DashboardLayout({
 				<div className="profile flex items-center gap-x-3">
 					<Popover>
 						<PopoverTrigger className="flex items-center gap-4 text-[#d69436]">
-							{name} <FaChevronDown />
+							<b>{name}</b><FaChevronDown />
 						</PopoverTrigger>
 						<PopoverContent className="flex items-center gap-4 w-fit border-2 border-primary rounded-xl">
 							<form action={logOut}>

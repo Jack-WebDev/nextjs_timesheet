@@ -11,6 +11,7 @@
 
 .link.active {
 	color: var(--primary-color);
+	font-weight: 600;
 }
 
 .side_menu {
