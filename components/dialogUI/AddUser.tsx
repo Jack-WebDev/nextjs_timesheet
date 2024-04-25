@@ -49,7 +49,7 @@ export function AddUser() {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button className="rounded-xl bg-[#DDA83A] text-white gap-x-4 hover:bg-[#DDA83A]">
+				<Button className="rounded-xl bg-primary text-white gap-x-4 hover:bg-primary">
 					<FaPlusCircle />
 					Add New User
 				</Button>
@@ -66,7 +66,7 @@ export function AddUser() {
 						<Input
 							id="name"
 							value={name}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setName(e.target.value)}
 						/>
 					</div>
@@ -79,7 +79,7 @@ export function AddUser() {
 						<Input
 							id="surname"
 							value={surname}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setSurname(e.target.value)}
 						/>
 					</div>
@@ -92,7 +92,7 @@ export function AddUser() {
 						<Input
 							id="email"
 							value={email}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setEmail(e.target.value)}
 						/>
 					</div>
@@ -105,7 +105,7 @@ export function AddUser() {
 						<Input
 							id="password"
 							value={password}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setPassword(e.target.value)}
 						/>
 					</div>
@@ -118,7 +118,7 @@ export function AddUser() {
 						<Input
 							id="status"
 							value={status}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setStatus(e.target.value)}
 						/>
 					</div>
@@ -131,7 +131,7 @@ export function AddUser() {
 						<Input
 							id="department"
 							value={department}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setDepartment(e.target.value)}
 						/>
 					</div>
@@ -144,7 +144,7 @@ export function AddUser() {
 						<Input
 							id="role"
 							value={role}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setRole(e.target.value)}
 						/>
 					</div>
@@ -152,7 +152,7 @@ export function AddUser() {
 				<DialogFooter>
 					<Button
 						type="submit"
-						className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]"
+						className="bg-primary text-white rounded-xl hover:bg-primary"
 						onClick={handleSave}
 					>
 						Add User

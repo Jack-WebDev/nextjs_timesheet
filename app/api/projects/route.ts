@@ -5,26 +5,25 @@ export async function GET() {
 	try {
 		const res = await db.project.findMany({
 			select: {
-			  id: true,
-			  Project_Name: true,
-			  Department_Id: true,
-			  department: {
-				select: {
-				  Department_Name: true,
+				id: true,
+				Project_Name: true,
+				Department_Id: true,
+				department: {
+					select: {
+						Department_Name: true,
+					},
 				},
-			  },
 			},
-		  });
+		});
 
-		  const data = res.map((i) => {
+		const data = res.map((i) => {
 			return {
 				id: i.id,
 				Project_Name: i.Project_Name,
 				Department_Name: i.department?.Department_Name,
-				Department_Id: i.Department_Id
-			}
-		  })
-
+				Department_Id: i.Department_Id,
+			};
+		});
 
 		return NextResponse.json(data, { status: 200 });
 	} catch (error) {
@@ -37,7 +36,6 @@ export async function POST(req: NextRequest) {
 		const res = await req.json();
 		const { Project_Name, Department_Id } = await res;
 
-		console.log(Project_Name, Department_Id);
 
 		const project = await db.project.create({
 			data: {

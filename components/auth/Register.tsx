@@ -39,6 +39,7 @@ export function RegisterForm() {
 		try {
 			const res = await axios.post("api/register", { ...values });
 			const user = await res.data;
+			console.log(user);
 			await login(user);
 		} catch (error) {
 			toast.error(

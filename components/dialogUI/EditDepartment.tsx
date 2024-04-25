@@ -61,7 +61,7 @@ export function EditDepartment({ id }: User) {
 						<Input
 							id="department"
 							value={department}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setDepartment(e.target.value)}
 						/>
 					</div>
@@ -70,7 +70,7 @@ export function EditDepartment({ id }: User) {
 				<DialogFooter>
 					<Button
 						type="submit"
-						className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]"
+						className="bg-primary text-white rounded-xl hover:bg-primary"
 						onClick={handleSave}
 					>
 						Save changes

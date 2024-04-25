@@ -38,8 +38,15 @@ const ProjectTable: React.FC = () => {
 	};
 
 	const handleDelete = async (id: any) => {
-		await axios.delete(`http://localhost:3000/api/projects/${id}`);
-		fetchprojects();
+		try {
+			await axios.delete(`http://localhost:3000/api/projects/${id}`);
+			fetchprojects();
+			toast.success("Project deleted successfully");
+		} catch (error) {
+			toast.error(
+				"An error occured while deleting project. Please reload and try again."
+			);
+		}
 	};
 
 	const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,12 +59,12 @@ const ProjectTable: React.FC = () => {
 	};
 
 	return (
-		<div className="w-1/2 mx-auto mt-12 bg-white border-2 border-primary p-8 rounded-2xl ">
+		<div className="w-[60%] mx-auto mt-12 bg-white border-2 border-primary p-8 rounded-2xl ">
 			<div className="flex items-center justify-between mb-12">
 				<input
 					type="text"
 					placeholder="Filter by project name..."
-					className="filter_input w-1/2 px-8 border border-black focus:border-[#DDA83A]"
+					className="filter_input w-1/2 px-8 py-[5px] border border-black focus:border-primary"
 					value={filter}
 					onChange={handleFilterChange}
 				/>

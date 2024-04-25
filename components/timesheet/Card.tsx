@@ -15,7 +15,7 @@ const ProjectCard: React.FC = () => {
 	};
 
 	return (
-		<div className="project-card mt-12 border border-[#dda83a] m-auto p-4 rounded-xl">
+		<div className="project-card mt-12 border border-primary m-auto p-4 rounded-xl">
 			<div className="flex items-center justify-around">
 				<div>Project</div>
 				<div>Task</div>
@@ -30,7 +30,7 @@ const ProjectCard: React.FC = () => {
 
 			<button
 				onClick={addRow}
-				className="bg-[#015a4a] text-white py-2 px-6 mt-8 rounded-xl"
+				className="bg-secondary text-white py-2 px-6 mt-8 rounded-xl"
 			>
 				Add Row
 			</button>

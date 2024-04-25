@@ -1,10 +1,9 @@
-
-import DepartmentTable from "@/components/tableUI/DepartmentTable"
+import DepartmentTable from "@/components/tableUI/DepartmentTable";
 
 export default function Departments() {
-  return (
-    <div>
-      <DepartmentTable />
-    </div>
-  )
+	return (
+		<div>
+			<DepartmentTable />
+		</div>
+	);
 }

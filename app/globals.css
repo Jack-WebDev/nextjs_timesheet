@@ -2,12 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-
 :root {
 	--primary-color: #dda83a;
 	--secondary-color: #015a4a;
 }
-
 
 .link.active {
 	color: var(--primary-color);
@@ -15,58 +13,58 @@
 }
 
 .side_menu {
-  grid-template-rows: 0.3fr 1fr;
-
+	grid-template-rows: 0.3fr 1fr;
 }
 
 .logo {
-  position: absolute;
-  top: 1rem;
-  left: 2rem;
+	position: absolute;
+	top: 1rem;
+	left: 2rem;
 }
-
 
 .form_img {
-  width: 100%;
+	width: 100%;
 }
-
 
 .tabs__header {
-  background-color: rgba(221, 167, 58, 0.3);
-  border-radius: 3rem;
+	background-color: rgba(221, 167, 58, 0.3);
+	border-radius: 3rem;
 }
 
-.tabs__header .login_tab[data-state="active"], .tabs__header .register_tab[data-state="active"] {
-  border: none;
-  background-color: #DDA83A;
-  border-radius: 4rem;
-  color: #FFF;
+.tabs__header .login_tab[data-state="active"],
+.tabs__header .register_tab[data-state="active"] {
+	border: none;
+	background-color: #dda83a;
+	border-radius: 4rem;
+	color: #fff;
 }
 
-
-.login_btn, .register_btn {
-  background-color: #DDA83A;
-  color: #FFF;
-  border: none;
-  border-radius: .5rem;
+.login_btn,
+.register_btn {
+	background-color: #dda83a;
+	color: #fff;
+	border: none;
+	border-radius: 0.5rem;
 }
 
 .form__container {
-border: 2px solid #dda83a;
-border-radius: 20px;
-padding: 4rem;
-  background-color: #fafafa;
+	border: 2px solid #dda83a;
+	border-radius: 20px;
+	padding: 4rem;
+	background-color: #fafafa;
 }
 
 input {
-  border-radius: 2rem;
+	border-radius: 2rem;
+}
+
+.filter_input {
+	border: 1px solid #000;
 }
 
 .left__column {
-width: 50%;
+	width: 50%;
 }
-
-
 
 .date-range-selector {
 	display: flex;
@@ -128,14 +126,12 @@ select {
 	width: 70%;
 }
 
-
 .background__image {
-    color: transparent;
-    width: 50%;
-    position: absolute;
-    top: 15%;
-    left: 37%;
-    z-index: -4;
-    filter: opacity(0.2);
+	color: transparent;
+	width: 50%;
+	position: absolute;
+	top: 15%;
+	left: 37%;
+	z-index: -4;
+	filter: opacity(0.2);
 }
-

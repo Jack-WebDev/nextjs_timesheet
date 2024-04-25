@@ -28,7 +28,7 @@ export function AddDepartment() {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button className="rounded-xl bg-[#DDA83A] text-white gap-x-4 hover:bg-[#DDA83A]">
+				<Button className="rounded-xl bg-primary text-white gap-x-4 hover:bg-primary">
 					<FaPlusCircle />
 					Add New Department
 				</Button>
@@ -45,7 +45,7 @@ export function AddDepartment() {
 						<Input
 							id="name"
 							value={Department_Name}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setDepartment_Name(e.target.value)}
 						/>
 					</div>
@@ -54,7 +54,7 @@ export function AddDepartment() {
 				<DialogFooter>
 					<Button
 						type="submit"
-						className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]"
+						className="bg-primary text-white rounded-xl hover:bg-primary"
 						onClick={handleSave}
 					>
 						Add Department

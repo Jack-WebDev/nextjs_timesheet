@@ -35,7 +35,7 @@ const Timesheet = () => {
 		new Date()
 	);
 
-	const name = localStorage.getItem("user")
+	const name = localStorage.getItem("user");
 
 	const formatDateToString = (date: Date | null): string => {
 		return date ? format(date, "yyyy-MM-dd") : "";
@@ -46,7 +46,7 @@ const Timesheet = () => {
 		setSelectedEndDate(endDate);
 
 		const date = `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
-		
+
 		localStorage.setItem("week", date);
 	};
 
@@ -56,7 +56,7 @@ const Timesheet = () => {
 				<img src="/ndt-technologies-web-logo.svg" alt="" className="w-[7%]" />
 				<div className="profile flex items-center gap-x-3">
 					<Popover>
-						<PopoverTrigger className="flex items-center gap-4 text-[#dda83a] font-semibold">
+						<PopoverTrigger className="flex items-center gap-4 text-primary font-semibold">
 							{name} <FaChevronDown />
 						</PopoverTrigger>
 						<PopoverContent className="flex items-center gap-4 w-fit border-2 border-primary">
@@ -77,7 +77,7 @@ const Timesheet = () => {
 					<div className="timesheet__details flex items-center justify-around mt-12">
 						<div className="time__period flex items-center gap-x-4">
 							<h2 className="font-semibold">Week:</h2>
-							<span className="bg-[#dda83a] text-white p-2 rounded-xl">
+							<span className="bg-primary text-white p-2 rounded-xl">
 								{formatDateToString(selectedStartDate)} -{" "}
 								{formatDateToString(selectedEndDate)}
 							</span>

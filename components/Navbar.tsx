@@ -20,7 +20,7 @@ export default function Navbar() {
 
 			<div className="profile flex items-center gap-x-3">
 				<Popover>
-					<PopoverTrigger className="flex items-center gap-4 text-[#dda83a] font-semibold">
+					<PopoverTrigger className="flex items-center gap-4 text-primary font-semibold">
 						<FaChevronDown />
 					</PopoverTrigger>
 					<PopoverContent className="flex items-center gap-4 w-fit">

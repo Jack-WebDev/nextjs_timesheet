@@ -70,23 +70,20 @@ const Row: React.FC = () => {
 			const res = await axios.post("http://localhost:3000/api/timesheets/", {
 				formData: updatedFormData,
 			});
-			localStorage.clear()
-			console.log(res)
-			//TODO toast doesnt appear
-			toast.success("Timesheet has been submitted.")
+			localStorage.clear();
+			toast.success("Timesheet has been submitted.");
 		} catch (error) {
 			toast.error(
 				"An error occured while submitting your timesheet. Please reload the screen and try again.."
 			);
 		}
 
-
 		setFormData({
 			project: "",
 			task_performed: "",
 			hours: [0, 0, 0, 0, 0],
 			total_hours: 0,
-		})
+		});
 	};
 
 	return (
@@ -134,7 +131,7 @@ const Row: React.FC = () => {
 			</div>
 			<button
 				type="submit"
-				className="rounded-xl bg-[#DDA83A] text-white gap-x-4 hover:bg-[#DDA83A] py-2 px-6 mb-4 mr-4"
+				className="rounded-xl bg-primary text-white gap-x-4 hover:bg-primary py-2 px-6 mb-4 mr-4"
 				onClick={handleSubmit}
 			>
 				Submit

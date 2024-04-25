@@ -25,8 +25,6 @@ export function middleware(request: NextRequest) {
 		} catch (error) {
 			console.error("JWT decoding failed:", error);
 		}
-	} else {
-		console.error("JWT token not found in cookies or is undefined");
 	}
 
 	if (!token) {

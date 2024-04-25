@@ -6,10 +6,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
 	try {
 		const data = await req.json();
 		const { email, password } = await data;
-		console.log(email, password);
 
 		const hashedPassword = await hashPassword(password, 10);
-		console.log(hashedPassword);
 
 		const user = await db.user.update({
 			where: {

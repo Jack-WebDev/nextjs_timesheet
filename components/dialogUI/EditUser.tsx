@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 import { FaEdit } from "react-icons/fa";
 
 type User = {
@@ -34,8 +34,7 @@ export function EditUser({ id }: User) {
 	}, []);
 
 	const fetchUsers = async () => {
-		const response = await axios.get<User[]>("http://localhost:3000/api/users");
-		const users = response.data;
+		await axios.get<User[]>("http://localhost:3000/api/users");
 	};
 
 	const handleSave = async () => {
@@ -58,6 +57,7 @@ export function EditUser({ id }: User) {
 	};
 
 	return (
+
 		<Dialog>
 			<DialogTrigger asChild>
 				<FaEdit className="cursor-pointer" />
@@ -74,7 +74,7 @@ export function EditUser({ id }: User) {
 						<Input
 							id="name"
 							value={name}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setName(e.target.value)}
 						/>
 					</div>
@@ -87,7 +87,7 @@ export function EditUser({ id }: User) {
 						<Input
 							id="surname"
 							value={surname}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setSurname(e.target.value)}
 						/>
 					</div>
@@ -100,7 +100,7 @@ export function EditUser({ id }: User) {
 						<Input
 							id="email"
 							value={email}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setEmail(e.target.value)}
 						/>
 					</div>
@@ -113,7 +113,7 @@ export function EditUser({ id }: User) {
 						<Input
 							id="password"
 							value={password}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setPassword(e.target.value)}
 						/>
 					</div>
@@ -126,7 +126,7 @@ export function EditUser({ id }: User) {
 						<Input
 							id="status"
 							value={status}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setStatus(e.target.value)}
 						/>
 					</div>
@@ -139,7 +139,7 @@ export function EditUser({ id }: User) {
 						<Input
 							id="department"
 							value={department}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setDepartment(e.target.value)}
 						/>
 					</div>
@@ -152,7 +152,7 @@ export function EditUser({ id }: User) {
 						<Input
 							id="role"
 							value={role}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setRole(e.target.value)}
 						/>
 					</div>
@@ -160,7 +160,7 @@ export function EditUser({ id }: User) {
 				<DialogFooter>
 					<Button
 						type="submit"
-						className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]"
+						className="bg-primary text-white rounded-xl hover:bg-primary"
 						onClick={handleSave}
 					>
 						Save changes
@@ -168,5 +168,6 @@ export function EditUser({ id }: User) {
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
+		
 	);
 }

@@ -47,7 +47,7 @@ export const login = async (userData: User) => {
 
 export const logOut = async () => {
 	const session = await getSession();
-	cookies().delete("jwtToken")
+	cookies().delete("jwtToken");
 
 	session.destroy();
 

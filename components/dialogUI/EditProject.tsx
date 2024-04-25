@@ -61,7 +61,7 @@ export function EditProject({ id }: User) {
 						<Input
 							id="projectName"
 							value={project}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setProject(e.target.value)}
 						/>
 					</div>
@@ -69,7 +69,7 @@ export function EditProject({ id }: User) {
 				<DialogFooter>
 					<Button
 						type="submit"
-						className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]"
+						className="bg-primary text-white rounded-xl hover:bg-primary"
 						onClick={handleSave}
 					>
 						Save changes

@@ -45,8 +45,15 @@ const UserTable: React.FC = () => {
 	};
 
 	const handleDelete = async (id: any) => {
-		await axios.delete(`api/users/${id}`);
-		fetchUsers();
+		try {
+			await axios.delete(`api/users/${id}`);
+			fetchUsers();
+			toast.success("User deleted successfully");
+		} catch (error) {
+			toast.error(
+				"An error occured while deleting user. Please reload and try again."
+			);
+		}
 	};
 
 	const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,12 +69,12 @@ const UserTable: React.FC = () => {
 	};
 
 	return (
-		<div className="w-1/2 mx-auto mt-12 border-2 bg-white broder-2 border-primary p-8 rounded-2xl ">
+		<div className="w-[70%] mx-auto mt-12 border-2 bg-white broder-2 border-primary p-8 rounded-2xl ">
 			<div className="flex items-center justify-between mb-12">
 				<input
 					type="text"
 					placeholder="Filter by name, department, or status..."
-					className="filter_input w-1/2 px-8 border border-black"
+					className="filter_input w-1/2 px-4 py-[5px] border border-black focus:border-primary"
 					value={filter}
 					onChange={handleFilterChange}
 				/>

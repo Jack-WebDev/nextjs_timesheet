@@ -1,15 +1,9 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
-
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FaBuilding, FaCalendar, FaTasks, FaUsers } from "react-icons/fa";
 import axios from "axios";
 
@@ -23,7 +17,7 @@ export default function page() {
 		getUsers();
 		getDepartments();
 		getProjects();
-		getTimesheets()
+		getTimesheets();
 	}, []);
 
 	const getUsers = async () => {
@@ -45,15 +39,13 @@ export default function page() {
 		const res = await axios.get("http://localhost:3000/api/timesheets/");
 		const timesheets = res.data;
 		setTimesheets(timesheets);
-		console.log(timesheets.Approval_status)
 	};
 
 	const countPendingTimesheets = () => {
-		return timesheets.filter((timesheet:any) => timesheet.Approval_Status === 'Pending').length;
-	  };
-
-
-
+		return timesheets.filter(
+			(timesheet: any) => timesheet.Approval_Status === "Pending"
+		).length;
+	};
 
 	return (
 		<div className="grid grid-cols-2 gap-12">

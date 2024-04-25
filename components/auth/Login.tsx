@@ -15,8 +15,8 @@ import {
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import { login } from "@/actions";
+import { toast } from "react-toastify";
 
 const formSchema = z.object({
 	email: z.string().min(2, {
@@ -27,8 +27,7 @@ const formSchema = z.object({
 
 export function LoginForm() {
 	const router = useRouter();
-	// const [authenticated, setAuthenticated] = useState(false);
-	// const [role, setRole] = useState("");
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -45,28 +44,12 @@ export function LoginForm() {
 			localStorage.setItem("user", fullName);
 
 			await login(userData);
-
-			// const { success, role, name, surname, token } = res.data;
-
-			// console.log(surname,success, role, name, token);
-
-			// if (success) {
-			// 	setAuthenticated(true);
-			// 	setRole(role);
-			// }
 		} catch (error) {
 			toast.error(
 				"An error occured while logging in. Please reload the screen and try again."
 			);
 		}
 	}
-	// if (authenticated) {
-	// 	if (role === "Employee" || role === "Manager") {
-	// 		router.push("/employee")
-	// 	} else if (role === "Admin") {
-	// 		router.push("/admin");
-	// 	}
-	// }
 
 	return (
 		<Form {...form}>

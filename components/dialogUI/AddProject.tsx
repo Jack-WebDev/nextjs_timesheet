@@ -60,7 +60,7 @@ export function AddProject() {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button className="rounded-xl bg-[#DDA83A] text-white gap-x-4 hover:bg-[#DDA83A]">
+				<Button className="rounded-xl bg-primary text-white gap-x-4 hover:bg-primary">
 					<FaPlusCircle />
 					Add New Project
 				</Button>
@@ -77,7 +77,7 @@ export function AddProject() {
 						<Input
 							id="name"
 							value={Project_Name}
-							className="col-span-3 rounded-xl focus:border-[#DDA83A]"
+							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setProject_Name(e.target.value)}
 						/>
 					</div>
@@ -89,7 +89,7 @@ export function AddProject() {
 						</Label>
 						<select
 							name="department"
-							className="focus:border-[#DDA83A]"
+							className="focus:border-primary"
 							value={department_id}
 							onChange={(e) => setDepartment_id(e.target.value)}
 						>
@@ -106,7 +106,7 @@ export function AddProject() {
 				<DialogFooter>
 					<Button
 						type="submit"
-						className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]"
+						className="bg-primary text-white rounded-xl hover:bg-primary"
 						onClick={handleSave}
 					>
 						Add Project
