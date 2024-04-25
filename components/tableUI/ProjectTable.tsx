@@ -1,18 +1,17 @@
-
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { EditProject } from "../dialogUI/EditProject";
 import { AddProject } from "../dialogUI/AddProject";
 import { FaTrashAlt } from "react-icons/fa";
-import {toast} from "react-toastify"
+import { toast } from "react-toastify";
 
 type Project = {
 	id: string;
 	Project_Name: string;
 
-	Department_Name: string
+	Department_Name: string;
 };
 
 const ProjectTable: React.FC = () => {
@@ -26,11 +25,15 @@ const ProjectTable: React.FC = () => {
 
 	const fetchprojects = async () => {
 		try {
-			const response = await axios.get<Project[]>("http://localhost:3000/api/projects");
+			const response = await axios.get<Project[]>(
+				"http://localhost:3000/api/projects"
+			);
 			setprojects(response.data);
 			setFilteredprojects(response.data);
 		} catch (error) {
-			toast.error("An error occured while fetching projects. Please try again.");
+			toast.error(
+				"An error occured while fetching projects. Please reload the screen and try again."
+			);
 		}
 	};
 
@@ -59,7 +62,6 @@ const ProjectTable: React.FC = () => {
 					onChange={handleFilterChange}
 				/>
 				<AddProject />
-
 			</div>
 			<table className="w-full">
 				<thead className="relative -top-4">
@@ -80,7 +82,10 @@ const ProjectTable: React.FC = () => {
 
 							<td className="flex items-center justify-center gap-4">
 								<EditProject id={project.id} />
-								<FaTrashAlt className="cursor-pointer" onClick={() => handleDelete(project.id)}/>
+								<FaTrashAlt
+									className="cursor-pointer"
+									onClick={() => handleDelete(project.id)}
+								/>
 							</td>
 						</tr>
 					))}

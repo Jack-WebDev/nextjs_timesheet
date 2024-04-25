@@ -38,7 +38,9 @@ const UserTable: React.FC = () => {
 			setUsers(users);
 			setFilteredUsers(users);
 		} catch (error) {
-			toast.error("An error occured while fetching users. Please try again");
+			toast.error(
+				"An error occured while fetching users. Please reload the screen and try again."
+			);
 		}
 	};
 

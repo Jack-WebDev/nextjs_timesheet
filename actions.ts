@@ -29,16 +29,21 @@ type User = {
 export const login = async (userData: User) => {
 	const session = await getSession();
 
-	const fullName = `${userData.Name} ${userData.Surname}`
+	const fullName = `${userData.Name} ${userData.Surname}`;
 
 	session.Name = fullName;
 	session.success = true;
 
-	await session.save();
-	redirect("/users/admin");
+	if (userData.Role === "Admin") {
+		session.isAdmin = true;
+		await session.save();
+		redirect("/users/admin");
+	} else {
+		session.isAdmin = false;
+		await session.save();
+		redirect("/users/employee");
+	}
 };
-
-
 
 export const logOut = async () => {
 	const session = await getSession();

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
 import RowForm from "./Row";
@@ -8,7 +8,7 @@ interface RowData {
 }
 
 const ProjectCard: React.FC = () => {
-	const [rows, setRows] = useState<RowData[]>([{ hours: [0, 0, 0, 0, 0] }]); // Initialize with at least one row
+	const [rows, setRows] = useState<RowData[]>([{ hours: [0, 0, 0, 0, 0] }]);
 
 	const addRow = () => {
 		setRows([...rows, { hours: [0, 0, 0, 0, 0] }]);
@@ -28,7 +28,12 @@ const ProjectCard: React.FC = () => {
 				<RowForm key={index} />
 			))}
 
-			<button onClick={addRow} className="bg-[#015a4a] text-white py-2 px-6 mt-8 rounded-xl">Add Row</button>
+			<button
+				onClick={addRow}
+				className="bg-[#015a4a] text-white py-2 px-6 mt-8 rounded-xl"
+			>
+				Add Row
+			</button>
 		</div>
 	);
 };

@@ -1,5 +1,4 @@
-
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,20 +18,20 @@ import { FaPlusCircle } from "react-icons/fa";
 export function AddDepartment() {
 	const [Department_Name, setDepartment_Name] = useState("");
 
-
 	const handleSave = async () => {
 		await axios.post(`http://localhost:3000/api/departments`, {
 			Department_Name,
-
 		});
-        window.location.reload()
-
+		window.location.reload();
 	};
 
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-			<Button className="rounded-xl bg-[#DDA83A] text-white gap-x-4 hover:bg-[#DDA83A]"><FaPlusCircle/>Add New Department</Button>
+				<Button className="rounded-xl bg-[#DDA83A] text-white gap-x-4 hover:bg-[#DDA83A]">
+					<FaPlusCircle />
+					Add New Department
+				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
@@ -53,7 +52,11 @@ export function AddDepartment() {
 				</div>
 
 				<DialogFooter>
-					<Button type="submit" className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]" onClick={handleSave}>
+					<Button
+						type="submit"
+						className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]"
+						onClick={handleSave}
+					>
 						Add Department
 					</Button>
 				</DialogFooter>

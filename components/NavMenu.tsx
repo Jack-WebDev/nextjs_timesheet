@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -22,7 +22,7 @@ function NavMenu() {
 						alt=""
 						width={100}
 						height={100}
-						style={{width: "auto", height: "auto"}}
+						style={{ width: "auto", height: "auto" }}
 					/>
 				</Link>
 				<ul className="grid gap-8">

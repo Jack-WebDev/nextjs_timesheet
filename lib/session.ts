@@ -1,4 +1,4 @@
-import {SessionOptions} from "iron-session"
+import { SessionOptions } from "iron-session";
 
 export type SessionProp = {
 	Department?: string;
@@ -8,22 +8,21 @@ export type SessionProp = {
 	Role?: string;
 	Status?: string;
 	Surname?: string;
-    success: boolean
+	success: boolean;
+	isAdmin: boolean;
 };
 
-
 export const defaultSession: SessionProp = {
-    Name: "",
-    success: false,
-}
-
-
+	Name: "",
+	success: false,
+	isAdmin: true,
+};
 
 export const sessionOptions: SessionOptions = {
-    password: process.env.SESSION_KEY!,
-    cookieName: "ndt-user_session",
-    cookieOptions: {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production"
-    }
-}
+	password: process.env.SESSION_KEY!,
+	cookieName: "ndt-user_session",
+	cookieOptions: {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === "production",
+	},
+};

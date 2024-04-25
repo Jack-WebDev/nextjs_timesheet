@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { FaChevronDown } from "react-icons/fa";
 import {
 	Popover,
@@ -26,8 +25,8 @@ export default function Navbar() {
 					</PopoverTrigger>
 					<PopoverContent className="flex items-center gap-4 w-fit">
 						<form action={logOut}>
-                            <button type="submit">Logout</button>
-                        </form>
+							<button type="submit">Logout</button>
+						</form>
 					</PopoverContent>
 				</Popover>
 			</div>

@@ -10,6 +10,7 @@ import DateRangeSelector from "@/components/timesheet/DatePicker";
 import { useState } from "react";
 import Card from "@/components/timesheet/Card";
 import { format } from "date-fns";
+import { logOut } from "@/actions";
 
 type Timesheet = {
 	Friday: string;
@@ -34,6 +35,8 @@ const Timesheet = () => {
 		new Date()
 	);
 
+	const name = localStorage.getItem("user")
+
 	const formatDateToString = (date: Date | null): string => {
 		return date ? format(date, "yyyy-MM-dd") : "";
 	};
@@ -54,10 +57,12 @@ const Timesheet = () => {
 				<div className="profile flex items-center gap-x-3">
 					<Popover>
 						<PopoverTrigger className="flex items-center gap-4 text-[#dda83a] font-semibold">
-							<FaChevronDown />
+							{name} <FaChevronDown />
 						</PopoverTrigger>
 						<PopoverContent className="flex items-center gap-4 w-fit">
-							<button>Log Out</button>
+							<form action={logOut}>
+								<button type="submit">Log Out</button>
+							</form>
 						</PopoverContent>
 					</Popover>
 				</div>

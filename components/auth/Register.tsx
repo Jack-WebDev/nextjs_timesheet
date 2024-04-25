@@ -1,5 +1,4 @@
-
-"use client"
+"use client";
 
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
-import {toast} from "react-toastify"
+import { toast } from "react-toastify";
 import { login } from "@/actions";
 
 const formSchema = z.object({
@@ -27,7 +26,7 @@ const formSchema = z.object({
 });
 
 export function RegisterForm() {
-	const router = useRouter()
+	const router = useRouter();
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -39,10 +38,12 @@ export function RegisterForm() {
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
 			const res = await axios.post("api/register", { ...values });
-			const user = await res.data
+			const user = await res.data;
 			await login(user);
 		} catch (error) {
-			toast.error("An error occured while registering. Please try again.")
+			toast.error(
+				"An error occured while registering. Please reload the screen and try again."
+			);
 		}
 	}
 
@@ -56,7 +57,11 @@ export function RegisterForm() {
 						<FormItem>
 							<FormLabel>Email</FormLabel>
 							<FormControl>
-								<Input placeholder="Enter your email" {...field} className="rounded-xl hover:border-primary" />
+								<Input
+									placeholder="Enter your email"
+									{...field}
+									className="rounded-xl hover:border-primary"
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -69,13 +74,19 @@ export function RegisterForm() {
 						<FormItem>
 							<FormLabel>Password</FormLabel>
 							<FormControl>
-								<Input placeholder="Enter your password" {...field} className="rounded-xl hover:border-primary"/>
+								<Input
+									placeholder="Enter your password"
+									{...field}
+									className="rounded-xl hover:border-primary"
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
 					)}
 				/>
-				<Button type="submit" className="register_btn w-full hover:bg-primary">Let's Go!</Button>
+				<Button type="submit" className="register_btn w-full hover:bg-primary">
+					Let's Go!
+				</Button>
 			</form>
 		</Form>
 	);

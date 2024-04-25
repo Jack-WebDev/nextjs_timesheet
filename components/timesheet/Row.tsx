@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 interface RowFormData {
 	project: string;
@@ -11,7 +12,6 @@ interface RowFormData {
 }
 
 const Row: React.FC = () => {
-	
 	const [formData, setFormData] = useState<RowFormData>({
 		project: "",
 		task_performed: "",
@@ -33,18 +33,15 @@ const Row: React.FC = () => {
 			);
 			setProjectNames(projectNamesArray);
 		} catch (error) {
-			console.error("Error fetching project names:", error);
-			// Handle error (e.g., show an error message)
+			toast.error(
+				"An error occured while fetching project. Please reload the screen and try again."
+			);
 		}
 	};
 
 	const calculateTotalHours = (): number => {
 		return formData.hours.reduce((total, hour) => total + hour, 0);
 	};
-
-	// const handleProjectChange = (value: string) => {
-	// 	setFormData({ ...formData, project: value });
-	// };
 
 	const handleTaskChange = (value: string) => {
 		setFormData({ ...formData, task_performed: value });
@@ -57,12 +54,10 @@ const Row: React.FC = () => {
 	};
 
 	const handleSubmit = async () => {
-		// Calculate total hours
 		const totalHours = calculateTotalHours();
 		const date = localStorage.getItem("week");
-		const fullName  = localStorage.getItem("user")
+		const fullName = localStorage.getItem("user");
 
-		// Update formData with total hours
 		const updatedFormData = {
 			fullName: fullName,
 			period: date,
@@ -75,23 +70,22 @@ const Row: React.FC = () => {
 			const res = await axios.post("http://localhost:3000/api/timesheets/", {
 				formData: updatedFormData,
 			});
-
-			console.log(res, updatedFormData);
-
-			// If successful, you may want to reset the form or show a success message
-			setFormData({
-				project: "",
-				task_performed: "",
-				hours: [0, 0, 0, 0, 0],
-				total_hours: 0,
-			});
-
-			// Optionally, fetch updated project names after submitting
-			fetchProjectNames();
+			console.log(res)
+			//TODO toast doesnt appear
+			toast.success("Timesheet has been submitted.")
 		} catch (error) {
-			console.error("Error submitting timesheet:", error);
-			// Handle error (e.g., show an error message)
+			toast.error(
+				"An error occured while submitting your timesheet. Please reload the screen and try again.."
+			);
 		}
+
+
+		setFormData({
+			project: "",
+			task_performed: "",
+			hours: [0, 0, 0, 0, 0],
+			total_hours: 0,
+		})
 	};
 
 	return (
@@ -111,7 +105,6 @@ const Row: React.FC = () => {
 						</option>
 					))}
 				</select>
-
 
 				<input
 					type="text"

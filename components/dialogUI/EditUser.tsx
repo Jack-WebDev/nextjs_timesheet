@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,7 +35,7 @@ export function EditUser({ id }: User) {
 
 	const fetchUsers = async () => {
 		const response = await axios.get<User[]>("http://localhost:3000/api/users");
-		const users = response.data
+		const users = response.data;
 	};
 
 	const handleSave = async () => {
@@ -49,17 +49,18 @@ export function EditUser({ id }: User) {
 				status,
 				role,
 			});
-			toast.success("Data has been updated.")
+			toast.success("Data has been updated.");
 		} catch (error) {
-			console.log(error);
-			toast.error("An error occured while saving data. Please try again.");
+			toast.error(
+				"An error occured while saving data. Please reload the screen and try again.."
+			);
 		}
 	};
 
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<FaEdit className="cursor-pointer"/>
+				<FaEdit className="cursor-pointer" />
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px] ">
 				<DialogHeader>
@@ -157,7 +158,11 @@ export function EditUser({ id }: User) {
 					</div>
 				</div>
 				<DialogFooter>
-					<Button type="submit" className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]" onClick={handleSave}>
+					<Button
+						type="submit"
+						className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]"
+						onClick={handleSave}
+					>
 						Save changes
 					</Button>
 				</DialogFooter>

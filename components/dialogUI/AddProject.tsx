@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaPlusCircle } from "react-icons/fa";
-import {toast} from "react-toastify"
+import { toast } from "react-toastify";
 
 type Department = {
 	id: string;
@@ -25,13 +25,12 @@ type Project = {
 	Project_Name: string;
 
 	Department: string;
-}
+};
 
 export function AddProject() {
-	const [Project_Name,setProject_Name] = useState("");
-	const [department_id, setDepartment_id] = useState("")
+	const [Project_Name, setProject_Name] = useState("");
+	const [department_id, setDepartment_id] = useState("");
 	const [departments, setDepartments] = useState<Department[]>([]);
-
 
 	useEffect(() => {
 		fetchdepartments();
@@ -39,26 +38,32 @@ export function AddProject() {
 
 	const fetchdepartments = async () => {
 		try {
-			const response = await axios.get<Department[]>("http://localhost:3000/api/departments/");
+			const response = await axios.get<Department[]>(
+				"http://localhost:3000/api/departments/"
+			);
 			setDepartments(response.data);
 		} catch (error) {
-			toast.error("An error occured while fetching departments. Please reload your page");
+			toast.error(
+				"An error occured while fetching departments. Please reload the screen and try again."
+			);
 		}
 	};
 
 	const handleSave = async () => {
 		await axios.post<Project>(`http://localhost:3000/api/projects/`, {
 			Project_Name: Project_Name,
-			Department_Id: department_id
-
+			Department_Id: department_id,
 		});
-		window.location.reload()
+		window.location.reload();
 	};
 
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-			<Button className="rounded-xl bg-[#DDA83A] text-white gap-x-4 hover:bg-[#DDA83A]"><FaPlusCircle/>Add New Project</Button>
+				<Button className="rounded-xl bg-[#DDA83A] text-white gap-x-4 hover:bg-[#DDA83A]">
+					<FaPlusCircle />
+					Add New Project
+				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
@@ -82,7 +87,12 @@ export function AddProject() {
 						<Label htmlFor="name" className="text-right">
 							Department Name
 						</Label>
-						<select name="department" className="focus:border-[#DDA83A]" value={department_id} onChange={(e) => setDepartment_id(e.target.value)}>
+						<select
+							name="department"
+							className="focus:border-[#DDA83A]"
+							value={department_id}
+							onChange={(e) => setDepartment_id(e.target.value)}
+						>
 							<option value={""}>Select Department</option>
 							{departments.map((department) => (
 								<option key={department.id} value={department.id}>
@@ -94,7 +104,11 @@ export function AddProject() {
 				</div>
 
 				<DialogFooter>
-					<Button type="submit" className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]" onClick={handleSave}>
+					<Button
+						type="submit"
+						className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]"
+						onClick={handleSave}
+					>
 						Add Project
 					</Button>
 				</DialogFooter>

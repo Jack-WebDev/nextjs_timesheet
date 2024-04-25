@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -38,14 +38,16 @@ export function EditDepartment({ id }: User) {
 			});
 			window.location.reload();
 		} catch (error) {
-			toast.error("An error occured while saving data. Please try again.");
+			toast.error(
+				"An error occured while saving data. Please reload the screen and try again.."
+			);
 		}
 	};
 
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-			<FaEdit className="cursor-pointer"/>
+				<FaEdit className="cursor-pointer" />
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
@@ -66,7 +68,11 @@ export function EditDepartment({ id }: User) {
 				</div>
 
 				<DialogFooter>
-					<Button type="submit" className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]" onClick={handleSave}>
+					<Button
+						type="submit"
+						className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]"
+						onClick={handleSave}
+					>
 						Save changes
 					</Button>
 				</DialogFooter>

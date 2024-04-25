@@ -1,5 +1,4 @@
-
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import axios from "axios";
-import {FaPlusCircle} from "react-icons/fa"
+import { FaPlusCircle } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 export function AddUser() {
 	const [name, setName] = useState("");
@@ -26,22 +26,31 @@ export function AddUser() {
 	const [department, setDepartment] = useState("");
 
 	const handleSave = async () => {
-		 await axios.post(`http://localhost:3000/api/users`, {
-			name,
-			surname,
-			email,
-			password,
-			department,
-			status,
-			role,
-		});
-		window.location.reload()
+		try {
+			await axios.post(`http://localhost:3000/api/users`, {
+				name,
+				surname,
+				email,
+				password,
+				department,
+				status,
+				role,
+			});
+			window.location.reload();
+		} catch (error) {
+			toast.error(
+				"An error oocured while saving. Please reload the screen and try again."
+			);
+		}
 	};
 
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button className="rounded-xl bg-[#DDA83A] text-white gap-x-4 hover:bg-[#DDA83A]"><FaPlusCircle/>Add New User</Button>
+				<Button className="rounded-xl bg-[#DDA83A] text-white gap-x-4 hover:bg-[#DDA83A]">
+					<FaPlusCircle />
+					Add New User
+				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
@@ -139,7 +148,11 @@ export function AddUser() {
 					</div>
 				</div>
 				<DialogFooter>
-					<Button type="submit" className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]" onClick={handleSave}>
+					<Button
+						type="submit"
+						className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]"
+						onClick={handleSave}
+					>
 						Add User
 					</Button>
 				</DialogFooter>

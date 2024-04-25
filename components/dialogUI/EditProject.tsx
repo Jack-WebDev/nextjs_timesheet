@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +21,6 @@ type User = {
 };
 
 export function EditProject({ id }: User) {
-
 	const [project, setProject] = useState("");
 
 	useEffect(() => {
@@ -35,20 +34,20 @@ export function EditProject({ id }: User) {
 	const handleSave = async () => {
 		try {
 			await axios.put(`http://localhost:3000/api/projects/${id}`, {
-				Project_Name: project
-
+				Project_Name: project,
 			});
-			window.location.reload()
+			window.location.reload();
 		} catch (error) {
-			toast.error("An error occured while saving data. Please try again.")
+			toast.error(
+				"An error occured while saving data. Please reload the screen and try again.."
+			);
 		}
-
 	};
 
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-			<FaEdit className="cursor-pointer"/>
+				<FaEdit className="cursor-pointer" />
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
@@ -68,7 +67,11 @@ export function EditProject({ id }: User) {
 					</div>
 				</div>
 				<DialogFooter>
-					<Button type="submit" className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]" onClick={handleSave}>
+					<Button
+						type="submit"
+						className="bg-[#DDA83A] text-white rounded-xl hover:bg-[#DDA83A]"
+						onClick={handleSave}
+					>
 						Save changes
 					</Button>
 				</DialogFooter>

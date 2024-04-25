@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { EditDepartment } from "../dialogUI/EditDepartment";
 import { AddDepartment } from "../dialogUI/AddDepartment";
 import { FaTrashAlt } from "react-icons/fa";
-import {toast} from "react-toastify"
+import { toast } from "react-toastify";
 
 type Department = {
 	id: string;
 	Department_Name: string;
-	projects: string[]
+	projects: string[];
 };
 
 const departmentTable: React.FC = () => {
@@ -20,23 +20,26 @@ const departmentTable: React.FC = () => {
 	);
 	const [filter, setFilter] = useState<string>("");
 
-
 	useEffect(() => {
 		fetchDepartments();
 	}, []);
 
 	const fetchDepartments = async () => {
 		try {
-			const response = await axios.get<Department[]>("http://localhost:3000/api/departments");
+			const response = await axios.get<Department[]>(
+				"http://localhost:3000/api/departments"
+			);
 			setdepartments(response.data);
 			setfilteredDepartments(response.data);
 		} catch (error) {
-			toast.error("An error occured while fetching departments. Please try again.");
+			toast.error(
+				"An error occured while fetching departments. Please reload the screen and try again.."
+			);
 		}
 	};
 
 	const handleDelete = async (id: any) => {
-		 await axios.delete(`http://localhost:3000/api/departments/${id}`);
+		await axios.delete(`http://localhost:3000/api/departments/${id}`);
 		fetchDepartments();
 	};
 
@@ -60,7 +63,6 @@ const departmentTable: React.FC = () => {
 					onChange={handleFilterChange}
 				/>
 				<AddDepartment />
-
 			</div>
 			<table className="w-full">
 				<thead className="relative -top-4">
@@ -78,7 +80,10 @@ const departmentTable: React.FC = () => {
 							<td>{department.projects.length}</td>
 							<td className="flex items-center justify-center gap-4">
 								<EditDepartment id={department.id} />
-								<FaTrashAlt className="cursor-pointer" onClick={() => handleDelete(department.id)}/>
+								<FaTrashAlt
+									className="cursor-pointer"
+									onClick={() => handleDelete(department.id)}
+								/>
 							</td>
 						</tr>
 					))}

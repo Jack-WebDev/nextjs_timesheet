@@ -15,7 +15,6 @@ import {
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { toast } from "react-toastify";
 import { login } from "@/actions";
 
@@ -42,9 +41,8 @@ export function LoginForm() {
 		try {
 			const res = await axios.post("api/login", values);
 			const userData = await res.data;
-			console.log(userData)
-			const fullName = `${userData.Name} ${userData.Surname}`
-			localStorage.setItem("user",fullName)
+			const fullName = `${userData.Name} ${userData.Surname}`;
+			localStorage.setItem("user", fullName);
 
 			await login(userData);
 
@@ -52,13 +50,14 @@ export function LoginForm() {
 
 			// console.log(surname,success, role, name, token);
 
-
 			// if (success) {
 			// 	setAuthenticated(true);
 			// 	setRole(role);
 			// }
 		} catch (error) {
-			toast.error("An error occured. Please try again");
+			toast.error(
+				"An error occured while logging in. Please reload the screen and try again."
+			);
 		}
 	}
 	// if (authenticated) {
