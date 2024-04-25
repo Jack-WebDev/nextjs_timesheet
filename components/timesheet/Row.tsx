@@ -70,6 +70,7 @@ const Row: React.FC = () => {
 			const res = await axios.post("http://localhost:3000/api/timesheets/", {
 				formData: updatedFormData,
 			});
+			localStorage.clear()
 			console.log(res)
 			//TODO toast doesnt appear
 			toast.success("Timesheet has been submitted.")

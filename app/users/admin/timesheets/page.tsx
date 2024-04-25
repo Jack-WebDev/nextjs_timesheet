@@ -35,7 +35,7 @@ const Timesheets = () => {
 	useEffect(() => {
 		const fetchTimesheets = async () => {
 			try {
-				const response = await axios.get("api/timesheets");
+				const response = await axios.get("http://localhost:3000/api/timesheets");
 
 				setTimesheets(response.data);
 			} catch (error) {
@@ -48,11 +48,14 @@ const Timesheets = () => {
 
 	const handleApprove = async (id: string, approval: string) => {
 		try {
-			await axios.put(`api/timesheets/${id}`, {
-				approval,
+			const res = await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
+				Approval_Status: approval,
 			});
+			console.log(res)
+			localStorage.clear()
 			window.location.reload();
 		} catch (error) {
+			console.log(error)
 			toast.error(
 				"An error occured while Approving timesheet. Please try again."
 			);
@@ -61,11 +64,13 @@ const Timesheets = () => {
 
 	const handleReject = async (id: string, approval: string) => {
 		try {
-			await axios.put(`api/timesheets/${id}`, {
-				approval,
+			const res = await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
+				Approval_Status: approval,
 			});
+			console.log(res)
 			window.location.reload();
 		} catch (error) {
+			console.log(error)
 			toast.error(
 				"An error occured while Rejecting timesheet. Please try again."
 			);
@@ -75,10 +80,10 @@ const Timesheets = () => {
 	return (
 		<div>
 
-			<div className="timesheets-container w-1/2 mx-auto flex justify-center flex-wrap gap-x-20 gap-y-8">
+			<div className="timesheets-container mx-auto grid grid-cols-3 gap-x-20 gap-y-8">
 				{timesheets.map((timesheet, index) => (
 					<div
-						className="card__container h-fit border border-black rounded-xl p-4"
+						className="card__container h-fit bg-white border-2 border-primary rounded-xl p-4"
 						key={timesheet.id}
 					>
 						<>
@@ -113,7 +118,7 @@ const Timesheets = () => {
 								<button
 									type="button"
 									onClick={() => toggleShowMore(index)}
-									className="text-blue-500"
+									className="text-secondary font-medium"
 								>
 									{expandedStates[index] ? "Show less" : "Show more"}
 								</button>

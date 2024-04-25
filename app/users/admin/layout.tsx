@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/popover";
 import { FaChevronDown } from "react-icons/fa";
 import NavMenu from "@/components/NavMenu";
+import Image from "next/image";
 
 export default async function DashboardLayout({
 	children,
@@ -21,7 +22,7 @@ export default async function DashboardLayout({
 				<div className="profile flex items-center gap-x-3">
 					<Popover>
 						<PopoverTrigger className="flex items-center gap-4 text-[#d69436]">
-							{session.Name} <FaChevronDown />
+							{name} <FaChevronDown />
 						</PopoverTrigger>
 						<PopoverContent className="flex items-center gap-4 w-fit border-2 border-primary rounded-xl">
 							<form action={logOut}>
@@ -35,7 +36,10 @@ export default async function DashboardLayout({
 			<div className="content flex flex-1">
 				<NavMenu />
 
-				<div className="main__content flex-1 m-12">{children}</div>
+				<div className="main__content flex-1 m-12">
+					<Image src={"/ndt-technologies-web-logo.svg"} alt="" width={100} height={100} className="background__image"/>
+					{children}
+					</div>
 			</div>
 		</div>
 	);

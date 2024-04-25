@@ -30,6 +30,8 @@ export async function PUT(
 		const { Approval_Status } = await res;
 		const id = params.id;
 
+		console.log(Approval_Status)
+
 		const timesheetData = await db.timesheet.update({
 			where: {
 				id: id,

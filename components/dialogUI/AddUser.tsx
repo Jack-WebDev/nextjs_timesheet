@@ -36,6 +36,8 @@ export function AddUser() {
 				status,
 				role,
 			});
+			localStorage.clear();
+
 			window.location.reload();
 		} catch (error) {
 			toast.error(

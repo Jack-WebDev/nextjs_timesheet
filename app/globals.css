@@ -128,3 +128,13 @@ select {
 }
 
 
+.background__image {
+    color: transparent;
+    width: 50%;
+    position: absolute;
+    top: 15%;
+    left: 37%;
+    z-index: -4;
+    filter: opacity(0.2);
+}
+

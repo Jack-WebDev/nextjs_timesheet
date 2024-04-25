@@ -62,7 +62,7 @@ const UserTable: React.FC = () => {
 	};
 
 	return (
-		<div className="w-1/2 mx-auto mt-12 border border-black p-8 rounded-2xl ">
+		<div className="w-1/2 mx-auto mt-12 border-2 bg-white broder-2 border-primary p-8 rounded-2xl ">
 			<div className="flex items-center justify-between mb-12">
 				<input
 					type="text"

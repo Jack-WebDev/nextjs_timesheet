@@ -52,7 +52,7 @@ const ProjectTable: React.FC = () => {
 	};
 
 	return (
-		<div className="w-1/2 mx-auto mt-12 border border-black p-8 rounded-2xl ">
+		<div className="w-1/2 mx-auto mt-12 bg-white border-2 border-primary p-8 rounded-2xl ">
 			<div className="flex items-center justify-between mb-12">
 				<input
 					type="text"
