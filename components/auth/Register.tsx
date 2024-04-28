@@ -39,7 +39,6 @@ export function RegisterForm() {
 		try {
 			const res = await axios.post("api/register", { ...values });
 			const user = await res.data;
-			console.log(user);
 			await login(user);
 		} catch (error) {
 			toast.error(
@@ -86,7 +85,7 @@ export function RegisterForm() {
 					)}
 				/>
 				<Button type="submit" className="register_btn w-full hover:bg-primary">
-					Let's Go!
+					Let&apos;s Go!
 				</Button>
 			</form>
 		</Form>

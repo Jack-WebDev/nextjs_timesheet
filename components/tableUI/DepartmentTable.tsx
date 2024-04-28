@@ -13,7 +13,7 @@ type Department = {
 	projects: string[];
 };
 
-const departmentTable: React.FC = () => {
+const DepartmentTable: React.FC = () => {
 	const [departments, setdepartments] = useState<Department[]>([]);
 	const [filteredDepartments, setfilteredDepartments] = useState<Department[]>(
 		[]
@@ -100,4 +100,4 @@ const departmentTable: React.FC = () => {
 	);
 };
 
-export default departmentTable;
+export default DepartmentTable;

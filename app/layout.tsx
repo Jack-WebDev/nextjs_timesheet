@@ -25,7 +25,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" className={roboto.className}>
 			<body>
-				<ToastContainer autoClose={500} />
+				<ToastContainer autoClose={1000} />
 				{children}
 			</body>
 		</html>

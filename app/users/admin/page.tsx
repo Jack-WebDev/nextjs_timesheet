@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FaBuilding, FaCalendar, FaTasks, FaUsers } from "react-icons/fa";
 import axios from "axios";
 
-export default function page() {
+export default function Dashboard() {
 	const [totalUsers, setTotalUsers] = useState<number>(0);
 	const [totalProjects, setTotalProjects] = useState<number>(0);
 	const [totalDepartments, setTotalDepartments] = useState<number>(0);

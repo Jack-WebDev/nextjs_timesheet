@@ -7,10 +7,11 @@ import {
 } from "@/components/ui/popover";
 import { FaChevronDown } from "react-icons/fa";
 import DateRangeSelector from "@/components/timesheet/DatePicker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "@/components/timesheet/Card";
 import { format } from "date-fns";
 import { logOut } from "@/actions";
+import Image from "next/image";
 
 type Timesheet = {
 	Friday: string;
@@ -34,8 +35,15 @@ const Timesheet = () => {
 	const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(
 		new Date()
 	);
+    const [name, setName] = useState<string | null>(null);
 
-	const name = localStorage.getItem("user");
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const storedName = localStorage.getItem("user");
+            setName(storedName);
+        }
+    }, []); 
+
 
 	const formatDateToString = (date: Date | null): string => {
 		return date ? format(date, "yyyy-MM-dd") : "";
@@ -47,13 +55,17 @@ const Timesheet = () => {
 
 		const date = `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
 
-		localStorage.setItem("week", date);
+		if (typeof localStorage !== "undefined") {
+			localStorage.setItem("week", date);
+		} else {
+			console.error("localStorage is not available.");
+		}
 	};
 
 	return (
 		<div>
 			<header className="flex justify-between items-center py-4 ml-[10rem] mr-[10rem]">
-				<img src="/ndt-technologies-web-logo.svg" alt="" className="w-[7%]" />
+				<Image src={"/ndt-technologies-web-logo.svg"} alt="" width={50} height={50}/>
 				<div className="profile flex items-center gap-x-3">
 					<Popover>
 						<PopoverTrigger className="flex items-center gap-4 text-primary font-semibold">
