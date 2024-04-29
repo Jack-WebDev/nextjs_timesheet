@@ -70,7 +70,7 @@ const Row: React.FC = () => {
 			const res = await axios.post("http://localhost:3000/api/timesheets/", {
 				formData: updatedFormData,
 			});
-			localStorage.clear();
+			// localStorage.clear();
 			toast.success("Timesheet has been submitted.");
 		} catch (error) {
 			toast.error(
