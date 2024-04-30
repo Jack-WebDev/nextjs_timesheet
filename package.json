@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "vercel-build":"npx prisma generate && npx prisma migrate deploy && next build",
     "postinstall": "npx prisma generate",
     "build": "next build",
     "start": "next start",
@@ -18,6 +19,7 @@
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.4",
+    "@vercel/postgres": "^0.8.0",
     "axios": "^1.6.8",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
