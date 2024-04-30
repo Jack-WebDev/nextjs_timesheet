@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import projects from "@/database/projects.json";
 
 interface RowFormData {
 	project: string;
@@ -19,25 +20,27 @@ const Row: React.FC = () => {
 		total_hours: 0,
 	});
 
-	const [projectNames, setProjectNames] = useState<string[]>([]);
+	const [project, setProject] = useState<string>("");
 
-	useEffect(() => {
-		fetchProjectNames();
-	}, []);
+	// const [projectNames, setProjectNames] = useState<string[]>([]);
 
-	const fetchProjectNames = async () => {
-		try {
-			const response = await axios.get("http://localhost:3000/api/projects");
-			const projectNamesArray = response.data.map(
-				(project: { Project_Name: string }) => project.Project_Name
-			);
-			setProjectNames(projectNamesArray);
-		} catch (error) {
-			toast.error(
-				"An error occured while fetching project. Please reload the screen and try again."
-			);
-		}
-	};
+	// useEffect(() => {
+	// 	fetchProjectNames();
+	// }, []);
+
+	// const fetchProjectNames = async () => {
+	// 	try {
+	// 		const response = await axios.get("http://localhost:3000/api/projects");
+	// 		const projectNamesArray = response.data.map(
+	// 			(project: { Project_Name: string }) => project.Project_Name
+	// 		);
+	// 		setProjectNames(projectNamesArray);
+	// 	} catch (error) {
+	// 		toast.error(
+	// 			"An error occured while fetching project. Please reload the screen and try again."
+	// 		);
+	// 	}
+	// };
 
 	const calculateTotalHours = (): number => {
 		return formData.hours.reduce((total, hour) => total + hour, 0);
@@ -54,30 +57,32 @@ const Row: React.FC = () => {
 	};
 
 	const handleSubmit = async () => {
-		const totalHours = calculateTotalHours();
-		const date = localStorage.getItem("week");
-		const fullName = localStorage.getItem("user");
+		// const totalHours = calculateTotalHours();
+		// const date = localStorage.getItem("week");
+		// const fullName = localStorage.getItem("user");
 
-		const updatedFormData = {
-			fullName: fullName,
-			period: date,
-			...formData,
-			hours: [...formData.hours],
-			total_hours: totalHours,
-		};
+		// const updatedFormData = {
+		// 	fullName: fullName,
+		// 	period: date,
+		// 	...formData,
+		// 	hours: [...formData.hours],
+		// 	total_hours: totalHours,
+		// };
 
-		try {
-			const res = await axios.post("http://localhost:3000/api/timesheets/", {
-				formData: updatedFormData,
-			});
-			// localStorage.clear();
-			toast.success("Timesheet has been submitted.");
-		} catch (error) {
-			toast.error(
-				"An error occured while submitting your timesheet. Please reload the screen and try again.."
-			);
-		}
+		// try {
+		// 	const res = await axios.post("http://localhost:3000/api/timesheets/", {
+		// 		formData: updatedFormData,
+		// 	});
+		// 	// localStorage.clear();
+		// 	toast.success("Timesheet has been submitted.");
+		// } catch (error) {
+		// 	toast.error(
+		// 		"An error occured while submitting your timesheet. Please reload the screen and try again.."
+		// 	);
+		// }
+		toast.success("Timesheet has been submitted");
 
+		setProject("");
 		setFormData({
 			project: "",
 			task_performed: "",
@@ -89,7 +94,7 @@ const Row: React.FC = () => {
 	return (
 		<>
 			<div className="row-form flex items-center justify-around my-4">
-				<select
+				{/* <select
 					className="project_dropdown"
 					value={formData.project}
 					onChange={(e) =>
@@ -100,6 +105,19 @@ const Row: React.FC = () => {
 					{projectNames.map((projectName, index) => (
 						<option key={index} value={projectName}>
 							{projectName}
+						</option>
+					))}
+				</select> */}
+
+				<select
+					className="project_dropdown"
+					value={project}
+					onChange={(e) => setProject(e.target.value)}
+				>
+					<option value="">Select Project</option>
+					{projects.map((project: { Project_Name: string }) => (
+						<option key={project.Project_Name} value={project.Project_Name}>
+							{project.Project_Name}
 						</option>
 					))}
 				</select>
