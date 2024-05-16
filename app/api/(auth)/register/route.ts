@@ -3,23 +3,23 @@ import db from "@/database/index";
 import { hashPassword } from "@/lib/auth";
 
 export async function POST(req: NextRequest, res: NextResponse) {
-	try {
-		const data = await req.json();
-		const { email, password } = await data;
+  try {
+    const data = await req.json();
+    const { email, password } = await data;
 
-		const hashedPassword = await hashPassword(password, 10);
+    const hashedPassword = await hashPassword(password, 10);
 
-		const user = await db.user.update({
-			where: {
-				Email: email,
-			},
-			data: {
-				Password: hashedPassword,
-			},
-		});
+    const user = await db.user.update({
+      where: {
+        Email: email,
+      },
+      data: {
+        Password: hashedPassword,
+      },
+    });
 
-		return NextResponse.json({ message: user }, { status: 201 });
-	} catch (error) {
-		return NextResponse.json({ error: error }, { status: 500 });
-	}
+    return NextResponse.json({ message: user }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({ error: error }, { status: 500 });
+  }
 }

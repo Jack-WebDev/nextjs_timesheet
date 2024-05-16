@@ -5,7 +5,8 @@ CREATE TABLE "User" (
     "Surname" TEXT NOT NULL,
     "Email" TEXT NOT NULL,
     "Password" TEXT,
-    "Department" TEXT NOT NULL,
+    "departmentId" TEXT,
+    "departmentName" TEXT,
     "Status" TEXT NOT NULL,
     "Role" TEXT NOT NULL DEFAULT 'Employee',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -18,8 +19,19 @@ CREATE TABLE "Project" (
     "id" TEXT NOT NULL,
     "Project_Name" TEXT NOT NULL,
     "Department_Id" TEXT,
+    "departmentName" TEXT,
+    "userId" TEXT,
 
     CONSTRAINT "Project_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "UserProject" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
+
+    CONSTRAINT "UserProject_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -60,4 +72,13 @@ CREATE UNIQUE INDEX "Project_Project_Name_key" ON "Project"("Project_Name");
 CREATE UNIQUE INDEX "Department_Department_Name_key" ON "Department"("Department_Name");
 
 -- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_departmentId_fkey" FOREIGN KEY ("departmentId") REFERENCES "Department"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Project" ADD CONSTRAINT "Project_Department_Id_fkey" FOREIGN KEY ("Department_Id") REFERENCES "Department"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserProject" ADD CONSTRAINT "UserProject_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserProject" ADD CONSTRAINT "UserProject_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

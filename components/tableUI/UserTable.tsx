@@ -15,7 +15,7 @@ type User = {
 	Surname: string;
 	Email: string;
 	Password: string;
-	Department: string;
+	departmentName: string;
 	Status: string;
 	Role: string;
 };
@@ -37,6 +37,7 @@ const UserTable: React.FC = () => {
 			const users = response.data;
 			setUsers(users);
 			setFilteredUsers(users);
+			console.log(users)
 		} catch (error) {
 			toast.error(
 				"An error occured while fetching users. Please reload the screen and try again."
@@ -62,7 +63,7 @@ const UserTable: React.FC = () => {
 		const filtered = users.filter(
 			(user) =>
 				user.Name.toLowerCase().includes(searchTerm) ||
-				user.Department.toLowerCase().includes(searchTerm) ||
+				user.departmentName.toLowerCase().includes(searchTerm) ||
 				user.Status.toLowerCase().includes(searchTerm)
 		);
 		setFilteredUsers(filtered);
@@ -98,7 +99,7 @@ const UserTable: React.FC = () => {
 							<td>{user.Name}</td>
 							<td>{user.Surname}</td>
 							<td>{user.Email}</td>
-							<td>{user.Department}</td>
+							<td>{user.departmentName}</td>
 							<td>{user.Status}</td>
 							<td>{user.Role}</td>
 							<td className="flex items-center justify-center gap-4">

@@ -9,7 +9,9 @@ import {
 	FaCalendarCheck,
 	FaTasks,
 	FaUsers,
+	FaWhatsapp,
 } from "react-icons/fa";
+import {FaBookmark, FaGear} from "react-icons/fa6"
 
 function NavMenu() {
 	const pathname = usePathname();
@@ -63,13 +65,31 @@ function NavMenu() {
 						Projects
 					</Link>
 					<Link
-						href={"/users/admin/timesheets"}
+						href={"/users/tasks"}
 						className={`link flex items-center gap-x-2 ${
-							pathname === "/users/admin/timesheets" ? "active" : ""
+							pathname === "/users/tasks" ? "active" : ""
 						}`}
 					>
 						<FaTasks />
-						Timesheets
+						Tasks
+					</Link>
+					<Link
+						href={"/users/bookings"}
+						className={`link flex items-center gap-x-2 ${
+							pathname === "/users/bookings" ? "active" : ""
+						}`}
+					>
+						<FaBookmark />
+						Bookings
+					</Link>
+					<Link
+						href={"/users/settings"}
+						className={`link flex items-center gap-x-2 ${
+							pathname === "/users/settings" ? "active" : ""
+						}`}
+					>
+						<FaGear />
+						Settings
 					</Link>
 				</ul>
 			</div>

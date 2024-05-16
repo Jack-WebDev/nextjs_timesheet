@@ -12,15 +12,19 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  Name       String
-  Surname    String
-  Email      String   @unique
-  Password   String?
-  Department String
-  Status     String
-  Role       String   @default("Employee")
-  createdAt  DateTime @default(now())
+  id            String      @id @default(uuid())
+  Name          String
+  Surname       String
+  Email         String      @unique
+  Password      String?
+  departmentId  String?
+  department    Department? @relation(fields: [departmentId], references: [id])
+    departmentName String?    // Direct field for department name
+
+  Status        String
+  Role          String      @default("Employee")
+  createdAt     DateTime    @default(now())
+  projects      UserProject[]
 }
 
 model Project {
@@ -28,12 +32,25 @@ model Project {
   Project_Name  String      @unique
   Department_Id String?
   department    Department? @relation(fields: [Department_Id], references: [id])
+    departmentName String?    // Direct field for department name
+
+  userId        String?
+  assignedUsers   UserProject[]   
+}
+
+model UserProject {
+  id        String   @id @default(uuid())
+  userId    String
+  projectId String
+  user      User     @relation(fields: [userId], references: [id])
+  project   Project  @relation(fields: [projectId], references: [id])
 }
 
 model Department {
   id              String    @id @default(uuid())
   Department_Name String    @unique
   projects        Project[]
+  users           User[]
 }
 
 model Timesheet {

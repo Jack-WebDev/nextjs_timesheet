@@ -57,29 +57,29 @@ const Row: React.FC = () => {
 	};
 
 	const handleSubmit = async () => {
-		// const totalHours = calculateTotalHours();
-		// const date = localStorage.getItem("week");
-		// const fullName = localStorage.getItem("user");
+		const totalHours = calculateTotalHours();
+		const date = localStorage.getItem("week");
+		const fullName = localStorage.getItem("user");
 
-		// const updatedFormData = {
-		// 	fullName: fullName,
-		// 	period: date,
-		// 	...formData,
-		// 	hours: [...formData.hours],
-		// 	total_hours: totalHours,
-		// };
+		const updatedFormData = {
+			fullName: fullName,
+			period: date,
+			...formData,
+			hours: [...formData.hours],
+			total_hours: totalHours,
+		};
 
-		// try {
-		// 	const res = await axios.post("http://localhost:3000/api/timesheets/", {
-		// 		formData: updatedFormData,
-		// 	});
-		// 	// localStorage.clear();
-		// 	toast.success("Timesheet has been submitted.");
-		// } catch (error) {
-		// 	toast.error(
-		// 		"An error occured while submitting your timesheet. Please reload the screen and try again.."
-		// 	);
-		// }
+		try {
+			const res = await axios.post("http://localhost:3000/api/timesheets/", {
+				formData: updatedFormData,
+			});
+			// localStorage.clear();
+			toast.success("Timesheet has been submitted.");
+		} catch (error) {
+			toast.error(
+				"An error occured while submitting your timesheet. Please reload the screen and try again.."
+			);
+		}
 		toast.success("Timesheet has been submitted");
 
 		setProject("");

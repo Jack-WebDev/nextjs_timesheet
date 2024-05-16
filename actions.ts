@@ -35,7 +35,6 @@ export const login = async (userData: User) => {
 	session.success = true;
 
 	if (userData.Role === "Admin") {
-		session.isAdmin = true;
 		await session.save();
 		redirect("/users/admin");
 	} else {
