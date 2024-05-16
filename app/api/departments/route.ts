@@ -12,6 +12,11 @@ export async function GET() {
 						id: true,
 					},
 				},
+				users: {
+					select: {
+						id:true
+					}
+				}
 			},
 		});
 

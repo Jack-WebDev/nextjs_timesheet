@@ -32,9 +32,7 @@ model Project {
   Project_Name  String      @unique
   Department_Id String?
   department    Department? @relation(fields: [Department_Id], references: [id])
-    departmentName String?    // Direct field for department name
 
-  userId        String?
   assignedUsers   UserProject[]   
 }
 
