@@ -19,18 +19,31 @@ import { toast } from "react-toastify";
 type Department = {
 	id: string;
 	Department_Name: string;
+	users: [];
 };
 
 type Project = {
 	Project_Name: string;
-
-	Department: string;
+	Department_Id: string;
+	departmentName: string;
+	user_id: string;
 };
+
+type User = {
+	id: string,
+	Email: string
+}
+
+
 
 export function AddProject() {
 	const [Project_Name, setProject_Name] = useState("");
 	const [department_id, setDepartment_id] = useState("");
+	const [user_id,setUser_id] = useState("")
+	const [selectedDepartment, setSelectedDepartment] = useState<string>('');
 	const [departments, setDepartments] = useState<Department[]>([]);
+	const [users, setUsers] = useState<User[][]>([]);
+
 
 	useEffect(() => {
 		fetchdepartments();
@@ -49,11 +62,40 @@ export function AddProject() {
 		}
 	};
 
+	const handleDepartmentChange = async (event: React.ChangeEvent<{ value: unknown }>) => {
+		const departmentId = event.target.value as string;
+		setSelectedDepartment(departmentId);
+		const department = departments.find((dept) => dept.id === departmentId);
+		if (department) {
+		  const userDetailsPromises = department.users.map(async ({id}) => {
+			const response = await fetch(`/api/users/${id}`);
+			if (response.ok) {
+			  return await response.json();
+			} else {
+			  console.error(`Failed to fetch user with ID ${id}`);
+			  return null;
+			}
+		  });
+		  
+		  const userDetails = await Promise.all(userDetailsPromises);
+		  const filteredUserDetails = userDetails.filter((userDetail) => userDetail !== null);
+
+		setUsers(filteredUserDetails)
+
+		}
+	  };
+	  
+
+
 	const handleSave = async () => {
+		console.log(user_id)
 		await axios.post<Project>(`http://localhost:3000/api/projects/`, {
 			Project_Name: Project_Name,
-			Department_Id: department_id,
+			Department_Id: selectedDepartment,
+			user_id: user_id,
+
 		});
+		
 		window.location.reload();
 	};
 
@@ -90,8 +132,8 @@ export function AddProject() {
 						<select
 							name="department"
 							className="focus:border-primary"
-							value={department_id}
-							onChange={(e) => setDepartment_id(e.target.value)}
+							value={selectedDepartment}
+							onChange={handleDepartmentChange}
 						>
 							<option value={""}>Select Department</option>
 							{departments.map((department) => (
@@ -102,6 +144,36 @@ export function AddProject() {
 						</select>
 					</div>
 				</div>
+
+				<div className="grid gap-4 py-4">
+					<div className="grid grid-cols-4 items-center gap-4">
+						<Label htmlFor="name" className="text-right">
+							Add Employee
+						</Label>
+						<select
+							name="user"
+							className="focus:border-primary"
+							value={user_id}
+							onChange={(e) => setUser_id(e.target.value)}
+						>
+							<option value={""}>Select Employee</option>
+								{users.map((user,index) => (
+									<optgroup key={index}>
+										{user.map((j,i) => (
+											<option key={i} value={j.id}>
+												{j.Email}
+											</option>
+										))}
+									</optgroup>
+								))}
+							
+							
+						</select>
+	
+					</div>
+
+				</div>
+
 
 				<DialogFooter>
 					<Button

@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
 				Surname: surname,
 				Email: email,
 				Password: password,
-				Department: department,
 				Status: status,
 				Role: role,
 			},

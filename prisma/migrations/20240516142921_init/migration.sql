@@ -19,8 +19,6 @@ CREATE TABLE "Project" (
     "id" TEXT NOT NULL,
     "Project_Name" TEXT NOT NULL,
     "Department_Id" TEXT,
-    "departmentName" TEXT,
-    "userId" TEXT,
 
     CONSTRAINT "Project_pkey" PRIMARY KEY ("id")
 );
