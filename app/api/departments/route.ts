@@ -14,7 +14,7 @@ export async function GET() {
 				},
 				users: {
 					select: {
-						id:true
+						
 					}
 				}
 			},
