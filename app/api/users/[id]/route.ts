@@ -10,6 +10,7 @@ export async function GET(
 		const user = await db.user.findMany({
 			where: {
 				id: params.id,
+				
 			},
 		});
 

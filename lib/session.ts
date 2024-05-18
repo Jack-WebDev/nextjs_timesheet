@@ -16,6 +16,7 @@ export const defaultSession: SessionProp = {
 	Name: "",
 	success: false,
 	isAdmin: true,
+	Email: ""
 };
 
 export const sessionOptions: SessionOptions = {
