@@ -18,7 +18,7 @@ const ProjectCard: React.FC = () => {
 		<div className="project-card mt-12 border-2 border-primary m-auto p-4 rounded-xl">
 			<div className="flex items-center justify-around">
 				<div>Project</div>
-				<div>Task</div>
+				{/* <div>Task</div> */}
 				{["Mon", "Tue", "Wed", "Thu", "Fri"].map((day, index) => (
 					<div key={index}>{day}</div>
 				))}

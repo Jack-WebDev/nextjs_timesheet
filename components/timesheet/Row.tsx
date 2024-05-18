@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import projects from "@/database/projects.json";
+import { Textarea } from "../ui/textarea";
 
 interface RowFormData {
 	project: string;
@@ -109,8 +110,12 @@ const Row: React.FC = () => {
 					))}
 				</select> */}
 
+				<div className="grid gap-y-4">
+
+
 				<select
-					className="project_dropdown"
+				
+					className="project_dropdown w-full"
 					value={project}
 					onChange={(e) => setProject(e.target.value)}
 				>
@@ -122,14 +127,19 @@ const Row: React.FC = () => {
 					))}
 				</select>
 
-				<input
+					<Textarea 					value={formData.task_performed}
+					onChange={(e) => handleTaskChange(e.target.value)}
+					placeholder="Task Performed..."
+					required/>
+				{/* <input
 					type="text"
 					className="task_input border border-black mx-4 px-4"
 					value={formData.task_performed}
 					onChange={(e) => handleTaskChange(e.target.value)}
 					placeholder="Task Performed..."
 					required
-				/>
+				/> */}
+				</div>
 
 				<div className="days">
 					{["Mon", "Tue", "Wed", "Thu", "Fri"].map((_day, index) => (
