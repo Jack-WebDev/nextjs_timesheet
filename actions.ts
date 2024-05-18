@@ -6,49 +6,50 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export const getSession = async () => {
-	const session = await getIronSession<SessionProp>(cookies(), sessionOptions);
+  const session = await getIronSession<SessionProp>(cookies(), sessionOptions);
 
-	if (!session.success) {
-		session.Name = defaultSession.Name;
-	}
+  if (!session.success) {
+    session.Name = defaultSession.Name;
+  }
 
-	return session;
+  return session;
 };
 
 type User = {
-	[x: string]: any;
-	Department?: string;
-	Email?: string;
-	Name?: string;
-	Password?: string;
-	Role?: string;
-	Status?: string;
-	Surname?: string;
+  [x: string]: any;
+  Department?: string;
+  Email?: string;
+  Name?: string;
+  Password?: string;
+  Role?: string;
+  Status?: string;
+  Surname?: string;
 };
 
 export const login = async (userData: User) => {
-	const session = await getSession();
+  const session = await getSession();
 
-	const fullName = `${userData.Name} ${userData.Surname}`;
+  const fullName = `${userData.Name} ${userData.Surname}`;
 
-	session.Name = fullName;
-	session.success = true;
+  session.Name = fullName;
+  session.success = true;
+  session.Email = userData.Email;
 
-	if (userData.Role === "Admin") {
-		await session.save();
-		redirect("/users/admin");
-	} else {
-		session.isAdmin = false;
-		await session.save();
-		redirect("/users/employee");
-	}
+  if (userData.Role === "Admin") {
+    await session.save();
+    redirect("/users/admin");
+  } else {
+    session.isAdmin = false;
+    await session.save();
+    redirect("/users/employee");
+  }
 };
 
 export const logOut = async () => {
-	const session = await getSession();
-	cookies().delete("jwtToken");
+  const session = await getSession();
+  cookies().delete("jwtToken");
 
-	session.destroy();
+  session.destroy();
 
-	redirect("/");
+  redirect("/");
 };

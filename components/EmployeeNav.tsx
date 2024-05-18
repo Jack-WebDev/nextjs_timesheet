@@ -7,7 +7,7 @@ import {
   FaAlignCenter,
   FaCalendarCheck,
   FaTasks,
-  FaClock
+  FaClock,
 } from "react-icons/fa";
 import { FaBookmark, FaGear } from "react-icons/fa6";
 
@@ -46,36 +46,39 @@ function EmployeeNavMenu() {
             Projects
           </Link>
           <Link
-            href={"/users/tasks"}
+            href={"/users/employee/Tasks"}
             className={`link flex items-center gap-x-2 ${
-              pathname === "/users/tasks" ? "active" : ""
+              pathname === "/users/employee/Tasks" ? "active" : ""
             }`}
           >
             <FaTasks />
             Tasks
           </Link>
+
           <Link
-            href={"/users/bookings"}
+            href={"/users/employee/Bookings"}
             className={`link flex items-center gap-x-2 ${
-              pathname === "/users/bookings" ? "active" : ""
+              pathname === "/users/employee/Bookings" ? "active" : ""
             }`}
           >
             <FaBookmark />
             Bookings
           </Link>
+
           <Link
-            href={"/users/timesheets"}
+            href={"/users/employee/timesheet"}
             className={`link flex items-center gap-x-2 ${
-              pathname === "/users/timesheets" ? "active" : ""
+              pathname === "/users/employee/timesheet" ? "active" : ""
             }`}
           >
             <FaClock />
             Timesheets
           </Link>
+
           <Link
-            href={"/users/settings"}
+            href={"/users/employee/settings"}
             className={`link flex items-center gap-x-2 ${
-              pathname === "/users/settings" ? "active" : ""
+              pathname === "/users/employee/settings" ? "active" : ""
             }`}
           >
             <FaGear />
