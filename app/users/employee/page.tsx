@@ -75,7 +75,7 @@ const Timesheet = () => {
 
 	return (
 		<div>
-			<header className="flex justify-between items-center py-4 ml-[10rem] mr-[10rem]">
+			{/* <header className="flex justify-between items-center py-4 ml-[10rem] mr-[10rem]">
 				<Image
 					src={"/ndt-technologies-web-logo.svg"}
 					alt=""
@@ -95,7 +95,7 @@ const Timesheet = () => {
 					</Popover>
 				</div>
 			</header>
-			<hr />
+			<hr /> */}
 			
 			<>
 			<Dialog defaultOpen>

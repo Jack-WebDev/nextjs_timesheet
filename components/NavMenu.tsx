@@ -9,7 +9,6 @@ import {
 	FaCalendarCheck,
 	FaTasks,
 	FaUsers,
-	FaWhatsapp,
 } from "react-icons/fa";
 import {FaBookmark, FaGear} from "react-icons/fa6"
 
@@ -81,6 +80,15 @@ function NavMenu() {
 					>
 						<FaBookmark />
 						Bookings
+					</Link>
+					<Link
+						href={"/users/admin/timesheets"}
+						className={`link flex items-center gap-x-2 ${
+							pathname === "/users/admin/timesheets" ? "active" : ""
+						}`}
+					>
+						<FaBookmark />
+						Timesheets
 					</Link>
 					<Link
 						href={"/users/settings"}
