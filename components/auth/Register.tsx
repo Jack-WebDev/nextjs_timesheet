@@ -70,6 +70,7 @@ export function RegisterForm() {
 				<FormField
 					control={form.control}
 					name="password"
+					
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Password</FormLabel>

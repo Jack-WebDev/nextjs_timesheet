@@ -7,6 +7,7 @@ import {
 	FaAlignCenter,
 	FaBuilding,
 	FaCalendarCheck,
+	FaClock,
 	FaTasks,
 	FaUsers,
 } from "react-icons/fa";
@@ -64,18 +65,18 @@ function NavMenu() {
 						Projects
 					</Link>
 					<Link
-						href={"/users/tasks"}
+						href={"/users/admin/tasks"}
 						className={`link flex items-center gap-x-2 ${
-							pathname === "/users/tasks" ? "active" : ""
+							pathname === "/users/admin/tasks" ? "active" : ""
 						}`}
 					>
 						<FaTasks />
 						Tasks
 					</Link>
 					<Link
-						href={"/users/bookings"}
+						href={"/users/admin/bookings"}
 						className={`link flex items-center gap-x-2 ${
-							pathname === "/users/bookings" ? "active" : ""
+							pathname === "/users/admin/bookings" ? "active" : ""
 						}`}
 					>
 						<FaBookmark />
@@ -87,7 +88,7 @@ function NavMenu() {
 							pathname === "/users/admin/timesheets" ? "active" : ""
 						}`}
 					>
-						<FaBookmark />
+						<FaClock />
 						Timesheets
 					</Link>
 					<Link

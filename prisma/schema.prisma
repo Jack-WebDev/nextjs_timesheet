@@ -19,7 +19,7 @@ model User {
   Password      String?
   departmentId  String?
   department    Department? @relation(fields: [departmentId], references: [id])
-    departmentName String?    // Direct field for department name
+  departmentName String?    // Direct field for department name
 
   Status        String
   Role          String      @default("Employee")
@@ -30,9 +30,9 @@ model User {
 model Project {
   id            String      @id @default(uuid())
   Project_Name  String      @unique
+  Description   String
   Department_Id String?
   department    Department? @relation(fields: [Department_Id], references: [id])
-
   assignedUsers   UserProject[]   
 }
 
