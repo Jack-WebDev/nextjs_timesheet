@@ -3,10 +3,20 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import projects from "@/database/projects.json";
 import { Textarea } from "../ui/textarea";
 import { getSession } from "@/actions";
 import { Input } from "../ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 interface RowFormData {
   project: string;
@@ -88,12 +98,21 @@ const Row: React.FC = () => {
       total_hours: totalHours,
     };
 
+    if (!fullName || !date || !formData.project || !formData.task_performed) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+  
+    if (totalHours <= 0) {
+      toast.error("Total hours cannot be 0.");
+      return;
+    }
+
     try {
       await axios.post("http://localhost:3000/api/timesheets/", {
         formData: updatedFormData,
       });
       // localStorage.clear();
-      toast.success("Timesheet has been submitted.");
     } catch (error) {
       toast.error(
         "An error occured while submitting your timesheet. Please reload the screen and try again.."
@@ -143,6 +162,7 @@ const Row: React.FC = () => {
             value={formData.hours[0]}
             onChange={(e) => handleHoursChange(0, parseInt(e.target.value))}
             type="number"
+            required
           />
           <Input
             className="w-[7%] shadow-none focus:border-2 focus:border-primary rounded-xl"
@@ -190,13 +210,83 @@ const Row: React.FC = () => {
         </div>
       </div>
 
-      <button
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button>Submit</Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Submit your timesheet for approval</DialogTitle>
+            <DialogDescription>
+              Click submit if the data is accurate
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name:
+              </Label>
+              <p>{localStorage.getItem("user")}</p>
+            </div>
+            <div className="grid grid-cols-2 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Week:
+              </Label>
+              <p>{localStorage.getItem("week")}</p>
+            </div>
+            <div className="grid grid-cols-2 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Project Name:
+              </Label>
+              <p>{formData.project}</p>
+            </div>
+            <div className="grid grid-cols-2 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Task Performed:
+              </Label>
+              <p>{formData.task_performed}</p>
+            </div>
+            <div className="grid grid-cols-2 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Total Hours:
+              </Label>
+              <p>{calculateTotalHours()}</p>
+            </div>
+
+            <div className="grid grid-cols-2 items-center gap-4">
+              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                (day, index) => (
+                  <>
+                  <Label htmlFor="name" key={index} className="text-right">
+                    {day}:
+                  </Label>
+                  <p key={index}>{formData.hours[index]} hrs</p>
+                  </>
+                )
+              )}
+
+              {/* <p>{formData.hours}</p> */}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="submit"
+              className="rounded-xl bg-primary text-white gap-x-4 hover:bg-primary py-2 px-6 mb-4 mr-4"
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* <button
         type="submit"
         className="rounded-xl bg-primary text-white gap-x-4 hover:bg-primary py-2 px-6 mb-4 mr-4"
         onClick={handleSubmit}
       >
         Submit
-      </button>
+      </button> */}
     </>
   );
 };
