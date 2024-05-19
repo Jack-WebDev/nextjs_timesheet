@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import projects from "@/database/projects.json";
 import { Textarea } from "../ui/textarea";
 import { getSession } from "@/actions";
+import { Input } from "../ui/input";
 
 interface RowFormData {
   project: string;
@@ -25,7 +26,7 @@ const Row: React.FC = () => {
   const [formData, setFormData] = useState<RowFormData>({
     project: "",
     task_performed: "",
-    hours: [0, 0, 0, 0, 0],
+    hours: [0, 0, 0, 0, 0, 0, 0],
     total_hours: 0,
   });
 
@@ -65,6 +66,10 @@ const Row: React.FC = () => {
   };
 
   const handleHoursChange = (index: number, value: number) => {
+    if (value < 0) {
+      value = 0;
+    }
+
     const newHours = [...formData.hours];
     newHours[index] = value;
     setFormData({ ...formData, hours: newHours });
@@ -84,7 +89,7 @@ const Row: React.FC = () => {
     };
 
     try {
-      const res = await axios.post("http://localhost:3000/api/timesheets/", {
+      await axios.post("http://localhost:3000/api/timesheets/", {
         formData: updatedFormData,
       });
       // localStorage.clear();
@@ -99,17 +104,17 @@ const Row: React.FC = () => {
     setFormData({
       project: "",
       task_performed: "",
-      hours: [0, 0, 0, 0, 0],
+      hours: [0, 0, 0, 0, 0, 0, 0],
       total_hours: 0,
     });
   };
 
   return (
     <>
-      <div className="row-form flex items-center justify-around my-4">
-        <div className="grid gap-y-4">
+      <div className="row-form flex items-center justify-around my-4 border-t border-gray-300 pt-4">
+        <div className="grid gap-y-4 w-[20%]">
           <select
-            className="project_dropdown w-full"
+            className="w-full"
             value={formData.project}
             onChange={(e) =>
               setFormData({ ...formData, project: e.target.value })
@@ -123,9 +128,8 @@ const Row: React.FC = () => {
             ))}
           </select>
 
-          <input
-            type="text"
-            className="task_input border border-black mx-4 px-4"
+          <Textarea
+            className="px-4 rounded-xl p-2 focus:border-2 focus:border-primary"
             value={formData.task_performed}
             onChange={(e) => handleTaskChange(e.target.value)}
             placeholder="Task Performed..."
@@ -133,22 +137,59 @@ const Row: React.FC = () => {
           />
         </div>
 
-        <div className="days">
-          {["Mon", "Tue", "Wed", "Thu", "Fri"].map((_day, index) => (
-            <input
-              key={index}
-              className="hour_input w-1/6 mr-4"
-              type="number"
-              value={formData.hours[index]}
-              onChange={(e) =>
-                handleHoursChange(index, parseInt(e.target.value))
-              }
-              required
-            />
-          ))}
+        <div className="days flex justify-around">
+          <Input
+            className="w-[7%] shadow-none focus:border-2 focus:border-primary rounded-xl"
+            value={formData.hours[0]}
+            onChange={(e) => handleHoursChange(0, parseInt(e.target.value))}
+            type="number"
+          />
+          <Input
+            className="w-[7%] shadow-none focus:border-2 focus:border-primary rounded-xl"
+            value={formData.hours[1]}
+            onChange={(e) => handleHoursChange(1, parseInt(e.target.value))}
+            type="number"
+          />
+          <Input
+            className="w-[7%] shadow-none focus:border-2 focus:border-primary rounded-xl"
+            value={formData.hours[2]}
+            onChange={(e) => handleHoursChange(2, parseInt(e.target.value))}
+            type="number"
+          />
+          <Input
+            className="w-[7%] shadow-none focus:border-2 focus:border-primary rounded-xl"
+            value={formData.hours[3]}
+            onChange={(e) => handleHoursChange(3, parseInt(e.target.value))}
+            type="number"
+          />
+          <Input
+            className="w-[7%] shadow-none focus:border-2 focus:border-primary rounded-xl"
+            value={formData.hours[4]}
+            onChange={(e) => handleHoursChange(4, parseInt(e.target.value))}
+            type="number"
+          />
+          <Input
+            className="w-[7%] shadow-none focus:border-2 focus:border-primary rounded-xl"
+            value={formData.hours[5]}
+            onChange={(e) => handleHoursChange(5, parseInt(e.target.value))}
+            type="number"
+          />
+
+          <Input
+            className="w-[7%] shadow-none focus:border-2 focus:border-primary rounded-xl"
+            value={formData.hours[6]}
+            onChange={(e) => handleHoursChange(6, parseInt(e.target.value))}
+            type="number"
+          />
         </div>
-        <div className="relative right-24">{calculateTotalHours()}</div>
       </div>
+      <div className="flex items-center gap-x-4 mb-4">
+        <div className="font-semibold">Total Hours:</div>
+        <div className="text-primary font-semibold">
+          {calculateTotalHours()}
+        </div>
+      </div>
+
       <button
         type="submit"
         className="rounded-xl bg-primary text-white gap-x-4 hover:bg-primary py-2 px-6 mb-4 mr-4"

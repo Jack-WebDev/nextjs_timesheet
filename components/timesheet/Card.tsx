@@ -8,21 +8,21 @@ interface RowData {
 }
 
 const ProjectCard: React.FC = () => {
-  const [rows, setRows] = useState<RowData[]>([{ hours: [0, 0, 0, 0, 0] }]);
+  const [rows, setRows] = useState<RowData[]>([{ hours: [0, 0, 0, 0, 0, 0, 0] }]);
 
   const addRow = () => {
-    setRows([...rows, { hours: [0, 0, 0, 0, 0] }]);
+    setRows([...rows, { hours: [0, 0, 0, 0, 0, 0,0] }]);
   };
 
   return (
     <div className="project-card mt-12 border-2 border-primary m-auto p-4 rounded-xl bg-white">
       <div className="flex items-center justify-around">
-        <div>Project</div>
+        <div className="font-semibold">Project/Task</div>
         {/* <div>Task</div> */}
-        {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day, index) => (
-          <div key={index}>{day}</div>
+        {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => (
+          <div className="font-semibold" key={index}>{day}</div>
         ))}
-        <div>Total Hours</div>
+        {/* <div>Total Hours</div> */}
       </div>
       {rows.map((_row, index) => (
         <RowForm key={index} />
