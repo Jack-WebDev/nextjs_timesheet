@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import db from "@/database/index";
+import { Description } from "@radix-ui/react-dialog";
 
 export async function GET() {
   try {
@@ -8,6 +9,7 @@ export async function GET() {
         id: true,
         Project_Name: true,
         Department_Id: true,
+        Description:true,
         department: {
           select: {
             Department_Name: true,
@@ -25,6 +27,7 @@ export async function GET() {
       return {
         id: i.id,
         Project_Name: i.Project_Name,
+        Description: i.Description,
         Department_Name: i.department?.Department_Name,
         Department_Id: i.Department_Id,
         AssignedUsers: i.assignedUsers.map((i) => i),
@@ -40,13 +43,17 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const res = await req.json();
-    const { Project_Name, Department_Id, user_id } = await res;
+    const { Project_Name,Description, Department_Id, user_id } = await res;
 
-    console.log(Project_Name, Department_Id, user_id);
+    console.log(Project_Name,Description, Department_Id, user_id);
+
+
+
 
     const project = await db.project.create({
       data: {
         Project_Name: Project_Name,
+        Description: Description,
         Department_Id: Department_Id,
       },
     });
