@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 type Timesheet = {
 	Friday: string;
@@ -20,6 +21,7 @@ type Timesheet = {
 };
 
 const Timesheets = () => {
+	const router = useRouter()
 	const [timesheets, setTimesheets] = useState<Timesheet[]>([]);
 	const [expandedStates, setExpandedStates] = useState(
 		timesheets.map(() => false)
@@ -58,6 +60,7 @@ const Timesheets = () => {
 			console.log(res);
 			localStorage.clear();
 			toast.success("Timesheet Updated");
+			router.refresh()
 		} catch (error) {
 			console.log(error);
 			toast.error(
@@ -75,7 +78,7 @@ const Timesheets = () => {
 				}
 			);
 			console.log(res);
-			window.location.reload();
+			router.refresh()
 		} catch (error) {
 			console.log(error);
 			toast.error(
