@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { getSession } from "@/actions";
+import { FaEye } from "react-icons/fa";
 
 type Project = {
   id: string;
@@ -100,7 +101,7 @@ const ProjectTable: React.FC = () => {
               <td>{truncateText(project.Description, 5)}</td>
 
               <td className="flex items-center justify-center gap-4">
-                <span>View</span>
+                <FaEye/>
               </td>
             </tr>
           ))}

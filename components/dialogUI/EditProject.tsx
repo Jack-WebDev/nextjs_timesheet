@@ -22,6 +22,7 @@ type User = {
 
 export function EditProject({ id }: User) {
 	const [project, setProject] = useState("");
+	const [description,setDescription] = useState("")
 
 	useEffect(() => {
 		fetchProjects();
@@ -35,6 +36,7 @@ export function EditProject({ id }: User) {
 		try {
 			await axios.put(`http://localhost:3000/api/projects/${id}`, {
 				Project_Name: project,
+				Description: description
 			});
 			window.location.reload();
 		} catch (error) {
@@ -63,6 +65,17 @@ export function EditProject({ id }: User) {
 							value={project}
 							className="col-span-3 rounded-xl focus:border-primary"
 							onChange={(e) => setProject(e.target.value)}
+						/>
+					</div>
+					<div className="grid grid-cols-4 items-center gap-4">
+						<Label htmlFor="projectName" className="text-right">
+							Project Description
+						</Label>
+						<Input
+							id="projectDescription"
+							value={description}
+							className="col-span-3 rounded-xl focus:border-primary"
+							onChange={(e) => setDescription(e.target.value)}
 						/>
 					</div>
 				</div>

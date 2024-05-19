@@ -7,7 +7,7 @@ export async function PUT(
 ) {
 	try {
 		const res = await req.json();
-		const { Project_Name } = await res;
+		const { Project_Name, Description } = await res;
 
 		const project = await db.project.update({
 			where: {
@@ -15,6 +15,7 @@ export async function PUT(
 			},
 			data: {
 				Project_Name: Project_Name,
+				Description: Description
 			},
 		});
 
@@ -46,6 +47,7 @@ export async function DELETE(
 	{ params }: { params: { id: string } }
 ) {
 	try {
+		console.log(params.id)
 		const project = await db.project.delete({
 			where: {
 				id: params.id,

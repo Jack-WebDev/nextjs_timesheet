@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { EditProject } from "../dialogUI/EditProject";
 import { AddProject } from "../dialogUI/AddProject";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaEye, FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 type Project = {
@@ -109,7 +109,8 @@ const ProjectTable: React.FC = () => {
 
               <td>{project.Department_Name}</td>
 
-              <td className="flex items-center justify-center gap-4">
+              <td className="flex items-center justify-center gap-2">
+                <FaEye/>
                 <EditProject id={project.id} />
                 <FaTrashAlt
                   className="cursor-pointer"
