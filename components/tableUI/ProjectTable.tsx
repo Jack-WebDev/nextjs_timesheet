@@ -104,7 +104,7 @@ const ProjectTable: React.FC = () => {
         <tbody>
           {filteredprojects.map((project) => (
             <tr key={project.id}>
-              <td>{project.Project_Name}</td>
+              <td>{truncateText(project.Project_Name, 5)}</td>
               <td>{truncateText(project.Description, 5)}</td>
 
               <td>{project.Department_Name}</td>

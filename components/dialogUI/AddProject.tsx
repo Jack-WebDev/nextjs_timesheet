@@ -99,7 +99,7 @@ export function AddProject() {
       user_id: user_id,
     });
 
-    router.refresh()
+    window.location.reload()
   };
 
   return (

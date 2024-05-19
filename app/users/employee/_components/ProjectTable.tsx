@@ -7,6 +7,7 @@ import { getSession } from "@/actions";
 type Project = {
   id: string;
   Project_Name: string;
+  Description: string;
   AssignedUsers: any[];
   Email: string;
 };
@@ -20,6 +21,24 @@ const ProjectTable: React.FC = () => {
     fetchprojects();
   }, []);
 
+  const truncateText = (text: string, wordLimit: number) => {
+    if (!text) return "No Description";
+
+    const words = text.split(" ");
+
+    if (words.length > 1) {
+      if (words.length <= wordLimit) {
+        return text;
+      }
+      return words.slice(0, wordLimit).join(" ") + ".....";
+    }
+
+    if (text.length <= 15) {
+      return text;
+    }
+    return text.slice(0, 15) + ".....";
+  };
+
   const fetchprojects = async () => {
     const data = await getSession();
 
@@ -27,6 +46,7 @@ const ProjectTable: React.FC = () => {
       const response = await axios.get<Project[]>(
         "http://localhost:3000/api/projects"
       );
+
       const projects = response.data;
 
       const userProjects = projects.filter((project) =>
@@ -42,6 +62,8 @@ const ProjectTable: React.FC = () => {
       console.log(error);
     }
   };
+
+  console.log(cleaned)
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = e.target.value.toLowerCase();
@@ -67,14 +89,15 @@ const ProjectTable: React.FC = () => {
         <thead className="relative -top-4">
           <tr className="text-left text-gray-500">
             <th className=" font-normal">Project Name</th>
-
+            <th className=" font-normal">Project Description</th>
             <th className=" font-normal">Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredprojects.map((project) => (
             <tr key={project.id}>
-              <td>{project.Project_Name}</td>
+              <td>{truncateText(project.Project_Name,3)}</td>
+              <td>{truncateText(project.Description, 5)}</td>
 
               <td className="flex items-center justify-center gap-4">
                 <span>View</span>
