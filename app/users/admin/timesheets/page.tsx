@@ -24,6 +24,8 @@ const Timesheets = () => {
   const [expandedStates, setExpandedStates] = useState(
     timesheets.map(() => false)
   );
+  const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>([]);
+	const [filter, setFilter] = useState<string>("");
 
   const toggleShowMore = (index: number) => {
     const newExpandedStates = [...expandedStates];
@@ -34,11 +36,14 @@ const Timesheets = () => {
   useEffect(() => {
     const fetchTimesheets = async () => {
       try {
-        const response = await axios.get(
+        const response = await axios.get<Timesheet[]>(
           "http://localhost:3000/api/timesheets"
         );
 
-        setTimesheets(response.data);
+        console.log(response.data)
+
+        setTimesheets(response.data)
+        setFilteredTimesheets(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -66,7 +71,7 @@ const Timesheets = () => {
 
   const handleReject = async (id: string, approval: string) => {
     try {
-      const res = await axios.put(
+      await axios.put(
         `http://localhost:3000/api/timesheets/${id}`,
         {
           Approval_Status: approval,
@@ -81,9 +86,29 @@ const Timesheets = () => {
     }
   };
 
+
+	const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const searchTerm = e.target.value.toLowerCase();
+		setFilter(searchTerm);
+		const filtered = timesheets.filter(
+			(timesheet) =>
+        timesheet.Project_Name.toLowerCase().includes(searchTerm) ||
+        timesheet.Full_Name.toLowerCase().includes(searchTerm)
+
+		);
+		setFilteredTimesheets(filtered);
+	};
+
   return (
-    <div className="timesheets-container mx-auto grid grid-cols-3 gap-x-20 gap-y-8">
-      {timesheets.map((timesheet, index) => (
+    <>
+				<input
+					type="text"
+					placeholder="Filter by employee name or project name...."
+					className="filter_input w-1/3 px-4 py-[5px] border border-black focus:border-primary"
+					value={filter}
+					onChange={handleFilterChange}
+				/>    <div className="timesheets-container mx-auto mt-12 grid grid-cols-3 gap-x-20 gap-y-8">
+      {filteredTimesheets.map((timesheet, index) => (
         <div
           className="card__container h-fit bg-white border-2 border-primary rounded-xl p-4"
           key={timesheet.id}
@@ -146,6 +171,7 @@ const Timesheets = () => {
         </div>
       ))}
     </div>
+    </>
   );
 };
 
