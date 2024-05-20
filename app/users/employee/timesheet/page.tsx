@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Card from "@/components/timesheet/Card";
 import { format } from "date-fns";
 import axios from "axios";
+import { getSession } from "@/actions";
 
 type Timesheet = {
   Friday: string;
@@ -28,7 +29,7 @@ const Timesheet = () => {
   const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(
     new Date()
   );
-  const [timesheets, setTimesheets] = useState<Timesheet[]>([]);
+  const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>([]);
 
 
   useEffect(() => {
@@ -39,10 +40,19 @@ const Timesheet = () => {
   }, []);
 
   const fetchTimesheets = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/api/timesheets");
+    const sessionData = await getSession()
+    
 
-      setTimesheets(response.data);
+    try {
+      const response = await axios.get<Timesheet[]>("http://localhost:3000/api/timesheets");
+
+      const timesheets = response.data;
+
+      const userTimesheets = timesheets.filter((timesheet) =>
+        timesheet.Full_Name === sessionData.Name
+      );
+        
+      setFilteredTimesheets(userTimesheets);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -87,7 +97,7 @@ const Timesheet = () => {
         <h2 className="text-center text-3xl text-secondary">Your Timesheets</h2>
 
         <div className="timesheets-container mx-auto grid grid-cols-3 gap-x-20 gap-y-8">
-          {timesheets.map((timesheet) => (
+          {filteredTimesheets.map((timesheet) => (
             <div
               className="card__container h-fit bg-white border-2 border-primary rounded-xl p-4"
               key={timesheet.id}
