@@ -210,9 +210,10 @@ const Row: React.FC = () => {
         </div>
       </div>
 
+
       <Dialog>
         <DialogTrigger asChild>
-          <Button>Submit</Button>
+          <Button className="rounded-xl bg-primary text-white gap-x-4 hover:bg-primary py-2 px-6 mb-4 mr-4">Submit</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -253,15 +254,15 @@ const Row: React.FC = () => {
               <p>{calculateTotalHours()}</p>
             </div>
 
-            <div className="grid grid-cols-2 items-center gap-4">
+            <div className="grid grid-cols-2 justify-items-center items-center gap-4">
               {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
                 (day, index) => (
-                  <>
+                  <div key={index} className="flex items-center gap-2">
                   <Label htmlFor="name" key={index} className="text-right">
                     {day}:
                   </Label>
                   <p key={index}>{formData.hours[index]} hrs</p>
-                  </>
+                  </div>
                 )
               )}
 
@@ -280,13 +281,6 @@ const Row: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* <button
-        type="submit"
-        className="rounded-xl bg-primary text-white gap-x-4 hover:bg-primary py-2 px-6 mb-4 mr-4"
-        onClick={handleSubmit}
-      >
-        Submit
-      </button> */}
     </>
   );
 };

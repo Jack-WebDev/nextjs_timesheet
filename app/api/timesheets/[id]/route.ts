@@ -28,6 +28,7 @@ export async function PUT(
 	try {
 		const res = await req.json();
 		const { Approval_Status } = await res;
+		console.log(Approval_Status)
 		const id = params.id;
 
 
