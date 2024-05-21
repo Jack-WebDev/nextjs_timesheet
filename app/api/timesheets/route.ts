@@ -4,8 +4,19 @@ import db from "@/database/index";
 export async function GET() {
 	try {
 		const res = await db.timesheet.findMany();
+		
+		const sortedTimesheets = res.sort((a, b) => {
+			if (a.Approval_Status === 'Pending' && b.Approval_Status !== 'Pending') {
+			  return -1;
+			}
+			if (a.Approval_Status !== 'Pending' && b.Approval_Status === 'Pending') {
+			  return 1;
+			}
+			return 0;
+		  });
+	  
 
-		return NextResponse.json(res, { status: 200 });
+		return NextResponse.json(sortedTimesheets, { status: 200 });
 	} catch (error) {
 		return NextResponse.json(error, { status: 500 });
 	}

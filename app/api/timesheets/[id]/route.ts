@@ -6,12 +6,10 @@ export async function GET(
 	{ params }: { params: { id: string } }
 ) {
 	try {
-		const res = await req.json();
-		const id = params.id;
 
 		const timesheetData = await db.timesheet.findFirst({
 			where: {
-				id: id,
+				id: params.id,
 			},
 		});
 
@@ -21,6 +19,7 @@ export async function GET(
 	}
 }
 
+
 export async function PUT(
 	req: NextRequest,
 	{ params }: { params: { id: string } }
@@ -28,6 +27,7 @@ export async function PUT(
 	try {
 		const res = await req.json();
 		const { Approval_Status } = await res;
+		console.log(Approval_Status)
 		const id = params.id;
 
 

@@ -14,7 +14,7 @@ const Home = () => {
 						width={500}
 						height={500}
 						className="form_img"
-						style={{ width: "auto", height: "auto" }}
+						style={{ width: "100%", height: "auto" }}
 					/>
 				</div>
 				<Image

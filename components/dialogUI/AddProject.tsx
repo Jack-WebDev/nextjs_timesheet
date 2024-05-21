@@ -1,4 +1,5 @@
 "use client";
+//TODO: Tags of selected users
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +16,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaPlusCircle } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { Textarea } from "../ui/textarea";
+import { useRouter } from "next/navigation";
 
 type Department = {
   id: string;
@@ -27,6 +30,7 @@ type Project = {
   Department_Id: string;
   departmentName: string;
   user_id: string;
+  Project_Description: string;
 };
 
 type User = {
@@ -36,11 +40,13 @@ type User = {
 
 export function AddProject() {
   const [Project_Name, setProject_Name] = useState("");
+  const [Project_Description, setProject_Description] = useState("");
   const [department_id, setDepartment_id] = useState("");
   const [user_id, setUser_id] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState<string>("");
   const [departments, setDepartments] = useState<Department[]>([]);
   const [users, setUsers] = useState<User[][]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     fetchdepartments();
@@ -86,9 +92,10 @@ export function AddProject() {
   };
 
   const handleSave = async () => {
-    console.log(user_id);
+    console.log(Project_Name, Project_Description, selectedDepartment, user_id);
     await axios.post<Project>(`http://localhost:3000/api/projects/`, {
       Project_Name: Project_Name,
+      Description: Project_Description,
       Department_Id: selectedDepartment,
       user_id: user_id,
     });
@@ -118,6 +125,19 @@ export function AddProject() {
               value={Project_Name}
               className="col-span-3 rounded-xl focus:border-primary"
               onChange={(e) => setProject_Name(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="text-right">
+              Project Description
+            </Label>
+            <Textarea
+              id="description"
+              value={Project_Description}
+              className="col-span-3 rounded-xl focus:border-primary"
+              onChange={(e) => setProject_Description(e.target.value)}
             />
           </div>
         </div>
