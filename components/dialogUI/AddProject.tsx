@@ -31,7 +31,6 @@ type Project = {
   departmentName: string;
   user_id: string;
   Project_Description: string;
-  
 };
 
 type User = {
@@ -41,13 +40,13 @@ type User = {
 
 export function AddProject() {
   const [Project_Name, setProject_Name] = useState("");
-  const [Project_Description, setProject_Description] = useState("")
+  const [Project_Description, setProject_Description] = useState("");
   const [department_id, setDepartment_id] = useState("");
   const [user_id, setUser_id] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState<string>("");
   const [departments, setDepartments] = useState<Department[]>([]);
   const [users, setUsers] = useState<User[][]>([]);
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     fetchdepartments();
@@ -93,6 +92,7 @@ export function AddProject() {
   };
 
   const handleSave = async () => {
+    console.log(Project_Name, Project_Description, selectedDepartment, user_id);
     await axios.post<Project>(`http://localhost:3000/api/projects/`, {
       Project_Name: Project_Name,
       Description: Project_Description,
@@ -100,7 +100,7 @@ export function AddProject() {
       user_id: user_id,
     });
 
-    window.location.reload()
+    window.location.reload();
   };
 
   return (
