@@ -4,6 +4,39 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+import * as React from "react";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 type Timesheet = {
   Friday: string;
   Monday: string;
@@ -18,20 +51,77 @@ type Timesheet = {
   id: string;
   Approval_Status: string;
 };
-
 const Timesheets = () => {
-  const [timesheets, setTimesheets] = useState<Timesheet[]>([]);
-  const [expandedStates, setExpandedStates] = useState(
-    timesheets.map(() => false)
-  );
-  const [filteredTimesheets, setFilteredTimesheets] = useState<Timesheet[]>([]);
-	const [filter, setFilter] = useState<string>("");
+  const [data, setTimesheets] = useState<Timesheet[]>([]);
 
-  const toggleShowMore = (index: number) => {
-    const newExpandedStates = [...expandedStates];
-    newExpandedStates[index] = !newExpandedStates[index];
-    setExpandedStates(newExpandedStates);
-  };
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
+  const columns: ColumnDef<Timesheet>[] = [
+    {
+      accessorKey: "Approval_Status",
+      header: "Approval Status",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("Approval_Status")}</div>
+      ),
+    },
+    {
+      accessorKey: "Project_Name",
+      header: "Project Name",
+      cell: ({ row }) => (
+        <div className="lowercase">{row.getValue("Project_Name")}</div>
+      ),
+    },
+    {
+      accessorKey: "Task_performed",
+      header: "Task Performed",
+      cell: ({ row }) => (
+        <div className="lowercase">{row.getValue("Task_performed")}</div>
+      ),
+    },
+    {
+      accessorKey: "actions",
+      header: () => <div className="text-start">Actions</div>,
+      cell: ({ row }) => {
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <DotsHorizontalIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-white">
+              <DropdownMenuItem>View Timesheet Details</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  });
 
   useEffect(() => {
     const fetchTimesheets = async () => {
@@ -40,10 +130,9 @@ const Timesheets = () => {
           "http://localhost:3000/api/timesheets"
         );
 
-        console.log(response.data)
+        console.log(response.data);
 
-        setTimesheets(response.data)
-        setFilteredTimesheets(response.data);
+        setTimesheets(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -71,12 +160,9 @@ const Timesheets = () => {
 
   const handleReject = async (id: string, approval: string) => {
     try {
-      await axios.put(
-        `http://localhost:3000/api/timesheets/${id}`,
-        {
-          Approval_Status: approval,
-        }
-      );
+      await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
+        Approval_Status: approval,
+      });
       window.location.reload();
     } catch (error) {
       console.log(error);
@@ -86,92 +172,100 @@ const Timesheets = () => {
     }
   };
 
-
-	const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const searchTerm = e.target.value.toLowerCase();
-		setFilter(searchTerm);
-		const filtered = timesheets.filter(
-			(timesheet) =>
-        timesheet.Project_Name.toLowerCase().includes(searchTerm) ||
-        timesheet.Full_Name.toLowerCase().includes(searchTerm)
-
-		);
-		setFilteredTimesheets(filtered);
-	};
-
   return (
-    <>
-				<input
-					type="text"
-					placeholder="Filter by employee name or project name...."
-					className="filter_input w-1/3 px-4 py-[5px] border border-black focus:border-primary"
-					value={filter}
-					onChange={handleFilterChange}
-				/>    <div className="timesheets-container mx-auto mt-12 grid grid-cols-3 gap-x-20 gap-y-8">
-      {filteredTimesheets.map((timesheet, index) => (
-        <div
-          className="card__container h-fit bg-white border-2 border-primary rounded-xl p-4"
-          key={timesheet.id}
-        >
-          <>
-            <div className="card__head grid gap-4">
-              <h1 className="font-bold">Full Name: {timesheet.Full_Name}</h1>
-              <h2>Project Name: {timesheet.Project_Name}</h2>
-            </div>
-            <div className="card__body grid gap-4">
-              <div>
-                <h2>Task Performed: {timesheet.Task_performed}</h2>
-                <h3 className="font-bold">Calendar Week: {timesheet.Week}</h3>
-              </div>
-
-              {expandedStates[index] && (
-                <div className="week-days__container">
-                  <h4 className="font-bold">Daily Hours</h4>
-                  <div className="week-days grid gap-2">
-                    <span>Monday: {timesheet.Monday} hours</span>
-                    <span>Tuesday: {timesheet.Tuesday} hours</span>
-                    <span>Wednesday: {timesheet.Wednesday} hours</span>
-                    <span>Thursday: {timesheet.Thursday} hours</span>
-                    <span>Friday: {timesheet.Friday} hours</span>
-                  </div>
-                  <h4 className="font-bold">
-                    Total hours worked: {timesheet.Total_hours}
-                  </h4>
-                  <br />
-                  <h3>Approval Status: {timesheet.Approval_Status}</h3>
-                </div>
-              )}
-
-              <button
-                type="button"
-                onClick={() => toggleShowMore(index)}
-                className="text-secondary font-medium"
-              >
-                {expandedStates[index] ? "Show less" : "Show more"}
-              </button>
-
-              <div className="buttons flex items-center justify-evenly gap-x-8">
-                <button
-                  type="button"
-                  className="bg-[#00ed64] text-white px-4 py-2 rounded-xl"
-                  onClick={() => handleApprove(timesheet.id, "Approved")}
-                >
-                  Approve
-                </button>
-                <button
-                  type="button"
-                  className="bg-red-600 text-white px-4 py-2 rounded-xl"
-                  onClick={() => handleReject(timesheet.id, "Rejected")}
-                >
-                  Reject
-                </button>
-              </div>
-            </div>
-          </>
+    <div className="timesheets-container w-[80%] mx-auto">
+      <div className="w-full">
+        <div className="flex items-center py-4">
+          <Input
+            placeholder="Filter by project name...."
+            value={
+              (table.getColumn("Project_Name")?.getFilterValue() as string) ??
+              ""
+            }
+            onChange={(event) =>
+              table
+                .getColumn("Project_Name")
+                ?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm rounded-xl"
+          />
         </div>
-      ))}
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <div className="flex-1 text-sm text-muted-foreground">
+            Showing {table.getFilteredSelectedRowModel().rows.length} to{" "}
+            {table.getFilteredRowModel().rows.length} out of 20 records.
+          </div>
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
-    </>
   );
 };
 

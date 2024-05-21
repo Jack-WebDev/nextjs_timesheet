@@ -106,14 +106,10 @@ const Timesheet = () => {
                 <DotsHorizontalIcon className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem
-              >
-                Copy payment ID
+            <DropdownMenuContent className="bg-white">
+              <DropdownMenuItem>
+                View Timesheet Details
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>View customer</DropdownMenuItem>
-              <DropdownMenuItem>View payment details</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -205,59 +201,18 @@ const Timesheet = () => {
         <div className="timesheet__container">
           <Card />
         </div>
-        <h2 className="text-center text-3xl text-secondary">Your Timesheets</h2>
+        <h2 className="text-center text-3xl text-secondary my-[3rem]">Your Timesheets</h2>
 
-        <div className="timesheets-container mx-auto grid grid-cols-3 gap-x-20 gap-y-8">
-          {/* {filteredTimesheets.map((timesheet) => (
-            <div
-              className="card__container h-fit bg-white border-2 border-primary rounded-xl p-4"
-              key={timesheet.id}
-            >
-              <>
-                <div className="card__head grid gap-4">
-                  <h1 className="font-bold">
-                    Full Name: {timesheet.Full_Name}
-                  </h1>
-                  <h2>Project Name: {timesheet.Project_Name}</h2>
-                </div>
-                <div className="card__body grid gap-4">
-                  <div>
-                    <h2>Task Performed: {timesheet.Task_performed}</h2>
-                    <h3 className="font-bold">
-                      Calendar Week: {timesheet.Week}
-                    </h3>
-                  </div>
+        <div className="timesheets-container w-[80%] mx-auto">
 
-                  {
-                    <div className="week-days__container">
-                      <h4 className="font-bold">Daily Hours</h4>
-                      <div className="week-days grid gap-2">
-                        <span>Monday: {timesheet.Monday} hours</span>
-                        <span>Tuesday: {timesheet.Tuesday} hours</span>
-                        <span>Wednesday: {timesheet.Wednesday} hours</span>
-                        <span>Thursday: {timesheet.Thursday} hours</span>
-                        <span>Friday: {timesheet.Friday} hours</span>
-                      </div>
-                      <h4 className="font-bold">
-                        Total hours worked: {timesheet.Total_hours}
-                      </h4>
-                      <br />
-                      <h3>Approval Status: {timesheet.Approval_Status}</h3>
-                    </div>
-                  }
-                </div>
-              </>
-            </div>
-          ))} */}
               <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
+          placeholder="Filter by project name...."
           value={(table.getColumn("Project_Name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("Project_Name")?.setFilterValue(event.target.value)
+          onChange={(event) => table.getColumn("Project_Name")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-sm rounded-xl"
         />
       </div>
       <div className="rounded-md border">
