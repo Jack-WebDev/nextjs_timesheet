@@ -19,12 +19,18 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
+
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -50,6 +56,8 @@ type Timesheet = {
   Full_Name: string;
   id: string;
   Approval_Status: string;
+  Saturday: string;
+  Sunday: string;
 };
 const Timesheets = () => {
   const [data, setTimesheets] = useState<Timesheet[]>([]);
@@ -77,27 +85,105 @@ const Timesheets = () => {
       ),
     },
     {
-      accessorKey: "Task_performed",
-      header: "Task Performed",
+      accessorKey: "Full_Name",
+      header: "FullName",
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("Task_performed")}</div>
+        <div className="capitalize">{row.getValue("Full_Name")}</div>
       ),
     },
     {
       accessorKey: "actions",
       header: () => <div className="text-start">Actions</div>,
       cell: ({ row }) => {
+        const timesheet = row.original;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <DotsHorizontalIcon className="h-4 w-4" />
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <span className="cursor-pointer">
+                    <DotsHorizontalIcon className="h-4 w-4" />
+                  </span>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Timesheet Details</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="flex justify-evenly items-center">
+                      <p className="w-full">Full Name:</p>
+                      <p className="w-full">{timesheet.Full_Name}</p>
+                    </div>
+                    <div className="flex justify-evenly items-center">
+                      <p className="w-full">Project Name:</p>
+                      <p className="w-full">{timesheet.Project_Name}</p>
+                    </div>
+                    <div className="flex justify-evenly items-center">
+                      <p className="w-full">Task(s) Performed:</p>
+                      <p className="w-full">{timesheet.Task_performed}</p>
+                    </div>
+                    <div className="flex justify-evenly items-center">
+                      <p className="w-full">Week:</p>
+                      <p className="w-full">{timesheet.Week}</p>
+                    </div>
+
+                    <div className="flex justify-evenly items-center">
+                      <p className="w-full">Total hours:</p>
+                      <p className="w-full">{timesheet.Total_hours}</p>
+                    </div>
+
+                    <h2>Daily Hours:</h2>
+                    <div className="daily-hours grid grid-cols-2">
+                      <div className="flex justify-evenly items-center">
+                        <p className="w-full">Monday:</p>
+                        <p className="w-full">{timesheet.Monday}</p>
+                      </div>
+                      <div className="flex justify-evenly items-center">
+                        <p className="w-full">Tuesday:</p>
+                        <p className="w-full">{timesheet.Tuesday}</p>
+                      </div>
+                      <div className="flex justify-evenly items-center">
+                        <p className="w-full">Wednesday:</p>
+                        <p className="w-full">{timesheet.Wednesday}</p>
+                      </div>
+                      <div className="flex justify-evenly items-center">
+                        <p className="w-full">Thursday:</p>
+                        <p className="w-full">{timesheet.Thursday}</p>
+                      </div>
+                      <div className="flex justify-evenly items-center">
+                        <p className="w-full">Friday:</p>
+                        <p className="w-full">{timesheet.Friday}</p>
+                      </div>
+                      <div className="flex justify-evenly items-center">
+                        <p className="w-full">Saturday:</p>
+                        <p className="w-full">{timesheet.Saturday}</p>
+                      </div>
+                      <div className="flex justify-evenly items-center">
+                        <p className="w-full">Sunday:</p>
+                        <p className="w-full">{timesheet.Sunday}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="buttons flex gap-8">
+                    <button
+                      type="button"
+                      className="bg-[#00ed64] text-white px-4 py-2 rounded-xl"
+                      onClick={() => handleApprove(timesheet.id, "Approved")}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      type="button"
+                      className="bg-red-600 text-white px-4 py-2 rounded-xl"
+                      onClick={() => handleReject(timesheet.id, "Rejected")}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white">
-              <DropdownMenuItem>View Timesheet Details</DropdownMenuItem>
-            </DropdownMenuContent>
           </DropdownMenu>
         );
       },

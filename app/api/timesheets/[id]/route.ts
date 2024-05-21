@@ -6,12 +6,10 @@ export async function GET(
 	{ params }: { params: { id: string } }
 ) {
 	try {
-		const res = await req.json();
-		const id = params.id;
 
 		const timesheetData = await db.timesheet.findFirst({
 			where: {
-				id: id,
+				id: params.id,
 			},
 		});
 
@@ -20,6 +18,7 @@ export async function GET(
 		return NextResponse.json(error, { status: 500 });
 	}
 }
+
 
 export async function PUT(
 	req: NextRequest,

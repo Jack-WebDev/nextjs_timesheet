@@ -7,10 +7,8 @@ import { format } from "date-fns";
 import axios from "axios";
 import { getSession } from "@/actions";
 
-import * as React from "react"
-import {
-  DotsHorizontalIcon,
-} from "@radix-ui/react-icons"
+import * as React from "react";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -22,17 +20,23 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
-import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -40,8 +44,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-
+} from "@/components/ui/table";
 
 type Timesheet = {
   Friday: string;
@@ -58,8 +61,6 @@ type Timesheet = {
   Approval_Status: string;
 };
 
-
-
 const Timesheet = () => {
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(
     new Date()
@@ -68,13 +69,14 @@ const Timesheet = () => {
     new Date()
   );
   const [data, setFilteredTimesheets] = useState<Timesheet[]>([]);
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
+  );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
+
   const columns: ColumnDef<Timesheet>[] = [
     {
       accessorKey: "Approval_Status",
@@ -85,38 +87,62 @@ const Timesheet = () => {
     },
     {
       accessorKey: "Project_Name",
-      header:"Project Name",
-      cell: ({ row }) => <div className="lowercase">{row.getValue("Project_Name")}</div>,
+      header: "Project Name",
+      cell: ({ row }) => (
+        <div className="lowercase">{row.getValue("Project_Name")}</div>
+      ),
     },
     {
       accessorKey: "Task_performed",
       header: "Task Performed",
-      cell: ({ row }) => <div className="lowercase">{row.getValue("Task_performed")}</div>,
+      cell: ({ row }) => (
+        <div className="lowercase">{row.getValue("Task_performed")}</div>
+      ),
     },
     {
       accessorKey: "actions",
       header: () => <div className="text-start">Actions</div>,
       cell: ({ row }) => {
-  
+        const timesheet = row.original;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <DotsHorizontalIcon className="h-4 w-4" />
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <span className="cursor-pointer">
+                    <DotsHorizontalIcon className="h-4 w-4" />
+                  </span>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Timesheet Details</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="flex justify-evenly items-center">
+                      <p className="w-full">Approval Status:</p>
+                      <p className="w-full">{timesheet.Approval_Status}</p>
+                    </div>
+                    <div className="flex justify-evenly items-center">
+                      <p className="w-full">Project Name:</p>
+                      <p className="w-full">{timesheet.Project_Name}</p>
+                    </div>
+                    <div className="flex justify-evenly items-center">
+                      <p className="w-full">Week:</p>
+                      <p className="w-full">{timesheet.Week}</p>
+                    </div>
+                    <div className="flex justify-evenly items-center">
+                      <p className="w-full">Total hours:</p>
+                      <p className="w-full">{timesheet.Total_hours}</p>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white">
-              <DropdownMenuItem>
-                View Timesheet Details
-              </DropdownMenuItem>
-            </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  
-  ]
+  ];
 
   const table = useReactTable({
     data,
@@ -135,30 +161,29 @@ const Timesheet = () => {
       columnVisibility,
       rowSelection,
     },
-  })
-
-
+  });
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       localStorage.getItem("user");
     }
-    fetchTimesheets()
+    fetchTimesheets();
   }, []);
 
   const fetchTimesheets = async () => {
-    const sessionData = await getSession()
-    
+    const sessionData = await getSession();
 
     try {
-      const response = await axios.get<Timesheet[]>("http://localhost:3000/api/timesheets");
+      const response = await axios.get<Timesheet[]>(
+        "http://localhost:3000/api/timesheets"
+      );
 
       const timesheets = response.data;
 
-      const userTimesheets = timesheets.filter((timesheet) =>
-        timesheet.Full_Name === sessionData.Name
+      const userTimesheets = timesheets.filter(
+        (timesheet) => timesheet.Full_Name === sessionData.Name
       );
-        
+
       setFilteredTimesheets(userTimesheets);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -201,95 +226,103 @@ const Timesheet = () => {
         <div className="timesheet__container">
           <Card />
         </div>
-        <h2 className="text-center text-3xl text-secondary my-[3rem]">Your Timesheets</h2>
+        <h2 className="text-center text-3xl text-secondary my-[3rem]">
+          Your Timesheets
+        </h2>
 
         <div className="timesheets-container w-[80%] mx-auto">
-
-              <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter by project name...."
-          value={(table.getColumn("Project_Name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("Project_Name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm rounded-xl"
-        />
-      </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
+          <div className="w-full">
+            <div className="flex items-center py-4">
+              <Input
+                placeholder="Filter by project name...."
+                value={
+                  (table
+                    .getColumn("Project_Name")
+                    ?.getFilterValue() as string) ?? ""
+                }
+                onChange={(event) =>
+                  table
+                    .getColumn("Project_Name")
+                    ?.setFilterValue(event.target.value)
+                }
+                className="max-w-sm rounded-xl"
+              />
+            </div>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => {
+                        return (
+                          <TableHead key={header.id}>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
+                          </TableHead>
+                        );
+                      })}
+                    </TableRow>
                   ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && "selected"}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+            <div className="flex items-center justify-end space-x-2 py-4">
+              <div className="flex-1 text-sm text-muted-foreground">
+                Showing {table.getFilteredSelectedRowModel().rows.length} to{" "}
+                {table.getFilteredRowModel().rows.length} out of 20 records.
+              </div>
+              <div className="space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
                 >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">Showing {" "}
-          {table.getFilteredSelectedRowModel().rows.length} to {" "}
-          {table.getFilteredRowModel().rows.length} out of 20 records.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-    </div>
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>
