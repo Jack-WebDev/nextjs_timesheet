@@ -30,7 +30,6 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -189,6 +188,10 @@ const Timesheets = () => {
       },
     },
   ];
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 20,
+  });
 
   const table = useReactTable({
     data,
@@ -201,11 +204,13 @@ const Timesheets = () => {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   });
 
@@ -232,7 +237,7 @@ const Timesheets = () => {
       const res = await axios.put(
         `http://localhost:3000/api/timesheets/${id}`,
         {
-          Approval_Status: approval,
+          Approval_Status: `${approval} by Line manager, awaiting approval from exec`,
         }
       );
       window.location.reload();
@@ -328,8 +333,8 @@ const Timesheets = () => {
         </div>
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="flex-1 text-sm text-muted-foreground">
-            Showing {table.getFilteredSelectedRowModel().rows.length} to{" "}
-            {table.getFilteredRowModel().rows.length} out of 20 records.
+          Showing {table.getState().pagination.pageIndex + 1} to {' '}
+            {table.getPageCount().toLocaleString()} out of {table.getRowCount().toLocaleString()} Records.
           </div>
           <div className="space-x-2">
             <Button
