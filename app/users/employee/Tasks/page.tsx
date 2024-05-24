@@ -1,7 +1,10 @@
-import React from 'react'
+"use client"
 
-export default function page() {
+import { useUser } from "@/app/store";
+
+export default function Tasks() {
+  const user = useUser()
   return (
-    <div>page</div>
+    <div>Data {user.Email}</div>
   )
 }

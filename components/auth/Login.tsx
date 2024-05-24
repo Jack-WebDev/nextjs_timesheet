@@ -17,6 +17,9 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { login } from "@/actions";
 import { toast } from "react-toastify";
+import { useUser } from "@/app/store";
+
+
 
 const formSchema = z.object({
 	email: z.string().min(2, {
@@ -26,7 +29,6 @@ const formSchema = z.object({
 });
 
 export function LoginForm() {
-	const router = useRouter();
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -42,7 +44,8 @@ export function LoginForm() {
 			const userData = await res.data;
 			const fullName = `${userData.Name} ${userData.Surname}`;
 			localStorage.setItem("user", fullName);
-
+			console.log(userData)
+			useUser.setState(userData)
 			await login(userData);
 		} catch (error) {
 			toast.error(

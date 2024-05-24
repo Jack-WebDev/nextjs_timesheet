@@ -1,5 +1,3 @@
-
-
 // schema.prisma
 generator client {
   provider        = "prisma-client-js"
@@ -12,36 +10,37 @@ datasource db {
 }
 
 model User {
-  id            String      @id @default(uuid())
-  Name          String
-  Surname       String
-  Email         String      @unique
-  Password      String?
-  departmentId  String?
-  department    Department? @relation(fields: [departmentId], references: [id])
-  departmentName String?    // Direct field for department name
+  id             String      @id @default(uuid())
+  Name           String
+  Surname        String
+  Email          String      @unique
+  Password       String?
+  departmentId   String?
+  department     Department? @relation(fields: [departmentId], references: [id])
+  departmentName String? // Direct field for department name
 
-  Status        String
-  Role          String      @default("Employee")
-  createdAt     DateTime    @default(now())
-  projects      UserProject[]
+  Status    String
+  Role      String        @default("Employee")
+  createdAt DateTime      @default(now())
+  projects  UserProject[]
+  tableRows TableRow[] // New relation to TableRow
 }
 
 model Project {
-  id            String      @id @default(uuid())
-  Project_Name  String      @unique
+  id            String        @id @default(uuid())
+  Project_Name  String        @unique
   Description   String
   Department_Id String?
-  department    Department? @relation(fields: [Department_Id], references: [id])
-  assignedUsers   UserProject[]   
+  department    Department?   @relation(fields: [Department_Id], references: [id])
+  assignedUsers UserProject[]
 }
 
 model UserProject {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   userId    String
   projectId String
-  user      User     @relation(fields: [userId], references: [id])
-  project   Project  @relation(fields: [projectId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+  project   Project @relation(fields: [projectId], references: [id])
 }
 
 model Department {
@@ -66,4 +65,35 @@ model Timesheet {
   Approval_Status String   @default("Pending")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model Task {
+  id            String   @id @default(uuid())
+  taskPerformed String
+  taskStatus    String
+  tableRow      TableRow @relation(fields: [tableRowId], references: [id])
+  tableRowId    String
+}
+
+model TableDetails {
+  id             String     @id @default(uuid())
+  month          String
+  name           String
+  role           String
+  weeklyPeriod   String
+  projectManager String
+  projectName    String
+  tableRows      TableRow[] // Link to TableRow
+}
+
+model TableRow {
+  id             String       @id @default(uuid())
+  weekday        String
+  totalHours     Float
+  comment        String
+  tasks          Task[]
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String // Foreign key to User
+  tableDetails   TableDetails @relation(fields: [tableDetailsId], references: [id])
+  tableDetailsId String // Foreign key to TableDetails
 }

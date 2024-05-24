@@ -5,6 +5,8 @@ import axios from "axios";
 import { getSession } from "@/actions";
 import { FaEye } from "react-icons/fa";
 import { ViewProject } from "@/components/dialogUI/ViewProject";
+import { useUser } from "@/app/store";
+
 
 type Project = {
   id: string;
@@ -18,6 +20,7 @@ const ProjectTable: React.FC = () => {
   const [cleaned, setCleaned] = useState<Project[]>([]);
   const [filteredprojects, setFilteredprojects] = useState<Project[]>([]);
   const [filter, setFilter] = useState<string>("");
+  const email = useUser()
 
   useEffect(() => {
     fetchprojects();
@@ -42,7 +45,7 @@ const ProjectTable: React.FC = () => {
   };
 
   const fetchprojects = async () => {
-    const data = await getSession();
+    // const data = await getSession();
 
     try {
       const response = await axios.get<Project[]>(
@@ -53,7 +56,7 @@ const ProjectTable: React.FC = () => {
 
       const userProjects = projects.filter((project) =>
         project.AssignedUsers.some(
-          (assignedUser) => assignedUser.user.Email === data.Email
+          (assignedUser) => assignedUser.user.Email === email.Email
         )
       );
 
