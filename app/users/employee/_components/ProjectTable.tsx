@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { getSession } from "@/actions";
 import { FaEye } from "react-icons/fa";
@@ -22,9 +22,32 @@ const ProjectTable: React.FC = () => {
   const [filter, setFilter] = useState<string>("");
   const email = useUser()
 
+  const fetchprojects = useCallback(async() => {
+    try {
+      const response = await axios.get<Project[]>(
+        "http://localhost:3000/api/projects"
+      );
+
+      const projects = response.data;
+
+      const userProjects = projects.filter((project) =>
+        project.AssignedUsers.some(
+          (assignedUser) => assignedUser.user.Email === email.Email
+        )
+      );
+
+      setCleaned(userProjects);
+
+      setFilteredprojects(userProjects);
+    } catch (error) {
+      console.log(error);
+    }  }, [email.Email]); 
+
   useEffect(() => {
     fetchprojects();
-  }, []);
+  }, [fetchprojects]); 
+
+
 
   const truncateText = (text: string, wordLimit: number) => {
     if (!text) return "No Description";
@@ -44,29 +67,6 @@ const ProjectTable: React.FC = () => {
     return text.slice(0, 15) + ".....";
   };
 
-  const fetchprojects = async () => {
-    // const data = await getSession();
-
-    try {
-      const response = await axios.get<Project[]>(
-        "http://localhost:3000/api/projects"
-      );
-
-      const projects = response.data;
-
-      const userProjects = projects.filter((project) =>
-        project.AssignedUsers.some(
-          (assignedUser) => assignedUser.user.Email === email.Email
-        )
-      );
-
-      setCleaned(userProjects);
-
-      setFilteredprojects(userProjects);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   console.log(cleaned)
 
