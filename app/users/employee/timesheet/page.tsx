@@ -410,20 +410,10 @@ export default function Timesheet() {
 
     console.log(res);
   };
-
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.getItem("user");
-    }
-    fetchTimesheets();
-  }, []);
-
-  const fetchTimesheets = async () => {
-    // const sessionData = await getSession();
-
+  const fetchTimesheets = React.useCallback(async () => {
     try {
       const response = await axios.get<Timesheet[]>(
-        "http://localhost:3000/api/pagAp"
+        "http://localhost:3000/api/timesheets"
       );
 
       const timesheets = response.data;
@@ -432,11 +422,17 @@ export default function Timesheet() {
         timesheet.tableRows.some((user) => user.userId === userZ.id)
       );
       setFilteredTimesheets(userTimesheets);
-      // setTasks(timesheets.tasks)
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
+  }, [userZ.id]);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.getItem("user");
+    }
+    fetchTimesheets();
+  }, [fetchTimesheets]);
 
   return (
     <>
