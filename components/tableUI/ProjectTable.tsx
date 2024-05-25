@@ -8,12 +8,21 @@ import { FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { ViewProject } from "../dialogUI/ViewProject";
 
+type Department = {
+  id: string,
+  Department_Name: string
+}
+
 type Project = {
   id: string;
   Project_Name: string;
+  Project_Manager: string,
+  Client_Name: string,
   Description: string;
-  Department_Name: string;
+  department: Department;
 };
+
+
 
 const ProjectTable: React.FC = () => {
   const [projects, setprojects] = useState<Project[]>([]);
@@ -24,24 +33,23 @@ const ProjectTable: React.FC = () => {
     fetchprojects();
   }, []);
 
-  const truncateText = (text:string, wordLimit:number) => {
-	if (!text) return "No Description";
-	
-	const words = text.split(" ");
-	
-	if (words.length > 1) {
-	  if (words.length <= wordLimit) {
-		return text;
-	  }
-	  return words.slice(0, wordLimit).join(" ") + ".....";
-	}
-	
-	if (text.length <= 15) {
-	  return text;
-	}
-	return text.slice(0, 15) + ".....";
+  const truncateText = (text: string, wordLimit: number) => {
+    if (!text) return "No Description";
+
+    const words = text.split(" ");
+
+    if (words.length > 1) {
+      if (words.length <= wordLimit) {
+        return text;
+      }
+      return words.slice(0, wordLimit).join(" ") + ".....";
+    }
+
+    if (text.length <= 15) {
+      return text;
+    }
+    return text.slice(0, 15) + ".....";
   };
-  
 
   const fetchprojects = async () => {
     try {
@@ -95,9 +103,9 @@ const ProjectTable: React.FC = () => {
         <thead className="relative -top-4">
           <tr className="text-left text-gray-500">
             <th className=" font-normal">Project Name</th>
-
-            <th className=" font-normal">Project Description</th>
-            <th className=" font-normal">Department</th>
+            <th className=" font-normal">Project Manager</th>
+            <th className=" font-normal">Client Name</th>
+            <th className=" font-normal">Department Name</th>
 
             <th className=" font-normal">Actions</th>
           </tr>
@@ -106,12 +114,11 @@ const ProjectTable: React.FC = () => {
           {filteredprojects.map((project) => (
             <tr key={project.id}>
               <td>{truncateText(project.Project_Name, 5)}</td>
-              <td>{truncateText(project.Description, 5)}</td>
-
-              <td>{project.Department_Name}</td>
-
+              <td>{truncateText(project.Project_Manager, 5)}</td>
+              <td>{truncateText(project.Client_Name, 5)}</td>
+              <td>{truncateText(project.department.Department_Name, 5)}</td>
               <td className="flex items-center justify-center gap-2">
-                <ViewProject id={project.id}/>
+                <ViewProject id={project.id} />
                 <EditProject id={project.id} />
                 <FaTrashAlt
                   className="cursor-pointer"

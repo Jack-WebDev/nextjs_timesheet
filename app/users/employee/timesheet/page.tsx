@@ -160,15 +160,17 @@ export default function Timesheet() {
   const [tableData, setTableData] = useState<TableRow[]>(initialData);
   const [data, setFilteredTimesheets] = useState<Timesheet[]>([]);
   // const [task,setTasks] = useState<Task[]>([])
+  const userZ = useUser();
+  const fullName = `${userZ.Name} ${userZ.Surname}`
+
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
-    name: "",
+    name: fullName,
     role: "",
     projectManager: "",
     projectName: "",
   });
-  const userZ = useUser();
 
   console.log(data);
 
@@ -450,8 +452,7 @@ export default function Timesheet() {
             Name:
             <input
               type="text"
-              value={formDetails.name}
-              onChange={(e) => handleFormChange("name", e.target.value)}
+              value={fullName}
             />
           </label>
           <label>

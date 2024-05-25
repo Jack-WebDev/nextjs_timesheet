@@ -7,7 +7,6 @@ import {
 	FaAlignCenter,
 	FaBuilding,
 	FaCalendarCheck,
-	FaClock,
 	FaTasks,
 	FaUsers,
 } from "react-icons/fa";
@@ -81,15 +80,6 @@ function NavMenu() {
 					>
 						<FaBookmark />
 						Bookings
-					</Link>
-					<Link
-						href={"/users/admin/timesheets"}
-						className={`link flex items-center gap-x-2 ${
-							pathname === "/users/admin/timesheets" ? "active" : ""
-						}`}
-					>
-						<FaClock />
-						Timesheets
 					</Link>
 					<Link
 						href={"/users/settings"}

@@ -18,19 +18,13 @@ CREATE TABLE "User" (
 CREATE TABLE "Project" (
     "id" TEXT NOT NULL,
     "Project_Name" TEXT NOT NULL,
+    "Project_Manager" TEXT NOT NULL,
+    "Client_Name" TEXT NOT NULL,
     "Description" TEXT NOT NULL,
     "Department_Id" TEXT,
+    "assignedMembers" TEXT[],
 
     CONSTRAINT "Project_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "UserProject" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "projectId" TEXT NOT NULL,
-
-    CONSTRAINT "UserProject_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -111,12 +105,6 @@ ALTER TABLE "User" ADD CONSTRAINT "User_departmentId_fkey" FOREIGN KEY ("departm
 
 -- AddForeignKey
 ALTER TABLE "Project" ADD CONSTRAINT "Project_Department_Id_fkey" FOREIGN KEY ("Department_Id") REFERENCES "Department"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "UserProject" ADD CONSTRAINT "UserProject_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "UserProject" ADD CONSTRAINT "UserProject_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Task" ADD CONSTRAINT "Task_tableRowId_fkey" FOREIGN KEY ("tableRowId") REFERENCES "TableRow"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
