@@ -76,14 +76,15 @@ model Task {
 }
 
 model TableDetails {
-  id             String     @id @default(uuid())
-  month          String
-  name           String
-  role           String
-  weeklyPeriod   String
-  projectManager String
-  projectName    String
-  tableRows      TableRow[] // Link to TableRow
+  id              String     @id @default(uuid())
+  month           String
+  name            String
+  role            String
+  weeklyPeriod    String
+  projectManager  String
+  projectName     String
+  tableRows       TableRow[]
+  Approval_Status String
 }
 
 model TableRow {

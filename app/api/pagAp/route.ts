@@ -30,11 +30,12 @@ export async function POST(req: NextRequest) {
           projectManager: combinedData.projectManager,
           projectName: combinedData.projectName,
           role: combinedData.role,
+          Approval_Status: combinedData.Approval_Status,
         },
       });
 
       for (const entry of mapped) {
-        await db.tableRow.create({
+        const s = await db.tableRow.create({
           data: {
             comment: entry.comment,
             totalHours: entry.totalHours,
@@ -44,6 +45,8 @@ export async function POST(req: NextRequest) {
             tableDetailsId: detailsID.id,
           },
         });
+
+        console.log(s)
       }
       console.log("Data inserted successfully.");
     } catch (error) {
@@ -59,22 +62,22 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   try {
     const res = await db.tableDetails.findMany({
-    select: {
-      month:true,
-      name:true,
-      projectManager:true,
-      projectName:true,
-      role:true,
-      tableRows: {
-        include: {
-          tasks:true
-        }
+      select: {
+        id:true,
+        month: true,
+        name: true,
+        projectManager: true,
+        projectName: true,
+        role: true,
+        tableRows: {
+          include: {
+            tasks: true,
+          },
+        },
+        weeklyPeriod: true,
+        Approval_Status:true,
       },
-      weeklyPeriod:true
-    } 
-    })
-
-
+    });
 
     return NextResponse.json(res, { status: 200 });
   } catch (error) {

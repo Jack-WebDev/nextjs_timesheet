@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { login } from "@/actions";
+import { useUser } from "@/app/store";
+
 
 const formSchema = z.object({
 	email: z.string().min(2, {
@@ -39,6 +41,7 @@ export function RegisterForm() {
 		try {
 			const res = await axios.post("api/register", { ...values });
 			const user = await res.data;
+			useUser.setState(user)
 			await login(user);
 		} catch (error) {
 			toast.error(

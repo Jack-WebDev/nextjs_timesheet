@@ -6,24 +6,26 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FaCalendar } from "react-icons/fa";
 import axios from "axios";
-import { getSession } from "@/actions";
+// import { getSession } from "@/actions";
+import { useUser } from "@/app/store";
 
 export default function Dashboard() {
   const [totalProjects, setTotalProjects] = useState<number>(0);
+  const user = useUser();
 
   useEffect(() => {
     getProjects();
   }, []);
 
   const getProjects = async () => {
-    const data = await getSession();
+    // const data = await getSession();
 
     const response = await axios.get("http://localhost:3000/api/projects");
     const projects = response.data;
 
     const userProjects = projects.filter((project: { AssignedUsers: any[] }) =>
       project.AssignedUsers.some(
-        (assignedUser) => assignedUser.user.Email === data.Email
+        (assignedUser) => assignedUser.user.Email === user.Email
       )
     );
 

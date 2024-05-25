@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 type User = {
   Email: string;
@@ -10,18 +11,35 @@ type User = {
   createdAt: string;
   departmentId: string;
   departmentName: string;
-  id:string;
+  id: string;
 };
 
-export const useUser = create<User>(() => ({
-  Email: "",
-  Name: "",
-  Password: "",
-  Role: "",
-  Status: "",
-  Surname: "",
-  createdAt: "",
-  departmentId: "",
-  departmentName: "",
-  id:"",
-}));
+export const useUser = create(
+  persist<User>(
+    () => ({
+      Email: "",
+      Name: "",
+      Password: "",
+      Role: "",
+      Status: "",
+      Surname: "",
+      createdAt: "",
+      departmentId: "",
+      departmentName: "",
+      id: "",
+    }),
+    {
+      name: "user",
+      partialize: (state) => ({ id: state.id, Email: state.Email }) as User,
+    }
+  )
+);
+
+const clearLocalStorageAfterTimeout = () => {
+  const timeoutDuration = 24 * 60 * 60 * 1000; 
+  setTimeout(() => {
+    localStorage.removeItem("user");
+  }, timeoutDuration);
+};
+
+clearLocalStorageAfterTimeout();

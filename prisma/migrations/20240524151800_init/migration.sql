@@ -80,6 +80,7 @@ CREATE TABLE "TableDetails" (
     "weeklyPeriod" TEXT NOT NULL,
     "projectManager" TEXT NOT NULL,
     "projectName" TEXT NOT NULL,
+    "Approval_Status" TEXT NOT NULL,
 
     CONSTRAINT "TableDetails_pkey" PRIMARY KEY ("id")
 );

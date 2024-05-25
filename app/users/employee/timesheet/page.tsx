@@ -6,7 +6,6 @@ import { addDays, format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
-
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -30,7 +29,6 @@ import {
 
 import { Input } from "@/components/ui/input";
 
-
 import {
   Table,
   TableBody,
@@ -39,7 +37,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 
 import {
   Tooltip,
@@ -66,12 +63,10 @@ import { useState } from "react";
 import axios from "axios";
 import { useUser } from "@/app/store";
 
-
 type AddTask = {
   taskPerformed: string;
   taskStatus: string;
 };
-
 
 type TableRow = {
   weekday: string;
@@ -134,30 +129,28 @@ const initialData: TableRow[] = [
 ];
 
 type Task = {
-  id:string;      
-  taskPerformed:string;
-  taskStatus:string;
-  tableRowId:string;
-}
+  id: string;
+  taskPerformed: string;
+  taskStatus: string;
+  tableRowId: string;
+};
 
 type TableRows = {
-  id:string;
+  id: string;
   totalHours: number;
   comment: string;
-  tasks:Task[]
-  weekday:string;
-  userId: string
-
-}
-
+  tasks: Task[];
+  weekday: string;
+  userId: string;
+};
 
 type Timesheet = {
-  id:string;
-  month:string;
-  name:string;
-  role:string;
-  projectManager  :string;
-  projectName     :string;
+  id: string;
+  month: string;
+  name: string;
+  role: string;
+  projectManager: string;
+  projectName: string;
   weeklyPeriod: string;
   tableRows: TableRows[];
   Approval_Status: string;
@@ -175,10 +168,9 @@ export default function Timesheet() {
     projectManager: "",
     projectName: "",
   });
-  const userZ = useUser()
+  const userZ = useUser();
 
-
-  console.log(data)
+  console.log(data);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -229,11 +221,11 @@ export default function Timesheet() {
                     <DialogTitle>Timesheet Details</DialogTitle>
                   </DialogHeader>
                   <div>
-      <table>
-        <thead>
-          <tr>
-            <th>Weekday</th>
-            {/* <th>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Weekday</th>
+                          {/* <th>
               Public/Normal Day{" "}
               <TooltipProvider>
                 <Tooltip>
@@ -246,50 +238,52 @@ export default function Timesheet() {
                 </Tooltip>
               </TooltipProvider>
             </th> */}
-            <th>Total Hours</th>
-            <th>Tasks Performed</th>
-            <th>Task Status</th>
-            <th>Comment</th>
-          </tr>
-        </thead>
-        <tbody>
-          {timesheet && timesheet.tableRows && timesheet.tableRows?.map((r) => (
-            <tr key={r.id}>
-              <td>
-                  <p>{r.weekday}</p>
-              </td>
-              {/* <td>
+                          <th>Total Hours</th>
+                          <th>Tasks Performed</th>
+                          <th>Task Status</th>
+                          <th>Comment</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {timesheet &&
+                          timesheet.tableRows &&
+                          timesheet.tableRows?.map((r) => (
+                            <tr key={r.id}>
+                              <td>
+                                <p>{r.weekday}</p>
+                              </td>
+                              {/* <td>
                 <select name="" id="">
                   <option value="">Select type of day</option>
                   <option value="publicDay">Public Holiday</option>
                   <option value="normalDay">Work/Normal Day</option>
                 </select>
               </td> */}
-              <td>
-                  <p>{r.totalHours}</p>
-              </td>
-              <td>
-                {r.tasks && r.tasks?.map((t) => (
-                  <div key={t.id}>
-                  <p>Task Performed: {t.taskPerformed}</p>
-                  </div>
-                ))  || <span>No data available</span>}
-
-              </td>
-              <td>
-                {r.tasks && r.tasks?.map((t) => (
-                  <div key={t.id}>
-                  <p>Task Status: {t.taskStatus}</p>
-                  </div>
-                ))  || <span>No data available</span>}
-
-              </td>
-              <td>
-                <p>{r.comment}</p>
-              </td>
-            </tr>
-          ))}
-          {/* {tableData.map((row, rowIndex) => (
+                              <td>
+                                <p>{r.totalHours}</p>
+                              </td>
+                              <td>
+                                {(r.tasks &&
+                                  r.tasks?.map((t) => (
+                                    <div key={t.id}>
+                                      <p>Task Performed: {t.taskPerformed}</p>
+                                    </div>
+                                  ))) || <span>No data available</span>}
+                              </td>
+                              <td>
+                                {(r.tasks &&
+                                  r.tasks?.map((t) => (
+                                    <div key={t.id}>
+                                      <p>Task Status: {t.taskStatus}</p>
+                                    </div>
+                                  ))) || <span>No data available</span>}
+                              </td>
+                              <td>
+                                <p>{r.comment}</p>
+                              </td>
+                            </tr>
+                          ))}
+                        {/* {tableData.map((row, rowIndex) => (
             <tr key={rowIndex}>
               <td>
                   <p>{timesheet.}</p>
@@ -317,9 +311,9 @@ export default function Timesheet() {
               </td>
             </tr>
           ))} */}
-        </tbody>
-      </table>
-    </div>
+                      </tbody>
+                    </table>
+                  </div>
                 </DialogContent>
               </Dialog>
             </DropdownMenuTrigger>
@@ -393,24 +387,29 @@ export default function Timesheet() {
   };
 
   const handleSubmit = async () => {
+    const timesheetIDs = data
+      .filter((Tid) => Tid.Approval_Status === "Draft")
+      .map((Tid) => Tid.id);
+
     const formData = {
       combinedData: {
         ...formDetails,
         weeklyPeriod: f,
         timesheet: tableData,
         userID: userZ.id,
+        Approval_Status: "Pending",
       },
     };
 
-    const res = await axios.post<TableRow, FormDetails>("/api/pagAp", {
-      formData: formData,
-    });
+    const res = await axios.put<TableRow, FormDetails>(
+      `/api/pagAp/${timesheetIDs[0]}`,
+      {
+        formData: formData,
+      }
+    );
 
     console.log(res);
   };
-
-  const jj = ""
-
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
@@ -429,8 +428,8 @@ export default function Timesheet() {
 
       const timesheets = response.data;
 
-      const userTimesheets = timesheets.filter(
-        (timesheet) => timesheet.tableRows.some((user) => user.userId === userZ.id)
+      const userTimesheets = timesheets.filter((timesheet) =>
+        timesheet.tableRows.some((user) => user.userId === userZ.id)
       );
       setFilteredTimesheets(userTimesheets);
       // setTasks(timesheets.tasks)
@@ -439,297 +438,297 @@ export default function Timesheet() {
     }
   };
 
-
-
   return (
     <>
-    <div>
-      <form>
-        <label>
-          Month:
-          <input
-            type="text"
-            value={jj ? jj : formDetails.month}
-            onChange={(e) => handleFormChange("month", e.target.value)}
-          />
-        </label>
-        <label>
-          Name:
-          <input
-            type="text"
-            value={formDetails.name}
-            onChange={(e) => handleFormChange("name", e.target.value)}
-          />
-        </label>
-        <label>
-          Role:
-          <input
-            type="text"
-            value={formDetails.role}
-            onChange={(e) => handleFormChange("role", e.target.value)}
-          />
-        </label>
-        <label>
-          Project Manager:
-          <input
-            type="text"
-            value={formDetails.projectManager}
-            onChange={(e) => handleFormChange("projectManager", e.target.value)}
-          />
-        </label>
-        <label>
-          Project Name:
-          <input
-            type="text"
-            value={formDetails.projectName}
-            onChange={(e) => handleFormChange("projectName", e.target.value)}
-          />
-        </label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              id="date"
-              variant={"outline"}
-              className={cn(
-                "w-[300px] justify-start text-left font-normal",
-                !date && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date?.from ? (
-                date.to ? (
-                  <>
-                    {format(date.from, "LLL dd")} - {format(date.to, "LLL dd")}
-                  </>
-                ) : (
-                  format(date.from, "LLL dd")
-                )
-              ) : (
-                <span>Pick a date</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              initialFocus
-              mode="range"
-              defaultMonth={date?.from}
-              selected={date}
-              onSelect={setDate}
-              numberOfMonths={1}
+      <div>
+        <form>
+          <label>
+            Month:
+            <input
+              type="text"
+              value={formDetails.month}
+              onChange={(e) => handleFormChange("month", e.target.value)}
             />
-          </PopoverContent>
-        </Popover>
-      </form>
-      <table>
-        <thead>
-          <tr>
-            <th>Weekday</th>
-            <th>
-              Public/Normal Day{" "}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild className="rounded-full">
-                    <Button variant="outline">?</Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Add to library</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </th>
-            <th>Total Hours</th>
-            <th>Tasks Performed</th>
-            <th>Comment</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableData.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              <td>
-                <input
-                  type="date"
-                  value={row.weekday}
-                  onChange={(e) =>
-                    setTableData((prevData) => {
-                      const newData = [...prevData];
-                      newData[rowIndex].weekday = e.target.value;
-                      return newData;
-                    })
-                  }
-                />
-              </td>
-              <td>
-                <select name="" id="">
-                  <option value="">Select type of day</option>
-                  <option value="publicDay">Public Holiday</option>
-                  <option value="normalDay">Work/Normal Day</option>
-                </select>
-              </td>
-              <td>
-                <input
-                  type="number"
-                  value={row.totalHours}
-                  onChange={(e) =>
-                    setTableData((prevData) => {
-                      const newData = [...prevData];
-                      newData[rowIndex].totalHours = parseInt(e.target.value);
-                      return newData;
-                    })
-                  }
-                />
-              </td>
-              <td>
-                {row.tasks.map((task, taskIndex) => (
-                  <div key={taskIndex}>
-                    <input
-                      type="text"
-                      value={task.taskPerformed}
-                      onChange={(e) =>
-                        handleChange(
-                          rowIndex,
-                          taskIndex,
-                          "taskPerformed",
-                          e.target.value
-                        )
-                      }
-                    />
-                    <select
-                      value={task.taskStatus}
-                      onChange={(e) =>
-                        handleChange(
-                          rowIndex,
-                          taskIndex,
-                          "taskStatus",
-                          e.target.value
-                        )
-                      }
-                    >
-                      <option value="">Select status</option>
-                      <option value="Pending">Pending</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
-                  </div>
-                ))}
-                <button onClick={() => handleAddTask(rowIndex)}>
-                  Add Task
-                </button>
-              </td>
-              <td>
-                <textarea
-                  value={row.comment}
-                  onChange={(e) =>
-                    setTableData((prevData) => {
-                      const newData = [...prevData];
-                      newData[rowIndex].comment = e.target.value;
-                      return newData;
-                    })
-                  }
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <button onClick={handleSubmit}>Submit</button>
-    </div>
-
-    <div className="timesheets-container w-[80%] mx-auto">
-          <div className="w-full">
-
-            <div className="flex items-center py-4">
-              <Input
-                placeholder="Filter by project name...."
-                value={
-                  (table
-                    .getColumn("projectName")
-                    ?.getFilterValue() as string) ?? ""
-                }
-                onChange={(event) =>
-                  table
-                    .getColumn("projectName")
-                    ?.setFilterValue(event.target.value)
-                }
-                className="max-w-sm rounded-xl"
-              />
-            </div>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => {
-                        return (
-                          <TableHead key={header.id}>
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext()
-                                )}
-                          </TableHead>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody>
-                  {table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        data-state={row.getIsSelected() && "selected"}
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
+          </label>
+          <label>
+            Name:
+            <input
+              type="text"
+              value={formDetails.name}
+              onChange={(e) => handleFormChange("name", e.target.value)}
+            />
+          </label>
+          <label>
+            Role:
+            <input
+              type="text"
+              value={formDetails.role}
+              onChange={(e) => handleFormChange("role", e.target.value)}
+            />
+          </label>
+          <label>
+            Project Manager:
+            <input
+              type="text"
+              value={formDetails.projectManager}
+              onChange={(e) =>
+                handleFormChange("projectManager", e.target.value)
+              }
+            />
+          </label>
+          <label>
+            Project Name:
+            <input
+              type="text"
+              value={formDetails.projectName}
+              onChange={(e) => handleFormChange("projectName", e.target.value)}
+            />
+          </label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="date"
+                variant={"outline"}
+                className={cn(
+                  "w-[300px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "LLL dd")} -{" "}
+                      {format(date.to, "LLL dd")}
+                    </>
                   ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns.length}
-                        className="h-24 text-center"
+                    format(date.from, "LLL dd")
+                  )
+                ) : (
+                  <span>Pick a date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={1}
+              />
+            </PopoverContent>
+          </Popover>
+        </form>
+        <table>
+          <thead>
+            <tr>
+              <th>Weekday</th>
+              <th>
+                Public/Normal Day{" "}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild className="rounded-full">
+                      <Button variant="outline">?</Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Add to library</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </th>
+              <th>Total Hours</th>
+              <th>Tasks Performed</th>
+              <th>Comment</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tableData.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                <td>
+                  <input
+                    type="date"
+                    value={row.weekday}
+                    onChange={(e) =>
+                      setTableData((prevData) => {
+                        const newData = [...prevData];
+                        newData[rowIndex].weekday = e.target.value;
+                        return newData;
+                      })
+                    }
+                  />
+                </td>
+                <td>
+                  <select name="" id="">
+                    <option value="">Select type of day</option>
+                    <option value="publicDay">Public Holiday</option>
+                    <option value="normalDay">Work/Normal Day</option>
+                  </select>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={row.totalHours}
+                    onChange={(e) =>
+                      setTableData((prevData) => {
+                        const newData = [...prevData];
+                        newData[rowIndex].totalHours = parseInt(e.target.value);
+                        return newData;
+                      })
+                    }
+                  />
+                </td>
+                <td>
+                  {row.tasks.map((task, taskIndex) => (
+                    <div key={taskIndex}>
+                      <input
+                        type="text"
+                        value={task.taskPerformed}
+                        onChange={(e) =>
+                          handleChange(
+                            rowIndex,
+                            taskIndex,
+                            "taskPerformed",
+                            e.target.value
+                          )
+                        }
+                      />
+                      <select
+                        value={task.taskStatus}
+                        onChange={(e) =>
+                          handleChange(
+                            rowIndex,
+                            taskIndex,
+                            "taskStatus",
+                            e.target.value
+                          )
+                        }
                       >
-                        No results.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
-          Showing {table.getState().pagination.pageIndex + 1} to {' '}
-            {table.getPageCount().toLocaleString()} out of {table.getRowCount().toLocaleString()} Records.
+                        <option value="">Select status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </div>
+                  ))}
+                  <button onClick={() => handleAddTask(rowIndex)}>
+                    Add Task
+                  </button>
+                </td>
+                <td>
+                  <textarea
+                    value={row.comment}
+                    onChange={(e) =>
+                      setTableData((prevData) => {
+                        const newData = [...prevData];
+                        newData[rowIndex].comment = e.target.value;
+                        return newData;
+                      })
+                    }
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <button onClick={handleSubmit}>Submit</button>
+      </div>
+
+      <div className="timesheets-container w-[80%] mx-auto">
+        <div className="w-full">
+          <div className="flex items-center py-4">
+            <Input
+              placeholder="Filter by project name...."
+              value={
+                (table.getColumn("projectName")?.getFilterValue() as string) ??
+                ""
+              }
+              onChange={(event) =>
+                table
+                  .getColumn("projectName")
+                  ?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm rounded-xl"
+            />
           </div>
-          <div className="space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No timesheets.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="flex-1 text-sm text-muted-foreground">
+              Showing {table.getState().pagination.pageIndex + 1} to{" "}
+              {table.getPageCount().toLocaleString()} out of{" "}
+              {table.getRowCount().toLocaleString()} Records.
+            </div>
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </div>
-    </div>
-    </div>
+      </div>
     </>
   );
 }
