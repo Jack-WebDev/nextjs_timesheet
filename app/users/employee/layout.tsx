@@ -15,6 +15,7 @@ export default async function DashboardLayout({
 }) {
 	const session = await getSession();
 	const name = session.Name;
+
 	return (
 		<div className="flex flex-col h-screen">
 			<header className="flex justify-end px-8 items-center py-8 pr-16 bg-[#a2a1a81a]">

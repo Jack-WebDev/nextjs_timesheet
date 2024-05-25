@@ -1,34 +1,40 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FaCalendar } from "react-icons/fa";
 import axios from "axios";
-import { getSession } from "@/actions";
+// import { getSession } from "@/actions";
+import { useUser } from "@/app/store";
 
 export default function Dashboard() {
   const [totalProjects, setTotalProjects] = useState<number>(0);
+  const user = useUser();
+
+  const getProjects = useCallback(async() => {
+    try {
+
+      const response = await axios.get("http://localhost:3000/api/projects");
+      const projects = response.data;
+  
+      const userProjects = projects.filter((project: { AssignedUsers: any[] }) =>
+        project.AssignedUsers.some(
+          (assignedUser) => assignedUser.user.Email === user.Email
+        )
+      );
+  
+      setTotalProjects(userProjects.length);
+    } catch (error) {
+      console.log(error);
+    }  }, [user.Email]); 
 
   useEffect(() => {
     getProjects();
-  }, []);
+  }, [getProjects]); 
 
-  const getProjects = async () => {
-    const data = await getSession();
 
-    const response = await axios.get("http://localhost:3000/api/projects");
-    const projects = response.data;
-
-    const userProjects = projects.filter((project: { AssignedUsers: any[] }) =>
-      project.AssignedUsers.some(
-        (assignedUser) => assignedUser.user.Email === data.Email
-      )
-    );
-
-    setTotalProjects(userProjects.length);
-  };
 
   return (
     <div className="grid grid-cols-2 gap-12">

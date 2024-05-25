@@ -61,6 +61,42 @@ CREATE TABLE "Timesheet" (
     CONSTRAINT "Timesheet_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Task" (
+    "id" TEXT NOT NULL,
+    "taskPerformed" TEXT NOT NULL,
+    "taskStatus" TEXT NOT NULL,
+    "tableRowId" TEXT NOT NULL,
+
+    CONSTRAINT "Task_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TableDetails" (
+    "id" TEXT NOT NULL,
+    "month" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "role" TEXT NOT NULL,
+    "weeklyPeriod" TEXT NOT NULL,
+    "projectManager" TEXT NOT NULL,
+    "projectName" TEXT NOT NULL,
+    "Approval_Status" TEXT NOT NULL,
+
+    CONSTRAINT "TableDetails_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TableRow" (
+    "id" TEXT NOT NULL,
+    "weekday" TEXT NOT NULL,
+    "totalHours" DOUBLE PRECISION NOT NULL,
+    "comment" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "tableDetailsId" TEXT NOT NULL,
+
+    CONSTRAINT "TableRow_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_Email_key" ON "User"("Email");
 
@@ -81,3 +117,12 @@ ALTER TABLE "UserProject" ADD CONSTRAINT "UserProject_userId_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "UserProject" ADD CONSTRAINT "UserProject_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Task" ADD CONSTRAINT "Task_tableRowId_fkey" FOREIGN KEY ("tableRowId") REFERENCES "TableRow"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_tableDetailsId_fkey" FOREIGN KEY ("tableDetailsId") REFERENCES "TableDetails"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
