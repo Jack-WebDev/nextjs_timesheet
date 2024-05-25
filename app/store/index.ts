@@ -36,7 +36,7 @@ export const useUser = create(
 );
 
 const clearLocalStorageAfterTimeout = () => {
-  const timeoutDuration = 10 * 60 * 60 * 1000; 
+  const timeoutDuration = 5 * 60 * 60 * 1000; 
   setTimeout(() => {
     localStorage.removeItem("user");
   }, timeoutDuration);

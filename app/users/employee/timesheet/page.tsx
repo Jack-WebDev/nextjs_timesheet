@@ -387,9 +387,9 @@ export default function Timesheet() {
   };
 
   const handleSubmit = async () => {
-    const timesheetIDs = data
-      .filter((Tid) => Tid.Approval_Status === "Draft")
-      .map((Tid) => Tid.id);
+    // const timesheetIDs = data
+    //   .filter((Tid) => Tid.Approval_Status === "Draft")
+    //   .map((Tid) => Tid.id);
 
     const formData = {
       combinedData: {
@@ -401,8 +401,8 @@ export default function Timesheet() {
       },
     };
 
-    const res = await axios.put<TableRow, FormDetails>(
-      `/api/pagAp/${timesheetIDs[0]}`,
+    const res = await axios.post<TableRow, FormDetails>(
+      "http://localhost:3000/api/timesheets",
       {
         formData: formData,
       }

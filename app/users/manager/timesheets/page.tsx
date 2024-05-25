@@ -35,7 +35,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -43,10 +42,11 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-
 import { useState } from "react";
 import axios from "axios";
 import { useUser } from "@/app/store";
+import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import { time } from "console";
 
 type AddTask = {
   taskPerformed: string;
@@ -59,8 +59,6 @@ type TableRow = {
   tasks: AddTask[];
   comment: string;
 };
-
-
 
 type Task = {
   id: string;
@@ -94,7 +92,6 @@ export default function Timesheet() {
   const [data, setFilteredTimesheets] = useState<Timesheet[]>([]);
   // const [task,setTasks] = useState<Task[]>([])
 
- 
   const userZ = useUser();
 
   console.log(data);
@@ -106,6 +103,18 @@ export default function Timesheet() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const handleApprove = async (id:string) => {
+    await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
+      Approval_Status: `Approved by ${userZ.Name} ${userZ.Surname}`,
+    });
+  };
+
+  const handleReject = async (id:string) => {
+    await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
+      Approval_Status: `Rejected by ${userZ.Name} ${userZ.Surname}`,
+    });
+  };
 
   const columns: ColumnDef<Timesheet>[] = [
     {
@@ -134,6 +143,7 @@ export default function Timesheet() {
       header: () => <div className="text-start">Actions</div>,
       cell: ({ row }) => {
         const timesheet = row.original;
+        console.log(timesheet.id)
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -143,12 +153,17 @@ export default function Timesheet() {
                     <DotsHorizontalIcon className="h-4 w-4" />
                   </span>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="w-[50%]">
                   <DialogHeader>
-                    <DialogTitle>Timesheet Details</DialogTitle>
+                    <DialogTitle className="flex justify-around items-center">
+                      Timesheet Details{" "}
+                      <span>
+                        Weekly Period: <b>{timesheet.weeklyPeriod}</b>
+                      </span>
+                    </DialogTitle>
                   </DialogHeader>
                   <div>
-                    <table>
+                    <table className="w-full">
                       <thead>
                         <tr>
                           <th>Weekday</th>
@@ -175,7 +190,7 @@ export default function Timesheet() {
                         {timesheet &&
                           timesheet.tableRows &&
                           timesheet.tableRows?.map((r) => (
-                            <tr key={r.id}>
+                            <tr key={r.id} className="text-center">
                               <td>
                                 <p>{r.weekday}</p>
                               </td>
@@ -193,7 +208,12 @@ export default function Timesheet() {
                                 {(r.tasks &&
                                   r.tasks?.map((t) => (
                                     <div key={t.id}>
-                                      <p>Task Performed: {t.taskPerformed}</p>
+                                      <p>
+                                        Task Performed:{" "}
+                                        {t.taskPerformed === ""
+                                          ? "No Tasks"
+                                          : t.taskPerformed}
+                                      </p>
                                     </div>
                                   ))) || <span>No data available</span>}
                               </td>
@@ -240,6 +260,27 @@ export default function Timesheet() {
           ))} */}
                       </tbody>
                     </table>
+
+                    <div className="flex justify-evenly items-center border-t mt-4 border-black approval_process">
+                      <div className="grid comment">
+                        <label htmlFor="comment">Add comment</label>
+                        <textarea className="mt-4" id="comment"></textarea>
+                      </div>
+                      <div className="btns flex items-end gap-x-4 justify-items-end">
+                        <button
+                          onClick={() => handleApprove(timesheet.id)}
+                          className="border border-black"
+                        >
+                          <FaThumbsUp /> Approve
+                        </button>
+                        <button
+                          onClick={() => handleReject(timesheet.id)}
+                          className="border border-black"
+                        >
+                          <FaThumbsDown /> Reject
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -252,7 +293,7 @@ export default function Timesheet() {
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 5,
+    pageSize: 10,
   });
 
   const table = useReactTable({
@@ -276,30 +317,34 @@ export default function Timesheet() {
     },
   });
 
-
   const fetchTimesheets = React.useCallback(async () => {
     try {
       const response = await axios.get<Timesheet[]>(
         "http://localhost:3000/api/timesheets"
       );
-  
+
       const timesheets = response.data;
       // console.log(timesheets)
-  
-      const formattedUserFullName = `${userZ.Name.trim()} ${userZ.Surname.trim()}`.toLowerCase();
-  
+
+      const formattedUserFullName =
+        `${userZ.Name.trim()} ${userZ.Surname.trim()}`.toLowerCase();
+
       const userTimesheets = timesheets.filter((timesheet) => {
-        const formattedProjectManagerName = timesheet.projectManager.trim().toLowerCase();
-        return formattedProjectManagerName === formattedUserFullName;
+        const formattedProjectManagerName = timesheet.projectManager
+          .trim()
+          .toLowerCase();
+        return (
+          formattedProjectManagerName === formattedUserFullName &&
+          timesheet.Approval_Status === "Pending"
+        );
       });
-  
+
       console.log(userTimesheets);
       setFilteredTimesheets(userTimesheets);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }, [userZ.Name, userZ.Surname]);
-  
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
@@ -310,7 +355,6 @@ export default function Timesheet() {
 
   return (
     <>
-
       <div className="timesheets-container w-[80%] mx-auto">
         <div className="w-full">
           <div className="flex items-center py-4">

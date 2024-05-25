@@ -41,24 +41,29 @@ export default function Dashboard() {
         const response = await axios.get(
           "http://localhost:3000/api/timesheets"
         );
-    
+  
         const timesheets = response.data;
         // console.log(timesheets)
-    
-        const formattedUserFullName = `${user.Name.trim()} ${user.Surname.trim()}`.toLowerCase();
-    
+  
+        const formattedUserFullName =
+          `${user.Name.trim()} ${user.Surname.trim()}`.toLowerCase();
+  
         const userTimesheets = timesheets.filter((timesheet:any) => {
-          const formattedProjectManagerName = timesheet.projectManager.trim().toLowerCase();
-          return formattedProjectManagerName === formattedUserFullName;
+          const formattedProjectManagerName = timesheet.projectManager
+            .trim()
+            .toLowerCase();
+          return (
+            formattedProjectManagerName === formattedUserFullName &&
+            timesheet.Approval_Status === "Pending"
+          );
         });
-    
+  
         console.log(userTimesheets);
         setTotalTimesheets(userTimesheets.length);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }, [user.Name, user.Surname]);
-    
 
   useEffect(() => {
     getProjects();
