@@ -506,7 +506,7 @@ export default function Timesheet() {
           <div>
           <label className="grid w-[60%] mb-1 text-[1.2rem]">Position:</label>
           <input
-            className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
+            className="px-4 py-1 border border-black focus:outline-primary rounded-xl w-[70%]"
               type="text"
               value={formDetails.role}
               onChange={(e) => handleFormChange("month", e.target.value)}
@@ -581,8 +581,8 @@ export default function Timesheet() {
           </Popover>
           </div>
         </form>
-        <table>
-          <thead>
+        <table className="mt-8">
+          <thead className="pb-2">
             <tr>
               <th>Weekday</th>
               <th>
@@ -605,9 +605,10 @@ export default function Timesheet() {
           </thead>
           <tbody>
             {tableData.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                <td>
+              <tr key={rowIndex} className="border-b border-secondary py-2">
+                <td className="text-center">
                   <input
+                  className="py-1 px-2 border-black focus:outline-primary rounded-xl"
                     type="date"
                     value={row.weekday}
                     onChange={(e) =>
@@ -619,15 +620,16 @@ export default function Timesheet() {
                     }
                   />
                 </td>
-                <td>
-                  <select name="" id="">
+                <td className="text-center">
+                  <select name="" id="" className="w-[10vw] ">
                     <option value="">Select type of day</option>
                     <option value="publicDay">Public Holiday</option>
                     <option value="normalDay">Work/Normal Day</option>
                   </select>
                 </td>
-                <td>
+                <td className="text-center">
                   <input
+                  className="w-[25%] py-1 pl-4 border-black focus:outline-primary rounded-xl"
                     type="number"
                     value={row.totalHours}
                     onChange={(e) =>
@@ -639,10 +641,11 @@ export default function Timesheet() {
                     }
                   />
                 </td>
-                <td>
+                <td className="grid text-center">
                   {row.tasks.map((task, taskIndex) => (
-                    <div key={taskIndex}>
+                    <div key={taskIndex} className="flex justify-center items-center mb-2 gap-x-1">
                       <input
+                      className="py-1 px-4 border border-black focus:outline-primary rounded-xl w-1/2"
                         type="text"
                         value={task.taskPerformed}
                         onChange={(e) =>
@@ -655,6 +658,7 @@ export default function Timesheet() {
                         }
                       />
                       <select
+                      className="w-[8vw] h-auto"
                         value={task.taskStatus}
                         onChange={(e) =>
                           handleChange(
@@ -666,18 +670,18 @@ export default function Timesheet() {
                         }
                       >
                         <option value="">Select status</option>
-                        <option value="Pending">Pending</option>
+                        <option value="In-Progress">In-Progress</option>
                         <option value="Completed">Completed</option>
-                        <option value="Cancelled">Cancelled</option>
                       </select>
                     </div>
                   ))}
-                  <button onClick={() => handleAddTask(rowIndex)}>
+                  <Button  onClick={() => handleAddTask(rowIndex)} className="grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold hover:bg-transparent mt-2">
                     Add Task
-                  </button>
+                  </Button>
                 </td>
-                <td>
+                <td className="text-center">
                   <textarea
+                  className="px-4 border border-black focus:outline-primary rounded-xl"
                     value={row.comment}
                     onChange={(e) =>
                       setTableData((prevData) => {
@@ -692,7 +696,7 @@ export default function Timesheet() {
             ))}
           </tbody>
         </table>
-        <button onClick={handleSubmit}>Submit</button>
+        <Button onClick={handleSubmit} className="w-[15%] h-[80%] text-xl grid justify-self-end mt-4 rounded-xl text-white">Submit</Button>
       </div>
 
       <div className="timesheets-container w-[80%] mx-auto">
