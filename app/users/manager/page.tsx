@@ -9,7 +9,14 @@ import axios from "axios";
 // import { getSession } from "@/actions";
 import { useUser } from "@/app/store";
 
-
+type Project = {
+  id: string;
+  Project_Name: string;
+  Project_Manager: string,
+  Client_Name: string,
+  Description: string;
+  assignedMembers: string[];
+};
 
 
 
@@ -21,19 +28,17 @@ export default function Dashboard() {
   const getProjects = useCallback(async() => {
     try {
 
-      const response = await axios.get("http://localhost:3000/api/projects");
+      const response = await axios.get<Project[]>("http://localhost:3000/api/projects");
       const projects = response.data;
   
-      const userProjects = projects.filter((project: { AssignedUsers: any[] }) =>
-        project.AssignedUsers.some(
-          (assignedUser) => assignedUser.user.Email === user.Email
-        )
-      );
+      const userProjects = projects.filter((project) => (
+        project.Project_Manager.toLowerCase() === `${user.Name.trim()} ${user.Surname.trim()}`.toLowerCase()
+      ));
   
       setTotalProjects(userProjects.length);
     } catch (error) {
       console.log(error);
-    }  }, [user.Email]); 
+    }  }, [user.Name, user.Surname]); 
 
 
     const fetchTimesheets = useCallback(async () => {
