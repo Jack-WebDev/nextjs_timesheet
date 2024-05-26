@@ -116,7 +116,7 @@ const ProjectTable: React.FC = () => {
               <td>{truncateText(project.Project_Name, 5)}</td>
               <td>{truncateText(project.Project_Manager, 5)}</td>
               <td>{truncateText(project.Client_Name, 5)}</td>
-              <td>{truncateText(project.department.Department_Name, 5)}</td>
+              <td>{truncateText(project.department?.Department_Name, 5)}</td>
               <td className="flex items-center justify-center gap-2">
                 <ViewProject id={project.id} />
                 <EditProject id={project.id} />
