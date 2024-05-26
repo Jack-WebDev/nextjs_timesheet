@@ -17,36 +17,31 @@ import axios from "axios";
 import { FaPlusCircle } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { Textarea } from "../ui/textarea";
-import { useRouter } from "next/navigation";
 
 type Department = {
   id: string;
   Department_Name: string;
-  users: [];
 };
 
 type Project = {
   Project_Name: string;
+  Project_Manager: string;
+  Client_Name: string;
   Department_Id: string;
   departmentName: string;
-  user_id: string;
   Project_Description: string;
+  assignedMembers: string[];
 };
 
-type User = {
-  id: string;
-  Email: string;
-};
 
 export function AddProject() {
   const [Project_Name, setProject_Name] = useState("");
+  const [Project_Manager, setProject_Manager] = useState("");
+  const [Client_Name, setClient_Name] = useState("");
+  const [Project_Team, setProject_Team] = useState("");
   const [Project_Description, setProject_Description] = useState("");
-  const [department_id, setDepartment_id] = useState("");
-  const [user_id, setUser_id] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState<string>("");
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [users, setUsers] = useState<User[][]>([]);
-  const router = useRouter();
 
   useEffect(() => {
     fetchdepartments();
@@ -70,34 +65,18 @@ export function AddProject() {
   ) => {
     const departmentId = event.target.value as string;
     setSelectedDepartment(departmentId);
-    const department = departments.find((dept) => dept.id === departmentId);
-    if (department) {
-      const userDetailsPromises = department.users.map(async ({ id }) => {
-        const response = await fetch(`/api/users/${id}`);
-        if (response.ok) {
-          return await response.json();
-        } else {
-          console.error(`Failed to fetch user with ID ${id}`);
-          return null;
-        }
-      });
-
-      const userDetails = await Promise.all(userDetailsPromises);
-      const filteredUserDetails = userDetails.filter(
-        (userDetail) => userDetail !== null
-      );
-
-      setUsers(filteredUserDetails);
-    }
   };
 
   const handleSave = async () => {
-    console.log(Project_Name, Project_Description, selectedDepartment, user_id);
+    // console.log(Project_Name, Project_Description,ClientName, Project_Manager, selectedDepartment);
     await axios.post<Project>(`http://localhost:3000/api/projects/`, {
       Project_Name: Project_Name,
       Description: Project_Description,
       Department_Id: selectedDepartment,
-      user_id: user_id,
+      Project_Manager: Project_Manager,
+      Client_Name: Client_Name,
+      assignedMembers: Project_Team.split(","),
+
     });
 
     window.location.reload();
@@ -118,33 +97,7 @@ export function AddProject() {
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
-              Project Name
-            </Label>
-            <Input
-              id="name"
-              value={Project_Name}
-              className="col-span-3 rounded-xl focus:border-primary"
-              onChange={(e) => setProject_Name(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Project Description
-            </Label>
-            <Textarea
-              id="description"
-              value={Project_Description}
-              className="col-span-3 rounded-xl focus:border-primary"
-              onChange={(e) => setProject_Description(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Department Name
+              NDT Division
             </Label>
             <select
               name="department"
@@ -161,29 +114,71 @@ export function AddProject() {
             </select>
           </div>
         </div>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="clientName" className="text-right">
+              Client Name
+            </Label>
+            <Input
+              id="clientName"
+              value={Client_Name}
+              className="col-span-3 rounded-xl focus:border-primary"
+              onChange={(e) => setClient_Name(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="projectName" className="text-right">
+              Project Name
+            </Label>
+            <Input
+              id="projectName"
+              value={Project_Name}
+              className="col-span-3 rounded-xl focus:border-primary"
+              onChange={(e) => setProject_Name(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="projectDescription" className="text-right">
+              Project Description
+            </Label>
+            <Textarea
+              id="projectDescription"
+              value={Project_Description}
+              className="col-span-3 rounded-xl focus:border-primary"
+              onChange={(e) => setProject_Description(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="projectManager" className="text-right">
+              Project Manager
+            </Label>
+            <Input
+              id="projectManager"
+              value={Project_Manager}
+              className="col-span-3 rounded-xl focus:border-primary"
+              onChange={(e) => setProject_Manager(e.target.value)}
+            />
+          </div>
+        </div>
 
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Add Employee
+            <Label htmlFor="teamMembers" className="text-right">
+              Project Team Members
             </Label>
-            <select
-              name="user"
-              className="focus:border-primary"
-              value={user_id}
-              onChange={(e) => setUser_id(e.target.value)}
-            >
-              <option value={""}>Select Employee</option>
-              {users.map((user, index) => (
-                <optgroup key={index}>
-                  {user.map((j, i) => (
-                    <option key={i} value={j.id}>
-                      {j.Email}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+            <Textarea
+              id="teamMembers"
+              placeholder="Marc Jones, Phila Mathambo, Sizwe Shibamvu....."
+              value={Project_Team}
+              className="col-span-3 rounded-xl focus:border-primary"
+              onChange={(e) => setProject_Team(e.target.value)}
+            />
           </div>
         </div>
 

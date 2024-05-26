@@ -15,28 +15,64 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { FaEdit } from "react-icons/fa";
+import { Textarea } from "../ui/textarea";
 
 type User = {
 	id: string;
 };
 
+type Department = {
+	id: string;
+	Department_Name: string;
+  };
+
 export function EditProject({ id }: User) {
-	const [project, setProject] = useState("");
-	const [description,setDescription] = useState("")
+	const [Project_Name, setProject_Name] = useState("");
+	const [Project_Manager, setProject_Manager] = useState("");
+	const [Client_Name, setClient_Name] = useState("");
+	const [Project_Team, setProject_Team] = useState("");
+	const [Project_Description, setProject_Description] = useState("");
+	const [selectedDepartment, setSelectedDepartment] = useState<string>("");
+	const [departments, setDepartments] = useState<Department[]>([]);
 
 	useEffect(() => {
 		fetchProjects();
+		fetchdepartments()
 	}, []);
+
+	const fetchdepartments = async () => {
+		try {
+		  const response = await axios.get<Department[]>(
+			"http://localhost:3000/api/departments/"
+		  );
+		  setDepartments(response.data);
+		} catch (error) {
+		  toast.error(
+			"An error occured while fetching departments. Please reload the screen and try again."
+		  );
+		}
+	  };
 
 	const fetchProjects = async () => {
 		await axios.get("http://localhost:3000/api/projects");
 	};
 
+	const handleDepartmentChange = async (
+		event: React.ChangeEvent<{ value: unknown }>
+	  ) => {
+		const departmentId = event.target.value as string;
+		setSelectedDepartment(departmentId);
+	  };
+
 	const handleSave = async () => {
 		try {
 			await axios.put(`http://localhost:3000/api/projects/${id}`, {
-				Project_Name: project,
-				Description: description
+				Project_Name: Project_Name,
+				Description: Project_Description,
+				Project_Manager: Project_Manager,
+				Client_Name: Client_Name,
+				Department_Id: selectedDepartment,
+
 			});
 			window.location.reload();
 		} catch (error) {
@@ -56,28 +92,93 @@ export function EditProject({ id }: User) {
 					<DialogTitle>Edit Project</DialogTitle>
 				</DialogHeader>
 				<div className="grid gap-4 py-4">
-					<div className="grid grid-cols-4 items-center gap-4">
-						<Label htmlFor="projectName" className="text-right">
-							Project Name
-						</Label>
-						<Input
-							id="projectName"
-							value={project}
-							className="col-span-3 rounded-xl focus:border-primary"
-							onChange={(e) => setProject(e.target.value)}
-						/>
-					</div>
-					<div className="grid grid-cols-4 items-center gap-4">
-						<Label htmlFor="projectName" className="text-right">
-							Project Description
-						</Label>
-						<Input
-							id="projectDescription"
-							value={description}
-							className="col-span-3 rounded-xl focus:border-primary"
-							onChange={(e) => setDescription(e.target.value)}
-						/>
-					</div>
+				<div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="text-right">
+              NDT Division
+            </Label>
+            <select
+              name="department"
+              className="focus:border-primary"
+              value={selectedDepartment}
+              onChange={handleDepartmentChange}
+            >
+              <option value={""}>Select Department</option>
+              {departments.map((department) => (
+                <option key={department.id} value={department.id}>
+                  {department.Department_Name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="clientName" className="text-right">
+              Client Name
+            </Label>
+            <Input
+              id="clientName"
+              value={Client_Name}
+              className="col-span-3 rounded-xl focus:border-primary"
+              onChange={(e) => setClient_Name(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="projectName" className="text-right">
+              Project Name
+            </Label>
+            <Input
+              id="projectName"
+              value={Project_Name}
+              className="col-span-3 rounded-xl focus:border-primary"
+              onChange={(e) => setProject_Name(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="projectDescription" className="text-right">
+              Project Description
+            </Label>
+            <Textarea
+              id="projectDescription"
+              value={Project_Description}
+              className="col-span-3 rounded-xl focus:border-primary"
+              onChange={(e) => setProject_Description(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="projectManager" className="text-right">
+              Project Manager
+            </Label>
+            <Input
+              id="projectManager"
+              value={Project_Manager}
+              className="col-span-3 rounded-xl focus:border-primary"
+              onChange={(e) => setProject_Manager(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="teamMembers" className="text-right">
+              Project Team Members
+            </Label>
+            <Textarea
+              id="teamMembers"
+              placeholder="Marc Jones, Phila Mathambo, Sizwe Shibamvu....."
+              value={Project_Team}
+              className="col-span-3 rounded-xl focus:border-primary"
+              onChange={(e) => setProject_Team(e.target.value)}
+            />
+          </div>
+        </div>
 				</div>
 				<DialogFooter>
 					<Button

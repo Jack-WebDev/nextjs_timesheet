@@ -1,40 +1,37 @@
 import { NextResponse, NextRequest } from "next/server";
 import db from "@/database/index";
-import { Description } from "@radix-ui/react-dialog";
 
 export async function GET() {
   try {
     const res = await db.project.findMany({
       select: {
         id: true,
+        Project_Manager: true,
         Project_Name: true,
         Department_Id: true,
-        Description:true,
+        Client_Name: true,
+        Description: true,
         department: {
           select: {
             Department_Name: true,
-          },
+          }
         },
-        assignedUsers: {
-          select: {
-            user: true,
-          },
-        },
+        assignedMembers: true,
       },
     });
 
-    const data = res.map((i) => {
-      return {
-        id: i.id,
-        Project_Name: i.Project_Name,
-        Description: i.Description,
-        Department_Name: i.department?.Department_Name,
-        Department_Id: i.Department_Id,
-        AssignedUsers: i.assignedUsers.map((i) => i),
-      };
-    });
+    // const data = res.map((i) => {
+    //   return {
+    //     id: i.id,
+    //     Project_Name: i.Project_Name,
+    //     Description: i.Description,
+    //     Department_Name: i.department?.Department_Name,
+    //     Department_Id: i.Department_Id,
+    //     AssignedUsers: i.assignedMembers.map((i) => i),
+    //   };
+    // });
 
-    return NextResponse.json(data, { status: 200 });
+    return NextResponse.json(res, { status: 200 });
   } catch (error) {
     return NextResponse.json(error, { status: 500 });
   }
@@ -43,30 +40,36 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const res = await req.json();
-    const { Project_Name,Description, Department_Id, user_id } = await res;
+    const {
+      Project_Name,
+      Description,
+      Project_Manager,
+      Client_Name,
+      assignedMembers,
+      Department_Id,
+    } = await res;
 
-    console.log(Project_Name,Description, Department_Id, user_id);
-
-
-
+    console.log(
+      Project_Name,
+      Description,
+      Project_Manager,
+      Client_Name,
+      assignedMembers,
+      Department_Id,
+    );
 
     const project = await db.project.create({
       data: {
         Project_Name: Project_Name,
         Description: Description,
         Department_Id: Department_Id,
+        Client_Name: Client_Name,
+        Project_Manager: Project_Manager,
+        assignedMembers: assignedMembers,
       },
     });
 
-    console.log(project.id);
-    const assigned = await db.userProject.create({
-      data: {
-        projectId: project.id,
-        userId: user_id,
-      },
-    });
-
-    return NextResponse.json(assigned, { status: 201 });
+    return NextResponse.json(project, { status: 201 });
   } catch (error) {
     return NextResponse.json(error, { status: 500 });
   }

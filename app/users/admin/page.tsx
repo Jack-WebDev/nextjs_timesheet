@@ -11,13 +11,11 @@ export default function Dashboard() {
 	const [totalUsers, setTotalUsers] = useState<number>(0);
 	const [totalProjects, setTotalProjects] = useState<number>(0);
 	const [totalDepartments, setTotalDepartments] = useState<number>(0);
-	const [timesheets, setTimesheets] = useState<string[]>([]);
 
 	useEffect(() => {
 		getUsers();
 		getDepartments();
 		getProjects();
-		getTimesheets();
 	}, []);
 
 	const getUsers = async () => {
@@ -35,17 +33,7 @@ export default function Dashboard() {
 		const departments = res.data;
 		setTotalDepartments(departments.length);
 	};
-	const getTimesheets = async () => {
-		const res = await axios.get("http://localhost:3000/api/timesheets/");
-		const timesheets = res.data;
-		setTimesheets(timesheets);
-	};
 
-	const countPendingTimesheets = () => {
-		return timesheets.filter(
-			(timesheet: any) => timesheet.Approval_Status === "Pending"
-		).length;
-	};
 
 	return (
 		<div className="grid grid-cols-2 gap-12">
@@ -85,19 +73,6 @@ export default function Dashboard() {
 					</CardHeader>
 					<CardContent>
 						<h2 className="font-semibold">{totalProjects}</h2>
-					</CardContent>
-				</Card>
-			</Link>
-			<Link href={"/users/admin/timesheets"}>
-				<Card className="bg-white border border-primary">
-					<CardHeader>
-						<CardTitle className="flex items-center gap-x-4 text-secondary font-bold">
-							<FaTasks fill="#d69436" fontSize={"2rem"} />
-							Pending Timesheet Approvals
-						</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<h2 className="font-semibold">{countPendingTimesheets()}</h2>
 					</CardContent>
 				</Card>
 			</Link>

@@ -36,6 +36,8 @@ export const login = async (userData: User) => {
   session.success = true;
   session.Email = userData.Email;
 
+  console.log("first")
+
   if (userData.Role === "Admin") {
     await session.save();
     redirect("/users/admin");

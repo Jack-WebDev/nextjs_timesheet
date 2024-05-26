@@ -62,6 +62,7 @@ import {
 import { useState } from "react";
 import axios from "axios";
 import { useUser } from "@/app/store";
+import { toast } from "react-toastify";
 
 type AddTask = {
   taskPerformed: string;
@@ -156,19 +157,32 @@ type Timesheet = {
   Approval_Status: string;
 };
 
+type Project = {
+  id: string;
+  Project_Name: string;
+  Project_Manager: string,
+  Client_Name: string,
+  Description: string;
+};
+
+
 export default function Timesheet() {
   const [tableData, setTableData] = useState<TableRow[]>(initialData);
   const [data, setFilteredTimesheets] = useState<Timesheet[]>([]);
-  // const [task,setTasks] = useState<Task[]>([])
+  const [projects, setprojects] = useState<Project[]>([]);
+  const [selectedProject, setSelectedProject] = useState<string>('');
+  const [projectManager, setProjectManager] = useState<string>('');
+  const userZ = useUser();
+  const fullName = `${userZ.Name} ${userZ.Surname}`
+
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
-    name: "",
+    name: fullName,
     role: "",
     projectManager: "",
     projectName: "",
   });
-  const userZ = useUser();
 
   console.log(data);
 
@@ -363,6 +377,26 @@ export default function Timesheet() {
     });
   };
 
+  const handleProjectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedProjectId = event.target.value;
+    setSelectedProject(selectedProjectId);
+
+    const selectedProject = projects.find(project => project.id === selectedProjectId);
+    if (selectedProject) {
+      setFormDetails({
+        ...formDetails,
+        projectName: selectedProject.Project_Name,
+        projectManager: selectedProject.Project_Manager,
+      });
+    } else {
+      setFormDetails({
+        ...formDetails,
+        projectName: '',
+        projectManager: '',
+      });
+    }
+  };
+
   const handleChange = (
     rowIndex: number,
     taskIndex: number,
@@ -387,9 +421,6 @@ export default function Timesheet() {
   };
 
   const handleSubmit = async () => {
-    const timesheetIDs = data
-      .filter((Tid) => Tid.Approval_Status === "Draft")
-      .map((Tid) => Tid.id);
 
     const formData = {
       combinedData: {
@@ -401,8 +432,8 @@ export default function Timesheet() {
       },
     };
 
-    const res = await axios.put<TableRow, FormDetails>(
-      `/api/pagAp/${timesheetIDs[0]}`,
+    const res = await axios.post<TableRow, FormDetails>(
+      "http://localhost:3000/api/timesheets",
       {
         formData: formData,
       }
@@ -427,10 +458,25 @@ export default function Timesheet() {
     }
   }, [userZ.id]);
 
+  const fetchprojects = async () => {
+    try {
+      const response = await axios.get<Project[]>(
+        "http://localhost:3000/api/projects"
+      );
+      console.log(response.data);
+      setprojects(response.data);
+    } catch (error) {
+      toast.error(
+        "An error occured while fetching projects. Please reload the screen and try again."
+      );
+    }
+  };
+
   React.useEffect(() => {
     if (typeof window !== "undefined") {
       localStorage.getItem("user");
     }
+    fetchprojects()
     fetchTimesheets();
   }, [fetchTimesheets]);
 
@@ -450,8 +496,7 @@ export default function Timesheet() {
             Name:
             <input
               type="text"
-              value={formDetails.name}
-              onChange={(e) => handleFormChange("name", e.target.value)}
+              value={fullName}
             />
           </label>
           <label>
@@ -467,19 +512,35 @@ export default function Timesheet() {
             <input
               type="text"
               value={formDetails.projectManager}
-              onChange={(e) =>
-                handleFormChange("projectManager", e.target.value)
-              }
+              readOnly
             />
           </label>
-          <label>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="name" className="text-right">
+              Project Name
+            </label>
+            <select
+              name="department"
+              className="focus:border-primary"
+              value={formDetails.projectName}
+              onChange={handleProjectChange}
+            >
+              <option value={""}>Select Project</option>
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.Project_Name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* <label>
             Project Name:
             <input
               type="text"
               value={formDetails.projectName}
               onChange={(e) => handleFormChange("projectName", e.target.value)}
             />
-          </label>
+          </label> */}
           <Popover>
             <PopoverTrigger asChild>
               <Button

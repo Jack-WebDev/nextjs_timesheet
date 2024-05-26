@@ -20,27 +20,20 @@ model User {
   departmentName String? // Direct field for department name
 
   Status    String
-  Role      String        @default("Employee")
-  createdAt DateTime      @default(now())
-  projects  UserProject[]
+  Role      String     @default("Employee")
+  createdAt DateTime   @default(now())
   tableRows TableRow[] // New relation to TableRow
 }
 
 model Project {
-  id            String        @id @default(uuid())
-  Project_Name  String        @unique
-  Description   String
-  Department_Id String?
-  department    Department?   @relation(fields: [Department_Id], references: [id])
-  assignedUsers UserProject[]
-}
-
-model UserProject {
-  id        String  @id @default(uuid())
-  userId    String
-  projectId String
-  user      User    @relation(fields: [userId], references: [id])
-  project   Project @relation(fields: [projectId], references: [id])
+  id              String      @id @default(uuid())
+  Project_Name    String      @unique
+  Project_Manager String
+  Client_Name     String
+  Description     String
+  Department_Id   String?
+  department      Department? @relation(fields: [Department_Id], references: [id])
+  assignedMembers String[]
 }
 
 model Department {

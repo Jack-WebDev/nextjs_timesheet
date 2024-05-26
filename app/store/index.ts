@@ -30,13 +30,13 @@ export const useUser = create(
     }),
     {
       name: "user",
-      partialize: (state) => ({ id: state.id, Email: state.Email }) as User,
+      partialize: (state) => ({ id: state.id, Email: state.Email, Name: state.Name, Surname:state.Surname }) as User,
     }
   )
 );
 
 const clearLocalStorageAfterTimeout = () => {
-  const timeoutDuration = 24 * 60 * 60 * 1000; 
+  const timeoutDuration = 5 * 60 * 60 * 1000; 
   setTimeout(() => {
     localStorage.removeItem("user");
   }, timeoutDuration);
