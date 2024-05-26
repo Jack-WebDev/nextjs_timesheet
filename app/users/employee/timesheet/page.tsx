@@ -331,7 +331,8 @@ export default function Timesheet() {
     to: addDays(new Date(), 20),
   });
 
-  const f = `${date?.from?.toLocaleDateString()} to ${date?.to?.toLocaleDateString()}`;
+  const f = `${date?.from?.toISOString().split("T")[0]} to ${date?.to?.toISOString().split("T")[0]}`;
+  console.log(f)
 
   const handleAddTask = (index: number) => {
     setTableData((prevData) => {
@@ -403,7 +404,7 @@ export default function Timesheet() {
         formData: formData,
       }
     );
-
+    window.location.reload()
     console.log(res);
   };
   const fetchTimesheets = React.useCallback(async () => {
