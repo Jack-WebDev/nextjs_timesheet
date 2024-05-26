@@ -160,21 +160,19 @@ type Timesheet = {
 type Project = {
   id: string;
   Project_Name: string;
-  Project_Manager: string,
-  Client_Name: string,
+  Project_Manager: string;
+  Client_Name: string;
   Description: string;
 };
-
 
 export default function Timesheet() {
   const [tableData, setTableData] = useState<TableRow[]>(initialData);
   const [data, setFilteredTimesheets] = useState<Timesheet[]>([]);
   const [projects, setprojects] = useState<Project[]>([]);
-  const [selectedProject, setSelectedProject] = useState<string>('');
-  const [projectManager, setProjectManager] = useState<string>('');
+  const [selectedProject, setSelectedProject] = useState<string>("");
+  const [projectManager, setProjectManager] = useState<string>("");
   const userZ = useUser();
-  const fullName = `${userZ.Name} ${userZ.Surname}`
-
+  const fullName = `${userZ.Name} ${userZ.Surname}`;
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -230,28 +228,15 @@ export default function Timesheet() {
                     <DotsHorizontalIcon className="h-4 w-4" />
                   </span>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="w-1/2">
                   <DialogHeader>
                     <DialogTitle>Timesheet Details</DialogTitle>
                   </DialogHeader>
                   <div>
-                    <table>
+                    <table className="w-full">
                       <thead>
                         <tr>
                           <th>Weekday</th>
-                          {/* <th>
-              Public/Normal Day{" "}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild className="rounded-full">
-                    <Button variant="outline">?</Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Add to library</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </th> */}
                           <th>Total Hours</th>
                           <th>Tasks Performed</th>
                           <th>Task Status</th>
@@ -262,69 +247,48 @@ export default function Timesheet() {
                         {timesheet &&
                           timesheet.tableRows &&
                           timesheet.tableRows?.map((r) => (
-                            <tr key={r.id}>
-                              <td>
+                            <tr
+                              key={r.id}
+                              className="border-b border-secondary"
+                            >
+                              <td className="text-center">
                                 <p>{r.weekday}</p>
                               </td>
-                              {/* <td>
-                <select name="" id="">
-                  <option value="">Select type of day</option>
-                  <option value="publicDay">Public Holiday</option>
-                  <option value="normalDay">Work/Normal Day</option>
-                </select>
-              </td> */}
-                              <td>
+                              <td className="text-center">
                                 <p>{r.totalHours}</p>
                               </td>
-                              <td>
-                                {(r.tasks &&
-                                  r.tasks?.map((t) => (
+                              <td className="text-center">
+                                {r.tasks && r.tasks.length > 0 ? (
+                                  r.tasks.map((t) => (
                                     <div key={t.id}>
-                                      <p>Task Performed: {t.taskPerformed}</p>
+                                      <p>
+                                        {t.taskPerformed === ""
+                                          ? "N/A"
+                                          : t.taskPerformed}
+                                      </p>
                                     </div>
-                                  ))) || <span>No data available</span>}
+                                  ))
+                                ) : (
+                                  <p>N/A</p>
+                                )}
                               </td>
-                              <td>
-                                {(r.tasks &&
-                                  r.tasks?.map((t) => (
+
+                              <td className="text-center">
+                                {r.tasks && r.tasks.length > 0 ? (
+                                  r.tasks.map((t) => (
                                     <div key={t.id}>
-                                      <p>Task Status: {t.taskStatus}</p>
+                                      <p>{t.taskStatus}</p>
                                     </div>
-                                  ))) || <span>No data available</span>}
+                                  ))
+                                ) : (
+                                  <span>N/A</span>
+                                )}
                               </td>
-                              <td>
-                                <p>{r.comment}</p>
+                              <td className="text-center">
+                                <p>{r.comment === "" ? "N/A" : r.comment}</p>
                               </td>
                             </tr>
                           ))}
-                        {/* {tableData.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              <td>
-                  <p>{timesheet.}</p>
-              </td>
-              <td>
-                <select name="" id="">
-                  <option value="">Select type of day</option>
-                  <option value="publicDay">Public Holiday</option>
-                  <option value="normalDay">Work/Normal Day</option>
-                </select>
-              </td>
-              <td>
-                  <p>{timesheet.totalHours}</p>
-              </td>
-              <td>
-                {timesheet.tasks.map((task) => (
-                  <div key={task.tableRowId}>
-                  <p>Task Performed: {task.taskPerformed}</p>
-                  <p>Task Status: {task.taskStatus}</p>
-                  </div>
-                ))}
-              </td>
-              <td>
-                <p>{timesheet.comment}</p>
-              </td>
-            </tr>
-          ))} */}
                       </tbody>
                     </table>
                   </div>
@@ -381,7 +345,9 @@ export default function Timesheet() {
     const selectedProjectId = event.target.value;
     setSelectedProject(selectedProjectId);
 
-    const selectedProject = projects.find(project => project.id === selectedProjectId);
+    const selectedProject = projects.find(
+      (project) => project.id === selectedProjectId
+    );
     if (selectedProject) {
       setFormDetails({
         ...formDetails,
@@ -391,8 +357,8 @@ export default function Timesheet() {
     } else {
       setFormDetails({
         ...formDetails,
-        projectName: '',
-        projectManager: '',
+        projectName: "",
+        projectManager: "",
       });
     }
   };
@@ -421,7 +387,6 @@ export default function Timesheet() {
   };
 
   const handleSubmit = async () => {
-
     const formData = {
       combinedData: {
         ...formDetails,
@@ -476,8 +441,8 @@ export default function Timesheet() {
     if (typeof window !== "undefined") {
       localStorage.getItem("user");
     }
-    // fetchprojects()
-    // fetchTimesheets();
+    fetchprojects();
+    fetchTimesheets();
   }, [fetchTimesheets]);
 
   return (
@@ -485,33 +450,30 @@ export default function Timesheet() {
       <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
         <form className="grid grid-cols-3 border-b-2 border-secondary pb-8 gap-y-4">
           <div>
-          <label className="grid w-[60%] mb-1 text-[1.2rem]">Month:</label>
-          <input
-            className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
+            <label className="grid w-[60%] mb-1 text-[1.2rem]">Month:</label>
+            <input
+              className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
               type="text"
               value={formDetails.month}
               onChange={(e) => handleFormChange("month", e.target.value)}
             />
-
           </div>
           <div>
-          <label className="grid w-[60%] mb-1 text-[1.2rem]">Name:</label>
-          <input
-            className="px-4 py-1 border border-black rounded-xl pointer-events-none"
+            <label className="grid w-[60%] mb-1 text-[1.2rem]">Name:</label>
+            <input
+              className="px-4 py-1 border border-black rounded-xl pointer-events-none"
               value={fullName}
               readOnly
             />
-
           </div>
           <div>
-          <label className="grid w-[60%] mb-1 text-[1.2rem]">Position:</label>
-          <input
-            className="px-4 py-1 border border-black focus:outline-primary rounded-xl w-[70%]"
+            <label className="grid w-[60%] mb-1 text-[1.2rem]">Position:</label>
+            <input
+              className="px-4 py-1 border border-black focus:outline-primary rounded-xl w-[70%]"
               type="text"
               value={formDetails.role}
               onChange={(e) => handleFormChange("month", e.target.value)}
             />
-
           </div>
           <div className="grid w-[60%]">
             <label htmlFor="name" className="mb-1 text-[1.2rem]">
@@ -532,53 +494,59 @@ export default function Timesheet() {
             </select>
           </div>
           <div>
-          <label className="grid w-[60%] mb-1 text-[1.2rem]">Project Manager:</label>
-          <input
-            className="px-4 py-1 border border-black rounded-xl pointer-events-none"
+            <label className="grid w-[60%] mb-1 text-[1.2rem]">
+              Project Manager:
+            </label>
+            <input
+              className="px-4 py-1 border border-black rounded-xl pointer-events-none"
               value={formDetails.projectManager}
               readOnly
             />
-
           </div>
           <div className="period grid">
-              <label htmlFor="date" className="mb-1 text-[1.2rem]">Weekly Period:</label>
-          <Popover>
-            <PopoverTrigger asChild className=" bg-white border border-black focus:outline-primary rounded-xl">
-              <Button
-                id="date"
-                variant={"outline"}
-                className={cn(
-                  "w-[300px] justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
+            <label htmlFor="date" className="mb-1 text-[1.2rem]">
+              Weekly Period:
+            </label>
+            <Popover>
+              <PopoverTrigger
+                asChild
+                className=" bg-white border border-black focus:outline-primary rounded-xl"
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date?.from ? (
-                  date.to ? (
-                    <>
-                      {format(date.from, "LLL dd")} -{" "}
-                      {format(date.to, "LLL dd")}
-                    </>
+                <Button
+                  id="date"
+                  variant={"outline"}
+                  className={cn(
+                    "w-[300px] justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date?.from ? (
+                    date.to ? (
+                      <>
+                        {format(date.from, "LLL dd")} -{" "}
+                        {format(date.to, "LLL dd")}
+                      </>
+                    ) : (
+                      format(date.from, "LLL dd")
+                    )
                   ) : (
-                    format(date.from, "LLL dd")
-                  )
-                ) : (
-                  <span>Pick a date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
-                onSelect={setDate}
-                numberOfMonths={1}
-                className="border-2 border-primary rounded-xl"
-              />
-            </PopoverContent>
-          </Popover>
+                    <span>Pick a date</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={date?.from}
+                  selected={date}
+                  onSelect={setDate}
+                  numberOfMonths={1}
+                  className="border-2 border-primary rounded-xl"
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         </form>
         <table className="mt-8">
@@ -608,7 +576,7 @@ export default function Timesheet() {
               <tr key={rowIndex} className="border-b border-secondary py-2">
                 <td className="text-center">
                   <input
-                  className="py-1 px-2 border-black focus:outline-primary rounded-xl"
+                    className="py-1 px-2 border-black focus:outline-primary rounded-xl"
                     type="date"
                     value={row.weekday}
                     onChange={(e) =>
@@ -629,7 +597,7 @@ export default function Timesheet() {
                 </td>
                 <td className="text-center">
                   <input
-                  className="w-[25%] py-1 pl-4 border-black focus:outline-primary rounded-xl"
+                    className="w-[25%] py-1 pl-4 border-black focus:outline-primary rounded-xl"
                     type="number"
                     value={row.totalHours}
                     onChange={(e) =>
@@ -643,9 +611,12 @@ export default function Timesheet() {
                 </td>
                 <td className="grid text-center">
                   {row.tasks.map((task, taskIndex) => (
-                    <div key={taskIndex} className="flex justify-center items-center mb-2 gap-x-1">
+                    <div
+                      key={taskIndex}
+                      className="flex justify-center items-center mb-2 gap-x-1"
+                    >
                       <input
-                      className="py-1 px-4 border border-black focus:outline-primary rounded-xl w-1/2"
+                        className="py-1 px-4 border border-black focus:outline-primary rounded-xl w-1/2"
                         type="text"
                         value={task.taskPerformed}
                         onChange={(e) =>
@@ -658,7 +629,7 @@ export default function Timesheet() {
                         }
                       />
                       <select
-                      className="w-[8vw] h-auto"
+                        className="w-[8vw] h-auto"
                         value={task.taskStatus}
                         onChange={(e) =>
                           handleChange(
@@ -675,13 +646,16 @@ export default function Timesheet() {
                       </select>
                     </div>
                   ))}
-                  <Button  onClick={() => handleAddTask(rowIndex)} className="grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold hover:bg-transparent mt-2">
+                  <Button
+                    onClick={() => handleAddTask(rowIndex)}
+                    className="grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold hover:bg-transparent mt-2"
+                  >
                     Add Task
                   </Button>
                 </td>
                 <td className="text-center">
                   <textarea
-                  className="px-4 border border-black focus:outline-primary rounded-xl"
+                    className="px-4 border border-black focus:outline-primary rounded-xl"
                     value={row.comment}
                     onChange={(e) =>
                       setTableData((prevData) => {
@@ -696,9 +670,17 @@ export default function Timesheet() {
             ))}
           </tbody>
         </table>
-        <Button onClick={handleSubmit} className="w-[15%] h-[80%] text-xl grid justify-self-end mt-4 rounded-xl text-white">Submit</Button>
+        <Button
+          onClick={handleSubmit}
+          className="w-[15%] h-[80%] text-xl grid justify-self-end mt-4 rounded-xl text-white"
+        >
+          Submit
+        </Button>
       </div>
 
+      <h2 className="text-center text-5xl my-12 text-secondary font-medium">
+        Your Timesheets
+      </h2>
       <div className="timesheets-container w-[80%] mx-auto">
         <div className="w-full">
           <div className="flex items-center py-4">
@@ -713,17 +695,24 @@ export default function Timesheet() {
                   .getColumn("projectName")
                   ?.setFilterValue(event.target.value)
               }
-              className="max-w-sm rounded-xl"
+              className="max-w-sm px-4 py-1 border border-black focus:outline-primary rounded-xl"
             />
           </div>
-          <div className="rounded-md border">
+
+          <div className="border-2 border-primary rounded-xl">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
+                  <TableRow
+                    key={headerGroup.id}
+                    className="border-b border-secondary"
+                  >
                     {headerGroup.headers.map((header) => {
                       return (
-                        <TableHead key={header.id}>
+                        <TableHead
+                          key={header.id}
+                          className="text-[1rem] font-medium"
+                        >
                           {header.isPlaceholder
                             ? null
                             : flexRender(
@@ -757,9 +746,9 @@ export default function Timesheet() {
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="h-24 text-center"
+                      className="h-24 text-center font-bold text-xl text-secondary"
                     >
-                      No timesheets.
+                      No timesheets for now.
                     </TableCell>
                   </TableRow>
                 )}
