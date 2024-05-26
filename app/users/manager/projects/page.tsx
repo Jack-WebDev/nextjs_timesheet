@@ -3,9 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-
 
 import {
   Dialog,
@@ -45,13 +43,13 @@ import {
 import { useUser } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-
+import { Input } from "@/components/ui/input";
 
 type Project = {
   id: string;
   Project_Name: string;
-  Project_Manager: string,
-  Client_Name: string,
+  Project_Manager: string;
+  Client_Name: string;
   Description: string;
   assignedMembers: string[];
 };
@@ -68,19 +66,19 @@ const ProjectTable: React.FC = () => {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const name = useUser()
+  const name = useUser();
 
-  const fetchprojects = useCallback(async() => {
+  const fetchprojects = useCallback(async () => {
     try {
       const response = await axios.get<Project[]>(
         "http://localhost:3000/api/projects"
       );
 
       const projects = response.data;
-      const fullName = name.Name + " " + name.Surname
+      const fullName = name.Name + " " + name.Surname;
 
-      const userProjects = projects.filter((project) =>
-        project.Project_Manager === fullName
+      const userProjects = projects.filter(
+        (project) => project.Project_Manager === fullName
       );
 
       setCleaned(userProjects);
@@ -88,13 +86,12 @@ const ProjectTable: React.FC = () => {
       setFilteredprojects(userProjects);
     } catch (error) {
       console.log(error);
-    }  }, [name.Name, name.Surname]); 
+    }
+  }, [name.Name, name.Surname]);
 
   useEffect(() => {
     fetchprojects();
-  }, [fetchprojects]); 
-
-
+  }, [fetchprojects]);
 
   const truncateText = (text: string, wordLimit: number) => {
     if (!text) return "No Description";
@@ -114,8 +111,7 @@ const ProjectTable: React.FC = () => {
     return text.slice(0, 15) + ".....";
   };
 
-
-  console.log(cleaned)
+  console.log(cleaned);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = e.target.value.toLowerCase();
@@ -145,7 +141,9 @@ const ProjectTable: React.FC = () => {
       accessorKey: "Description",
       header: "Project Description",
       cell: ({ row }) => (
-        <div className="capitalize">{truncateText(row.getValue("Description"), 5)}</div>
+        <div className="capitalize">
+          {truncateText(row.getValue("Description"), 5)}
+        </div>
       ),
     },
 
@@ -163,48 +161,51 @@ const ProjectTable: React.FC = () => {
                     <DotsHorizontalIcon className="h-4 w-4" />
                   </span>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="w-1/2">
                   <DialogHeader>
-                    <DialogTitle>Project Details</DialogTitle>
+                    <DialogTitle className="text-2xl">Project Details</DialogTitle>
                   </DialogHeader>
                   <div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectName" className="text-right">
-                Project Name:
-              </Label>
-              <p>{project.Project_Name}</p>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectName" className="text-right">
-                Project Manager:
-              </Label>
-              <p>{project.Project_Manager}</p>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectName" className="text-right">
-                Client Name:
-              </Label>
-              <p>{project.Client_Name}</p>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectName" className="text-right">
-                Project Description:
-              </Label>
-              <p>{project.Description}</p>
-            </div>
+                    <div className="flex  items-center gap-4 mb-4">
+                      <Label htmlFor="projectName" className="text-[1.3rem]">
+                        Project Name:
+                      </Label>
+                      <p className="text-[1.1rem]">{project.Project_Name}</p>
+                    </div>
+                    <div className="flex  items-center gap-4 mb-4">
+                      <Label htmlFor="projectName" className="text-[1.3rem]">
+                        Project Manager:
+                      </Label>
+                      <p className="text-[1.1rem]">{project.Project_Manager}</p>
+                    </div>
+                    <div className="flex  items-center gap-4 mb-4">
+                      <Label htmlFor="projectName" className="text-[1.3rem]">
+                        Client Name:
+                      </Label>
+                      <p className="text-[1.1rem]">{project.Client_Name}</p>
+                    </div>
+                    <div className="flex  items-center gap-4 mb-4">
+                      <Label htmlFor="projectName" className="text-[1.3rem]">
+                        Project Description:
+                      </Label>
+                      <p className="text-[1.1rem]">{project.Description}</p>
+                    </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectName" className="text-right">
-                Assigned to the project:
-              </Label>
-              <p>
-                {project.assignedMembers.map((member, index) => (
-                  <div key={index} className="flex">
-                    <span>{member}</span>
-                  </div>
-                ))}
-              </p>
-            </div>
+                    <div className="flex items-center gap-4">
+                      <Label htmlFor="projectName" className="text-[1.3rem]">
+                        Project Team:
+                      </Label>
+                      <p className="flex">
+                        {project.assignedMembers.map((member, index) => (
+                          <div key={index} className="flex">
+                            <span className="text-[1.1rem]">
+                              {index !== 0 && ", "}
+                              {member}
+                            </span>
+                          </div>
+                        ))}
+                      </p>
+                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -242,83 +243,98 @@ const ProjectTable: React.FC = () => {
   });
 
   return (
-    <>
-                <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
+    <div className="w-[90%] mx-auto">
+      <div className="flex items-center py-4">
+        <Input
+          placeholder="Filter by project name...."
+          value={
+            (table.getColumn("Project_Name")?.getFilterValue() as string) ?? ""
+          }
+          onChange={(event) =>
+            table.getColumn("Project_Name")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm rounded-xl"
+        />
+      </div>
+      <div className="border-2 border-primary rounded-xl bg-white">
+        <Table className="rounded-xl">
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow
+                key={headerGroup.id}
+                className="border-b border-secondary"
+              >
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
                           )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No timesheets.
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
-              Showing {table.getState().pagination.pageIndex + 1} to{" "}
-              {table.getPageCount().toLocaleString()} out of{" "}
-              {table.getRowCount().toLocaleString()} Records.
-            </div>
-            <div className="space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-    </>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-secondary font-semibold text-2xl"
+                >
+                  No timesheets.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          Showing {table.getState().pagination.pageIndex + 1} to{" "}
+          {table.getPageCount().toLocaleString()} out of{" "}
+          {table.getRowCount().toLocaleString()} Records.
+        </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 
