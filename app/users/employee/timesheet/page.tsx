@@ -1,14 +1,11 @@
 "use client";
 
-import DateRangeSelector from "@/components/timesheet/DatePicker";
-import { useEffect, useState } from "react";
-import Card from "@/components/timesheet/Card";
-import { format } from "date-fns";
-import axios from "axios";
-import { getSession } from "@/actions";
-
 import * as React from "react";
+import { CalendarIcon } from "@radix-ui/react-icons";
+import { addDays, format } from "date-fns";
+import { DateRange } from "react-day-picker";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -29,14 +26,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+
 import {
   Table,
   TableBody,
@@ -46,29 +38,154 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-type Timesheet = {
-  Friday: string;
-  Monday: string;
-  Project_Name: string;
-  Task_performed: string;
-  Thursday: string;
-  Total_hours: string;
-  Tuesday: string;
-  Wednesday: string;
-  Week: string;
-  Full_Name: string;
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { useState } from "react";
+import axios from "axios";
+import { useUser } from "@/app/store";
+import { toast } from "react-toastify";
+
+type AddTask = {
+  taskPerformed: string;
+  taskStatus: string;
+};
+
+type TableRow = {
+  weekday: string;
+  totalHours: number;
+  tasks: AddTask[];
+  comment: string;
+};
+
+type FormDetails = {
+  month: string;
+  name: string;
+  role: string;
+  projectManager: string;
+  projectName: string;
+};
+
+const initialData: TableRow[] = [
+  {
+    weekday: new Date().toISOString().split("T")[0],
+    totalHours: 0,
+    tasks: [],
+    comment: "",
+  },
+  {
+    weekday: new Date().toISOString().split("T")[0],
+    totalHours: 0,
+    tasks: [],
+    comment: "",
+  },
+  {
+    weekday: new Date().toISOString().split("T")[0],
+    totalHours: 0,
+    tasks: [],
+    comment: "",
+  },
+  {
+    weekday: new Date().toISOString().split("T")[0],
+    totalHours: 0,
+    tasks: [],
+    comment: "",
+  },
+  {
+    weekday: new Date().toISOString().split("T")[0],
+    totalHours: 0,
+    tasks: [],
+    comment: "",
+  },
+  {
+    weekday: new Date().toISOString().split("T")[0],
+    totalHours: 0,
+    tasks: [],
+    comment: "",
+  },
+  {
+    weekday: new Date().toISOString().split("T")[0],
+    totalHours: 0,
+    tasks: [],
+    comment: "",
+  },
+];
+
+type Task = {
   id: string;
+  taskPerformed: string;
+  taskStatus: string;
+  tableRowId: string;
+};
+
+type TableRows = {
+  id: string;
+  totalHours: number;
+  comment: string;
+  tasks: Task[];
+  weekday: string;
+  userId: string;
+};
+
+type Timesheet = {
+  id: string;
+  month: string;
+  name: string;
+  role: string;
+  projectManager: string;
+  projectName: string;
+  weeklyPeriod: string;
+  tableRows: TableRows[];
   Approval_Status: string;
 };
 
-const Timesheet = () => {
-  const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(
-    new Date()
-  );
-  const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(
-    new Date()
-  );
+type Project = {
+  id: string;
+  Project_Name: string;
+  Project_Manager: string,
+  Client_Name: string,
+  Description: string;
+};
+
+
+export default function Timesheet() {
+  const [tableData, setTableData] = useState<TableRow[]>(initialData);
   const [data, setFilteredTimesheets] = useState<Timesheet[]>([]);
+  const [projects, setprojects] = useState<Project[]>([]);
+  const [selectedProject, setSelectedProject] = useState<string>('');
+  const [projectManager, setProjectManager] = useState<string>('');
+  const userZ = useUser();
+  const fullName = `${userZ.Name} ${userZ.Surname}`
+
+
+  const [formDetails, setFormDetails] = useState<FormDetails>({
+    month: "",
+    name: fullName,
+    role: "",
+    projectManager: "",
+    projectName: "",
+  });
+
+  console.log(data);
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -86,17 +203,17 @@ const Timesheet = () => {
       ),
     },
     {
-      accessorKey: "Project_Name",
+      accessorKey: "projectName",
       header: "Project Name",
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("Project_Name")}</div>
+        <div className="lowercase">{row.getValue("projectName")}</div>
       ),
     },
     {
-      accessorKey: "Task_performed",
-      header: "Task Performed",
+      accessorKey: "projectManager",
+      header: "Project Manager",
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("Task_performed")}</div>
+        <div className="lowercase">{row.getValue("projectManager")}</div>
       ),
     },
     {
@@ -117,23 +234,99 @@ const Timesheet = () => {
                   <DialogHeader>
                     <DialogTitle>Timesheet Details</DialogTitle>
                   </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="flex justify-evenly items-center">
-                      <p className="w-full">Approval Status:</p>
-                      <p className="w-full">{timesheet.Approval_Status}</p>
-                    </div>
-                    <div className="flex justify-evenly items-center">
-                      <p className="w-full">Project Name:</p>
-                      <p className="w-full">{timesheet.Project_Name}</p>
-                    </div>
-                    <div className="flex justify-evenly items-center">
-                      <p className="w-full">Week:</p>
-                      <p className="w-full">{timesheet.Week}</p>
-                    </div>
-                    <div className="flex justify-evenly items-center">
-                      <p className="w-full">Total hours:</p>
-                      <p className="w-full">{timesheet.Total_hours}</p>
-                    </div>
+                  <div>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Weekday</th>
+                          {/* <th>
+              Public/Normal Day{" "}
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild className="rounded-full">
+                    <Button variant="outline">?</Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Add to library</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </th> */}
+                          <th>Total Hours</th>
+                          <th>Tasks Performed</th>
+                          <th>Task Status</th>
+                          <th>Comment</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {timesheet &&
+                          timesheet.tableRows &&
+                          timesheet.tableRows?.map((r) => (
+                            <tr key={r.id}>
+                              <td>
+                                <p>{r.weekday}</p>
+                              </td>
+                              {/* <td>
+                <select name="" id="">
+                  <option value="">Select type of day</option>
+                  <option value="publicDay">Public Holiday</option>
+                  <option value="normalDay">Work/Normal Day</option>
+                </select>
+              </td> */}
+                              <td>
+                                <p>{r.totalHours}</p>
+                              </td>
+                              <td>
+                                {(r.tasks &&
+                                  r.tasks?.map((t) => (
+                                    <div key={t.id}>
+                                      <p>Task Performed: {t.taskPerformed}</p>
+                                    </div>
+                                  ))) || <span>No data available</span>}
+                              </td>
+                              <td>
+                                {(r.tasks &&
+                                  r.tasks?.map((t) => (
+                                    <div key={t.id}>
+                                      <p>Task Status: {t.taskStatus}</p>
+                                    </div>
+                                  ))) || <span>No data available</span>}
+                              </td>
+                              <td>
+                                <p>{r.comment}</p>
+                              </td>
+                            </tr>
+                          ))}
+                        {/* {tableData.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              <td>
+                  <p>{timesheet.}</p>
+              </td>
+              <td>
+                <select name="" id="">
+                  <option value="">Select type of day</option>
+                  <option value="publicDay">Public Holiday</option>
+                  <option value="normalDay">Work/Normal Day</option>
+                </select>
+              </td>
+              <td>
+                  <p>{timesheet.totalHours}</p>
+              </td>
+              <td>
+                {timesheet.tasks.map((task) => (
+                  <div key={task.tableRowId}>
+                  <p>Task Performed: {task.taskPerformed}</p>
+                  <p>Task Status: {task.taskStatus}</p>
+                  </div>
+                ))}
+              </td>
+              <td>
+                <p>{timesheet.comment}</p>
+              </td>
+            </tr>
+          ))} */}
+                      </tbody>
+                    </table>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -143,6 +336,11 @@ const Timesheet = () => {
       },
     },
   ];
+
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 5,
+  });
 
   const table = useReactTable({
     data,
@@ -155,24 +353,95 @@ const Timesheet = () => {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   });
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: new Date(),
+    to: addDays(new Date(), 20),
+  });
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.getItem("user");
+  const f = `${date?.from?.toLocaleDateString()} to ${date?.to?.toLocaleDateString()}`;
+
+  const handleAddTask = (index: number) => {
+    setTableData((prevData) => {
+      const newData = [...prevData];
+      newData[index].tasks.push({ taskPerformed: "", taskStatus: "" });
+      return newData;
+    });
+  };
+
+  const handleProjectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedProjectId = event.target.value;
+    setSelectedProject(selectedProjectId);
+
+    const selectedProject = projects.find(project => project.id === selectedProjectId);
+    if (selectedProject) {
+      setFormDetails({
+        ...formDetails,
+        projectName: selectedProject.Project_Name,
+        projectManager: selectedProject.Project_Manager,
+      });
+    } else {
+      setFormDetails({
+        ...formDetails,
+        projectName: '',
+        projectManager: '',
+      });
     }
-    fetchTimesheets();
-  }, []);
+  };
 
-  const fetchTimesheets = async () => {
-    const sessionData = await getSession();
+  const handleChange = (
+    rowIndex: number,
+    taskIndex: number,
+    field: keyof Task,
+    value: string
+  ) => {
+    setTableData((prevData) => {
+      const newData = [...prevData];
+      newData[rowIndex].tasks[taskIndex] = {
+        ...newData[rowIndex].tasks[taskIndex],
+        [field]: value,
+      };
+      return newData;
+    });
+  };
 
+  const handleFormChange = (field: keyof FormDetails, value: string) => {
+    setFormDetails((prevDetails) => ({
+      ...prevDetails,
+      [field]: value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+
+    const formData = {
+      combinedData: {
+        ...formDetails,
+        weeklyPeriod: f,
+        timesheet: tableData,
+        userID: userZ.id,
+        Approval_Status: "Pending",
+      },
+    };
+
+    const res = await axios.post<TableRow, FormDetails>(
+      "http://localhost:3000/api/timesheets",
+      {
+        formData: formData,
+      }
+    );
+
+    console.log(res);
+  };
+  const fetchTimesheets = React.useCallback(async () => {
     try {
       const response = await axios.get<Timesheet[]>(
         "http://localhost:3000/api/timesheets"
@@ -180,153 +449,343 @@ const Timesheet = () => {
 
       const timesheets = response.data;
 
-      const userTimesheets = timesheets.filter(
-        (timesheet) => timesheet.Full_Name === sessionData.Name
+      const userTimesheets = timesheets.filter((timesheet) =>
+        timesheet.tableRows.some((user) => user.userId === userZ.id)
       );
-
       setFilteredTimesheets(userTimesheets);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
+  }, [userZ.id]);
 
-  const formatDateToString = (date: Date | null): string => {
-    return date ? format(date, "dd/MM/yyyy") : "";
-  };
-
-  const handleUpdateDateRange = (startDate: Date, endDate: Date) => {
-    setSelectedStartDate(startDate);
-    setSelectedEndDate(endDate);
-
-    const date = `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
-
-    if (typeof localStorage !== "undefined") {
-      localStorage.setItem("week", date);
-    } else {
-      console.error("localStorage is not available.");
+  const fetchprojects = async () => {
+    try {
+      const response = await axios.get<Project[]>(
+        "http://localhost:3000/api/projects"
+      );
+      console.log(response.data);
+      setprojects(response.data);
+    } catch (error) {
+      toast.error(
+        "An error occured while fetching projects. Please reload the screen and try again."
+      );
     }
   };
 
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.getItem("user");
+    }
+    fetchprojects()
+    fetchTimesheets();
+  }, [fetchTimesheets]);
+
   return (
-    <div>
-      <main>
-        <div className="flex justify-center gap-x-12">
-          <DateRangeSelector onUpdateDateRange={handleUpdateDateRange} />
-
-          <div className="timesheet__details flex items-center justify-around mt-12">
-            <div className="time__period flex items-center gap-x-4">
-              <h2 className="font-semibold">Week:</h2>
-              <span className="bg-primary text-white p-2 rounded-xl">
-                {formatDateToString(selectedStartDate)} -{" "}
-                {formatDateToString(selectedEndDate)}
-              </span>
-            </div>
+    <>
+      <div>
+        <form>
+          <label>
+            Month:
+            <input
+              type="text"
+              value={formDetails.month}
+              onChange={(e) => handleFormChange("month", e.target.value)}
+            />
+          </label>
+          <label>
+            Name:
+            <input
+              type="text"
+              value={fullName}
+            />
+          </label>
+          <label>
+            Role:
+            <input
+              type="text"
+              value={formDetails.role}
+              onChange={(e) => handleFormChange("role", e.target.value)}
+            />
+          </label>
+          <label>
+            Project Manager:
+            <input
+              type="text"
+              value={formDetails.projectManager}
+              readOnly
+            />
+          </label>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="name" className="text-right">
+              Project Name
+            </label>
+            <select
+              name="department"
+              className="focus:border-primary"
+              value={formDetails.projectName}
+              onChange={handleProjectChange}
+            >
+              <option value={""}>Select Project</option>
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.Project_Name}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
-        <div className="timesheet__container">
-          <Card />
-        </div>
-        <h2 className="text-center text-3xl text-secondary my-[3rem]">
-          Your Timesheets
-        </h2>
-
-        <div className="timesheets-container w-[80%] mx-auto">
-          <div className="w-full">
-            <div className="flex items-center py-4">
-              <Input
-                placeholder="Filter by project name...."
-                value={
-                  (table
-                    .getColumn("Project_Name")
-                    ?.getFilterValue() as string) ?? ""
-                }
-                onChange={(event) =>
-                  table
-                    .getColumn("Project_Name")
-                    ?.setFilterValue(event.target.value)
-                }
-                className="max-w-sm rounded-xl"
-              />
-            </div>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => {
-                        return (
-                          <TableHead key={header.id}>
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext()
-                                )}
-                          </TableHead>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody>
-                  {table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        data-state={row.getIsSelected() && "selected"}
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
+          {/* <label>
+            Project Name:
+            <input
+              type="text"
+              value={formDetails.projectName}
+              onChange={(e) => handleFormChange("projectName", e.target.value)}
+            />
+          </label> */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="date"
+                variant={"outline"}
+                className={cn(
+                  "w-[300px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "LLL dd")} -{" "}
+                      {format(date.to, "LLL dd")}
+                    </>
                   ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns.length}
-                        className="h-24 text-center"
+                    format(date.from, "LLL dd")
+                  )
+                ) : (
+                  <span>Pick a date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={1}
+              />
+            </PopoverContent>
+          </Popover>
+        </form>
+        <table>
+          <thead>
+            <tr>
+              <th>Weekday</th>
+              <th>
+                Public/Normal Day{" "}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild className="rounded-full">
+                      <Button variant="outline">?</Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Add to library</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </th>
+              <th>Total Hours</th>
+              <th>Tasks Performed</th>
+              <th>Comment</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tableData.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                <td>
+                  <input
+                    type="date"
+                    value={row.weekday}
+                    onChange={(e) =>
+                      setTableData((prevData) => {
+                        const newData = [...prevData];
+                        newData[rowIndex].weekday = e.target.value;
+                        return newData;
+                      })
+                    }
+                  />
+                </td>
+                <td>
+                  <select name="" id="">
+                    <option value="">Select type of day</option>
+                    <option value="publicDay">Public Holiday</option>
+                    <option value="normalDay">Work/Normal Day</option>
+                  </select>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={row.totalHours}
+                    onChange={(e) =>
+                      setTableData((prevData) => {
+                        const newData = [...prevData];
+                        newData[rowIndex].totalHours = parseInt(e.target.value);
+                        return newData;
+                      })
+                    }
+                  />
+                </td>
+                <td>
+                  {row.tasks.map((task, taskIndex) => (
+                    <div key={taskIndex}>
+                      <input
+                        type="text"
+                        value={task.taskPerformed}
+                        onChange={(e) =>
+                          handleChange(
+                            rowIndex,
+                            taskIndex,
+                            "taskPerformed",
+                            e.target.value
+                          )
+                        }
+                      />
+                      <select
+                        value={task.taskStatus}
+                        onChange={(e) =>
+                          handleChange(
+                            rowIndex,
+                            taskIndex,
+                            "taskStatus",
+                            e.target.value
+                          )
+                        }
                       >
-                        No results.
-                      </TableCell>
+                        <option value="">Select status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </div>
+                  ))}
+                  <button onClick={() => handleAddTask(rowIndex)}>
+                    Add Task
+                  </button>
+                </td>
+                <td>
+                  <textarea
+                    value={row.comment}
+                    onChange={(e) =>
+                      setTableData((prevData) => {
+                        const newData = [...prevData];
+                        newData[rowIndex].comment = e.target.value;
+                        return newData;
+                      })
+                    }
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <button onClick={handleSubmit}>Submit</button>
+      </div>
+
+      <div className="timesheets-container w-[80%] mx-auto">
+        <div className="w-full">
+          <div className="flex items-center py-4">
+            <Input
+              placeholder="Filter by project name...."
+              value={
+                (table.getColumn("projectName")?.getFilterValue() as string) ??
+                ""
+              }
+              onChange={(event) =>
+                table
+                  .getColumn("projectName")
+                  ?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm rounded-xl"
+            />
+          </div>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No timesheets.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="flex-1 text-sm text-muted-foreground">
+              Showing {table.getState().pagination.pageIndex + 1} to{" "}
+              {table.getPageCount().toLocaleString()} out of{" "}
+              {table.getRowCount().toLocaleString()} Records.
             </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
-              <div className="flex-1 text-sm text-muted-foreground">
-                Showing {table.getFilteredSelectedRowModel().rows.length} to{" "}
-                {table.getFilteredRowModel().rows.length} out of 20 records.
-              </div>
-              <div className="space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  Next
-                </Button>
-              </div>
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
-};
-
-export default Timesheet;
+}

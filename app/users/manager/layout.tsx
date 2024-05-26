@@ -5,8 +5,8 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { FaChevronDown } from "react-icons/fa";
+import ManagerNav from "@/components/ManagerNav";
 import Image from "next/image";
-import EmployeeNavMenu from "@/components/EmployeeNav";
 
 export default async function DashboardLayout({
 	children,
@@ -15,7 +15,6 @@ export default async function DashboardLayout({
 }) {
 	const session = await getSession();
 	const name = session.Name;
-
 	return (
 		<div className="flex flex-col h-screen">
 			<header className="flex justify-end px-8 items-center py-8 pr-16 bg-[#a2a1a81a]">
@@ -35,7 +34,7 @@ export default async function DashboardLayout({
 			</header>
 
 			<div className="content flex flex-1">
-				<EmployeeNavMenu/>
+				<ManagerNav />
 
 				<div className="main__content flex-1 m-12">
 					<Image

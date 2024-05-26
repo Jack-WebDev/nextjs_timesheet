@@ -4,6 +4,7 @@ import { SessionProp, defaultSession, sessionOptions } from "@/lib/session";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import axios from "axios";
 
 export const getSession = async () => {
   const session = await getIronSession<SessionProp>(cookies(), sessionOptions);
@@ -35,9 +36,17 @@ export const login = async (userData: User) => {
   session.success = true;
   session.Email = userData.Email;
 
+  console.log("first")
+
   if (userData.Role === "Admin") {
     await session.save();
     redirect("/users/admin");
+  } else if (userData.Role === "Manager") {
+    await session.save();
+    redirect("/users/manager");
+  } else if (userData.Role === "Executive") {
+    await session.save();
+    redirect("/users/exec");
   } else {
     session.isAdmin = false;
     await session.save();
