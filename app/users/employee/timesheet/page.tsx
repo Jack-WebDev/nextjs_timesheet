@@ -476,52 +476,50 @@ export default function Timesheet() {
     if (typeof window !== "undefined") {
       localStorage.getItem("user");
     }
-    fetchprojects()
-    fetchTimesheets();
+    // fetchprojects()
+    // fetchTimesheets();
   }, [fetchTimesheets]);
 
   return (
     <>
-      <div>
-        <form>
-          <label>
-            Month:
-            <input
+      <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
+        <form className="grid grid-cols-3 border-b-2 border-secondary pb-8 gap-y-4">
+          <div>
+          <label className="grid w-[60%] mb-1 text-[1.2rem]">Month:</label>
+          <input
+            className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
               type="text"
               value={formDetails.month}
               onChange={(e) => handleFormChange("month", e.target.value)}
             />
-          </label>
-          <label>
-            Name:
-            <input
-              type="text"
+
+          </div>
+          <div>
+          <label className="grid w-[60%] mb-1 text-[1.2rem]">Name:</label>
+          <input
+            className="px-4 py-1 border border-black rounded-xl pointer-events-none"
               value={fullName}
-            />
-          </label>
-          <label>
-            Role:
-            <input
-              type="text"
-              value={formDetails.role}
-              onChange={(e) => handleFormChange("role", e.target.value)}
-            />
-          </label>
-          <label>
-            Project Manager:
-            <input
-              type="text"
-              value={formDetails.projectManager}
               readOnly
             />
-          </label>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="name" className="text-right">
+
+          </div>
+          <div>
+          <label className="grid w-[60%] mb-1 text-[1.2rem]">Position:</label>
+          <input
+            className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
+              type="text"
+              value={formDetails.role}
+              onChange={(e) => handleFormChange("month", e.target.value)}
+            />
+
+          </div>
+          <div className="grid w-[60%]">
+            <label htmlFor="name" className="mb-1 text-[1.2rem]">
               Project Name
             </label>
             <select
-              name="department"
-              className="focus:border-primary"
+              name="name"
+              className="border border-black focus:outline-primary rounded-xl h-auto"
               value={formDetails.projectName}
               onChange={handleProjectChange}
             >
@@ -533,16 +531,19 @@ export default function Timesheet() {
               ))}
             </select>
           </div>
-          {/* <label>
-            Project Name:
-            <input
-              type="text"
-              value={formDetails.projectName}
-              onChange={(e) => handleFormChange("projectName", e.target.value)}
+          <div>
+          <label className="grid w-[60%] mb-1 text-[1.2rem]">Project Manager:</label>
+          <input
+            className="px-4 py-1 border border-black rounded-xl pointer-events-none"
+              value={formDetails.projectManager}
+              readOnly
             />
-          </label> */}
+
+          </div>
+          <div className="period grid">
+              <label htmlFor="date" className="mb-1 text-[1.2rem]">Weekly Period:</label>
           <Popover>
-            <PopoverTrigger asChild>
+            <PopoverTrigger asChild className=" bg-white border border-black focus:outline-primary rounded-xl">
               <Button
                 id="date"
                 variant={"outline"}
@@ -574,9 +575,11 @@ export default function Timesheet() {
                 selected={date}
                 onSelect={setDate}
                 numberOfMonths={1}
+                className="border-2 border-primary rounded-xl"
               />
             </PopoverContent>
           </Popover>
+          </div>
         </form>
         <table>
           <thead>
