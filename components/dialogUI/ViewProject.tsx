@@ -66,49 +66,52 @@ export function ViewProject({id}:any ) {
       <DialogTrigger asChild>
         <FaEye className="cursor-pointer" />
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="w-[25%]">
         <DialogHeader>
-          <DialogTitle>Project Details</DialogTitle>
+          <DialogTitle className="text-2xl">Project Details</DialogTitle>
         </DialogHeader>
         {projects?.map((project) => (
           <div key={project.id} className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectName" className="text-right">
-                Project Name:
-              </Label>
-              <p>{project.Project_Name}</p>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectName" className="text-right">
-                Project Manager:
-              </Label>
-              <p>{project.Project_Manager}</p>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectName" className="text-right">
-                Client Name:
-              </Label>
-              <p>{project.Client_Name}</p>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectName" className="text-right">
-                Project Description:
-              </Label>
-              <p>{project.Description}</p>
-            </div>
+                    <div className="flex  items-center gap-4 mb-4">
+                      <Label htmlFor="projectName" className="text-[1.3rem]">
+                        Project Name:
+                      </Label>
+                      <p className="text-[1.1rem]">{project.Project_Name}</p>
+                    </div>
+                    <div className="flex  items-center gap-4 mb-4">
+                      <Label htmlFor="projectName" className="text-[1.3rem]">
+                        Project Manager:
+                      </Label>
+                      <p className="text-[1.1rem]">{project.Project_Manager}</p>
+                    </div>
+                    <div className="flex  items-center gap-4 mb-4">
+                      <Label htmlFor="projectName" className="text-[1.3rem]">
+                        Client Name:
+                      </Label>
+                      <p className="text-[1.1rem]">{project.Client_Name}</p>
+                    </div>
+                    <div className="flex  items-center gap-4 mb-4">
+                      <Label htmlFor="projectName" className="text-[1.3rem]">
+                        Project Description:
+                      </Label>
+                      <p className="text-[1.1rem]">{project.Description}</p>
+                    </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectName" className="text-right">
-                Assigned to the project:
-              </Label>
-              <p>
-                {project.assignedMembers.map((member, index) => (
-                  <div key={index} className="flex">
-                    <span>{member}</span>
-                  </div>
-                ))}
-              </p>
-            </div>
+                    <div className="flex items-center gap-4">
+                      <Label htmlFor="projectName" className="text-[1.3rem]">
+                        Project Team:
+                      </Label>
+                      <p className="flex">
+                        {project.assignedMembers.map((member, index) => (
+                          <div key={index} className="flex">
+                            <span className="text-[1.1rem]">
+                              {index !== 0 && ", "}
+                              {member}
+                            </span>
+                          </div>
+                        ))}
+                      </p>
+                    </div>
           </div>
         ))}
       </DialogContent>

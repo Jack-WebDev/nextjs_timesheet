@@ -106,18 +106,16 @@ export default function Timesheet() {
 
   const handleApprove = async (id: string) => {
     await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
-      Approval_Status: `Approved by ${userZ.Name} ${userZ.Surname}, awaiting approval executive`,
+      Approval_Status: `Approved by ${userZ.Name} ${userZ.Surname}, pending executive approval`,
     });
-    window.location.reload()
-
+    window.location.reload();
   };
 
   const handleReject = async (id: string) => {
     await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
-      Approval_Status: `Rejected by ${userZ.Name} ${userZ.Surname}, awaiting approval executive`,
+      Approval_Status: `Rejected by ${userZ.Name} ${userZ.Surname}, pending executive approva;`,
     });
-    window.location.reload()
-
+    window.location.reload();
   };
 
   const columns: ColumnDef<Timesheet>[] = [
@@ -162,7 +160,8 @@ export default function Timesheet() {
                     <DialogTitle className="flex justify-around items-center text-2xl">
                       Timesheet Details
                       <span className="text-xl">
-                        Weekly Period: <b className="text-primary">{timesheet.weeklyPeriod}</b>
+                        Weekly Period:{" "}
+                        <b className="text-primary">{timesheet.weeklyPeriod}</b>
                       </span>
                     </DialogTitle>
                   </DialogHeader>
@@ -230,7 +229,9 @@ export default function Timesheet() {
 
                     <div className="flex justify-evenly items-end mt-4 approval_process">
                       <div className="grid comment">
-                        <label htmlFor="comment" className="mb-2">Add comment:</label>
+                        <label htmlFor="comment" className="mb-2">
+                          Add comment:
+                        </label>
                         <textarea
                           className="px-4 border border-black focus:outline-primary rounded-xl"
                           id="comment"
@@ -346,7 +347,10 @@ export default function Timesheet() {
             <Table className="rounded-xl">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="border-b border-secondary">
+                  <TableRow
+                    key={headerGroup.id}
+                    className="border-b border-secondary"
+                  >
                     {headerGroup.headers.map((header) => {
                       return (
                         <TableHead key={header.id}>
