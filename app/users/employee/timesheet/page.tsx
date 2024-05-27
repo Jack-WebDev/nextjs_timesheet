@@ -219,6 +219,14 @@ export default function Timesheet() {
       header: () => <div className="text-start">Actions</div>,
       cell: ({ row }) => {
         const timesheet = row.original;
+        const statusClass =
+          timesheet.Approval_Status === "Pending"
+            ? "text-yellow-500 font-semibold"
+            : timesheet.Approval_Status.includes("Rejected")
+            ? "text-red-500 font-semibold"
+            : timesheet.Approval_Status.includes("Approved")
+            ? "text-green-700 font-semibold"
+            : "";
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -229,8 +237,14 @@ export default function Timesheet() {
                   </span>
                 </DialogTrigger>
                 <DialogContent className="w-1/2">
-                  <DialogHeader>
+                  <DialogHeader className="flex flex-row items-baseline justify-around">
                     <DialogTitle>Timesheet Details</DialogTitle>
+                    <div className="text-xl">
+                      Approval Status:{" "}
+                      <span className={statusClass}>
+                        {timesheet.Approval_Status}
+                      </span>{" "}
+                    </div>
                   </DialogHeader>
                   <div>
                     <table className="w-full">
@@ -331,8 +345,10 @@ export default function Timesheet() {
     to: addDays(new Date(), 20),
   });
 
-  const f = `${date?.from?.toISOString().split("T")[0]} to ${date?.to?.toISOString().split("T")[0]}`;
-  console.log(f)
+  const f = `${date?.from?.toISOString().split("T")[0]} to ${
+    date?.to?.toISOString().split("T")[0]
+  }`;
+  console.log(f);
 
   const handleAddTask = (index: number) => {
     setTableData((prevData) => {
@@ -404,7 +420,7 @@ export default function Timesheet() {
         formData: formData,
       }
     );
-    window.location.reload()
+    window.location.reload();
     console.log(res);
   };
   const fetchTimesheets = React.useCallback(async () => {

@@ -161,7 +161,7 @@ const ProjectTable: React.FC = () => {
                     <DotsHorizontalIcon className="h-4 w-4" />
                   </span>
                 </DialogTrigger>
-                <DialogContent className="w-1/2">
+                <DialogContent className="w-[25%]">
                   <DialogHeader>
                     <DialogTitle className="text-2xl">Project Details</DialogTitle>
                   </DialogHeader>
