@@ -5,7 +5,7 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { FaChevronDown } from "react-icons/fa";
-import ExecNav from "@/components/ExecNav";
+import ExecNav from "@/app/users/exec/_components/ExecNav";
 import Image from "next/image";
 
 export default async function DashboardLayout({
