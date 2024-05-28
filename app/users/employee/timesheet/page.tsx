@@ -71,6 +71,7 @@ type AddTask = {
 
 type TableRow = {
   weekday: string;
+  typeOfDay:string;
   totalHours: number;
   tasks: AddTask[];
   comment: string;
@@ -87,42 +88,55 @@ type FormDetails = {
 const initialData: TableRow[] = [
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
+
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
+
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
+
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
+
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
+
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
+
     totalHours: 0,
     tasks: [],
     comment: "",
@@ -143,6 +157,7 @@ type TableRows = {
   tasks: Task[];
   weekday: string;
   userId: string;
+  typeOfDay:string;
 };
 
 type Timesheet = {
@@ -155,31 +170,30 @@ type Timesheet = {
   weeklyPeriod: string;
   tableRows: TableRows[];
   Approval_Status: string;
+  comments: string;
 };
 
 type Project = {
   id: string;
   Project_Name: string;
-  Project_Manager: string,
-  Client_Name: string,
+  Project_Manager: string;
+  Client_Name: string;
   Description: string;
 };
-
 
 export default function Timesheet() {
   const [tableData, setTableData] = useState<TableRow[]>(initialData);
   const [data, setFilteredTimesheets] = useState<Timesheet[]>([]);
   const [projects, setprojects] = useState<Project[]>([]);
-  const [selectedProject, setSelectedProject] = useState<string>('');
-  const [projectManager, setProjectManager] = useState<string>('');
+  const [selectedProject, setSelectedProject] = useState<string>("");
+  const [projectManager, setProjectManager] = useState<string>("");
   const userZ = useUser();
-  const fullName = `${userZ.Name} ${userZ.Surname}`
-
+  const fullName = `${userZ.Name} ${userZ.Surname}`;
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
     name: fullName,
-    role: "",
+    role: userZ.Position,
     projectManager: "",
     projectName: "",
   });
@@ -219,8 +233,18 @@ export default function Timesheet() {
     {
       accessorKey: "actions",
       header: () => <div className="text-start">Actions</div>,
+      sortDescFirst: true,
+      enableSorting: true,
       cell: ({ row }) => {
         const timesheet = row.original;
+        const statusClass =
+          timesheet.Approval_Status === "Pending"
+            ? "text-yellow-500 font-semibold"
+            : timesheet.Approval_Status.includes("Rejected")
+            ? "text-red-500 font-semibold"
+            : timesheet.Approval_Status.includes("Approved")
+            ? "text-green-700 font-semibold"
+            : "";
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -230,28 +254,25 @@ export default function Timesheet() {
                     <DotsHorizontalIcon className="h-4 w-4" />
                   </span>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
+                <DialogContent className="w-1/2">
+                  <DialogHeader className="flex flex-row items-baseline justify-around">
                     <DialogTitle>Timesheet Details</DialogTitle>
+                    <div className="grid text-xl">
+                      <div className="flex">
+                      Approval Status:
+                      <span className={statusClass}>
+                        {timesheet.Approval_Status}
+                      </span>
+                      </div>
+                   
+                      </div>
                   </DialogHeader>
                   <div>
-                    <table>
+                    <table className="w-full">
                       <thead>
                         <tr>
                           <th>Weekday</th>
-                          {/* <th>
-              Public/Normal Day{" "}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild className="rounded-full">
-                    <Button variant="outline">?</Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Add to library</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </th> */}
+                          <th>Type Of Day</th>
                           <th>Total Hours</th>
                           <th>Tasks Performed</th>
                           <th>Task Status</th>
@@ -262,71 +283,58 @@ export default function Timesheet() {
                         {timesheet &&
                           timesheet.tableRows &&
                           timesheet.tableRows?.map((r) => (
-                            <tr key={r.id}>
-                              <td>
+                            <tr
+                              key={r.id}
+                              className="border-b border-secondary"
+                            >
+                              <td className="text-center">
                                 <p>{r.weekday}</p>
                               </td>
-                              {/* <td>
-                <select name="" id="">
-                  <option value="">Select type of day</option>
-                  <option value="publicDay">Public Holiday</option>
-                  <option value="normalDay">Work/Normal Day</option>
-                </select>
-              </td> */}
-                              <td>
+                              <td className="text-center">
+                                <p>{r.typeOfDay === "" ? "N/A" : r.typeOfDay}</p>
+                              </td>
+                              <td className="text-center">
                                 <p>{r.totalHours}</p>
                               </td>
-                              <td>
-                                {(r.tasks &&
-                                  r.tasks?.map((t) => (
+                              <td className="text-center">
+                                {r.tasks && r.tasks.length > 0 ? (
+                                  r.tasks.map((t) => (
                                     <div key={t.id}>
-                                      <p>Task Performed: {t.taskPerformed}</p>
+                                      <p>
+                                        {t.taskPerformed === ""
+                                          ? "N/A"
+                                          : t.taskPerformed}
+                                      </p>
                                     </div>
-                                  ))) || <span>No data available</span>}
+                                  ))
+                                ) : (
+                                  <p>N/A</p>
+                                )}
                               </td>
-                              <td>
-                                {(r.tasks &&
-                                  r.tasks?.map((t) => (
+
+                              <td className="text-center">
+                                {r.tasks && r.tasks.length > 0 ? (
+                                  r.tasks.map((t) => (
                                     <div key={t.id}>
-                                      <p>Task Status: {t.taskStatus}</p>
+                                      <p>{t.taskStatus}</p>
                                     </div>
-                                  ))) || <span>No data available</span>}
+                                  ))
+                                ) : (
+                                  <span>N/A</span>
+                                )}
                               </td>
-                              <td>
-                                <p>{r.comment}</p>
+                              <td className="text-center">
+                                <p>{r.comment === "" ? "N/A" : r.comment}</p>
                               </td>
                             </tr>
                           ))}
-                        {/* {tableData.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              <td>
-                  <p>{timesheet.}</p>
-              </td>
-              <td>
-                <select name="" id="">
-                  <option value="">Select type of day</option>
-                  <option value="publicDay">Public Holiday</option>
-                  <option value="normalDay">Work/Normal Day</option>
-                </select>
-              </td>
-              <td>
-                  <p>{timesheet.totalHours}</p>
-              </td>
-              <td>
-                {timesheet.tasks.map((task) => (
-                  <div key={task.tableRowId}>
-                  <p>Task Performed: {task.taskPerformed}</p>
-                  <p>Task Status: {task.taskStatus}</p>
-                  </div>
-                ))}
-              </td>
-              <td>
-                <p>{timesheet.comment}</p>
-              </td>
-            </tr>
-          ))} */}
                       </tbody>
                     </table>
+
+                    <div className="mt-4">
+                        <h2 className="font-semibold">Project Manager&apos;s comments:</h2>
+                        <p>{timesheet.comments === "" ? "No comment." : timesheet.comments}</p>
+                      </div> 
                   </div>
                 </DialogContent>
               </Dialog>
@@ -363,11 +371,14 @@ export default function Timesheet() {
     },
   });
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(),
-    to: addDays(new Date(), 20),
+    from: addDays(new Date(),0),
+    to: addDays(new Date(), 7),
   });
 
-  const f = `${date?.from?.toLocaleDateString()} to ${date?.to?.toLocaleDateString()}`;
+  const f = `${date?.from?.toISOString().split("T")[0]} to ${
+    date?.to?.toISOString().split("T")[0]
+  }`;
+  console.log(f);
 
   const handleAddTask = (index: number) => {
     setTableData((prevData) => {
@@ -381,7 +392,9 @@ export default function Timesheet() {
     const selectedProjectId = event.target.value;
     setSelectedProject(selectedProjectId);
 
-    const selectedProject = projects.find(project => project.id === selectedProjectId);
+    const selectedProject = projects.find(
+      (project) => project.id === selectedProjectId
+    );
     if (selectedProject) {
       setFormDetails({
         ...formDetails,
@@ -391,8 +404,8 @@ export default function Timesheet() {
     } else {
       setFormDetails({
         ...formDetails,
-        projectName: '',
-        projectManager: '',
+        projectName: "",
+        projectManager: "",
       });
     }
   };
@@ -421,7 +434,6 @@ export default function Timesheet() {
   };
 
   const handleSubmit = async () => {
-
     const formData = {
       combinedData: {
         ...formDetails,
@@ -438,7 +450,7 @@ export default function Timesheet() {
         formData: formData,
       }
     );
-
+    window.location.reload();
     console.log(res);
   };
   const fetchTimesheets = React.useCallback(async () => {
@@ -476,52 +488,46 @@ export default function Timesheet() {
     if (typeof window !== "undefined") {
       localStorage.getItem("user");
     }
-    fetchprojects()
+    fetchprojects();
     fetchTimesheets();
   }, [fetchTimesheets]);
 
   return (
     <>
-      <div>
-        <form>
-          <label>
-            Month:
+      <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
+        <form className="grid grid-cols-3 border-b-2 border-secondary pb-8 gap-y-4">
+          <div>
+            <label className="grid w-[60%] mb-1 text-[1.2rem]">Month:</label>
             <input
+              className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
               type="text"
               value={formDetails.month}
               onChange={(e) => handleFormChange("month", e.target.value)}
             />
-          </label>
-          <label>
-            Name:
+          </div>
+          <div>
+            <label className="grid w-[60%] mb-1 text-[1.2rem]">Name:</label>
             <input
-              type="text"
+              className="px-4 py-1 border border-black rounded-xl pointer-events-none"
               value={fullName}
-            />
-          </label>
-          <label>
-            Role:
-            <input
-              type="text"
-              value={formDetails.role}
-              onChange={(e) => handleFormChange("role", e.target.value)}
-            />
-          </label>
-          <label>
-            Project Manager:
-            <input
-              type="text"
-              value={formDetails.projectManager}
               readOnly
             />
-          </label>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="name" className="text-right">
+          </div>
+          <div>
+            <label className="grid w-[60%] mb-1 text-[1.2rem]">Position:</label>
+            <input
+              className="px-4 py-1 border border-black focus:outline-primary rounded-xl w-[70%] pointer-events-none"
+              value={userZ.Position}
+              readOnly
+            />
+          </div>
+          <div className="grid w-[60%]">
+            <label htmlFor="name" className="mb-1 text-[1.2rem]">
               Project Name
             </label>
             <select
-              name="department"
-              className="focus:border-primary"
+              name="name"
+              className="border border-black focus:outline-primary rounded-xl h-auto"
               value={formDetails.projectName}
               onChange={handleProjectChange}
             >
@@ -533,67 +539,70 @@ export default function Timesheet() {
               ))}
             </select>
           </div>
-          {/* <label>
-            Project Name:
+          <div>
+            <label className="grid w-[60%] mb-1 text-[1.2rem]">
+              Project Manager:
+            </label>
             <input
-              type="text"
-              value={formDetails.projectName}
-              onChange={(e) => handleFormChange("projectName", e.target.value)}
+              className="px-4 py-1 border border-black rounded-xl pointer-events-none"
+              value={formDetails.projectManager}
+              readOnly
             />
-          </label> */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                id="date"
-                variant={"outline"}
-                className={cn(
-                  "w-[300px] justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
+          </div>
+          <div className="period grid">
+            <label htmlFor="date" className="mb-1 text-[1.2rem]">
+              Weekly Period:
+            </label>
+            <Popover>
+              <PopoverTrigger
+                asChild
+                className=" bg-white border border-black focus:outline-primary rounded-xl"
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date?.from ? (
-                  date.to ? (
-                    <>
-                      {format(date.from, "LLL dd")} -{" "}
-                      {format(date.to, "LLL dd")}
-                    </>
+                <Button
+                  id="date"
+                  variant={"outline"}
+                  className={cn(
+                    "w-[300px] justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date?.from ? (
+                    date.to ? (
+                      <>
+                        {format(date.from, "LLL dd")} -{" "}
+                        {format(date.to, "LLL dd")}
+                      </>
+                    ) : (
+                      format(date.from, "LLL dd")
+                    )
                   ) : (
-                    format(date.from, "LLL dd")
-                  )
-                ) : (
-                  <span>Pick a date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
-                onSelect={setDate}
-                numberOfMonths={1}
-              />
-            </PopoverContent>
-          </Popover>
+                    <span>Pick a date</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={date?.from}
+                  selected={date}
+                  onSelect={setDate}
+                  numberOfMonths={1}
+                  className="border-2 border-primary rounded-xl"
+                  weekStartsOn={1}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         </form>
-        <table>
-          <thead>
+        <table className="mt-8">
+          <thead className="pb-2">
             <tr>
               <th>Weekday</th>
               <th>
                 Public/Normal Day{" "}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild className="rounded-full">
-                      <Button variant="outline">?</Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Add to library</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+               
               </th>
               <th>Total Hours</th>
               <th>Tasks Performed</th>
@@ -602,9 +611,10 @@ export default function Timesheet() {
           </thead>
           <tbody>
             {tableData.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                <td>
+              <tr key={rowIndex} className="border-b border-secondary py-2">
+                <td className="text-center">
                   <input
+                    className="py-1 px-2 border-black focus:outline-primary rounded-xl"
                     type="date"
                     value={row.weekday}
                     onChange={(e) =>
@@ -616,15 +626,23 @@ export default function Timesheet() {
                     }
                   />
                 </td>
-                <td>
-                  <select name="" id="">
+                <td className="text-center">
+                  <select name="" id="" className="w-[10vw] " value={row.typeOfDay}
+    onChange={(e) =>
+      setTableData((prevData) => {
+        const newData = [...prevData];
+        newData[rowIndex].typeOfDay = e.target.value;
+        return newData;
+      })
+    }>
                     <option value="">Select type of day</option>
-                    <option value="publicDay">Public Holiday</option>
-                    <option value="normalDay">Work/Normal Day</option>
+                    <option value="Public Holiday">Public Holiday</option>
+                    <option value="Normal Day">Work/Normal Day</option>
                   </select>
                 </td>
-                <td>
+                <td className="text-center">
                   <input
+                    className="w-[25%] py-1 pl-4 border-black focus:outline-primary rounded-xl"
                     type="number"
                     value={row.totalHours}
                     onChange={(e) =>
@@ -636,10 +654,14 @@ export default function Timesheet() {
                     }
                   />
                 </td>
-                <td>
+                <td className="grid text-center">
                   {row.tasks.map((task, taskIndex) => (
-                    <div key={taskIndex}>
+                    <div
+                      key={taskIndex}
+                      className="flex justify-center items-center mb-2 gap-x-1"
+                    >
                       <input
+                        className="py-1 px-4 border border-black focus:outline-primary rounded-xl w-1/2"
                         type="text"
                         value={task.taskPerformed}
                         onChange={(e) =>
@@ -652,6 +674,7 @@ export default function Timesheet() {
                         }
                       />
                       <select
+                        className="w-[8vw] h-auto"
                         value={task.taskStatus}
                         onChange={(e) =>
                           handleChange(
@@ -663,18 +686,21 @@ export default function Timesheet() {
                         }
                       >
                         <option value="">Select status</option>
-                        <option value="Pending">Pending</option>
+                        <option value="In-Progress">In-Progress</option>
                         <option value="Completed">Completed</option>
-                        <option value="Cancelled">Cancelled</option>
                       </select>
                     </div>
                   ))}
-                  <button onClick={() => handleAddTask(rowIndex)}>
+                  <Button
+                    onClick={() => handleAddTask(rowIndex)}
+                    className="grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold hover:bg-transparent mt-2"
+                  >
                     Add Task
-                  </button>
+                  </Button>
                 </td>
-                <td>
+                <td className="text-center">
                   <textarea
+                    className="px-4 border border-black focus:outline-primary rounded-xl"
                     value={row.comment}
                     onChange={(e) =>
                       setTableData((prevData) => {
@@ -689,11 +715,19 @@ export default function Timesheet() {
             ))}
           </tbody>
         </table>
-        <button onClick={handleSubmit}>Submit</button>
+        <Button
+          onClick={handleSubmit}
+          className="w-[15%] h-[80%] text-xl grid justify-self-end mt-4 rounded-xl text-white"
+        >
+          Submit
+        </Button>
       </div>
 
+      <h2 className="text-center text-5xl my-12 text-secondary font-medium">
+        Your Timesheets
+      </h2>
       <div className="timesheets-container w-[80%] mx-auto">
-        <div className="w-full">
+        <div className="w-full bg-[#F5F5F5] p-4 rounded-xl border-2 border-primary">
           <div className="flex items-center py-4">
             <Input
               placeholder="Filter by project name...."
@@ -706,17 +740,24 @@ export default function Timesheet() {
                   .getColumn("projectName")
                   ?.setFilterValue(event.target.value)
               }
-              className="max-w-sm rounded-xl"
+              className="max-w-sm px-4 py-1 border border-black focus:outline-primary rounded-xl"
             />
           </div>
-          <div className="rounded-md border">
+
+          <div>
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
+                  <TableRow
+                    key={headerGroup.id}
+                    className="border-b border-secondary"
+                  >
                     {headerGroup.headers.map((header) => {
                       return (
-                        <TableHead key={header.id}>
+                        <TableHead
+                          key={header.id}
+                          className="text-[1rem] font-medium"
+                        >
                           {header.isPlaceholder
                             ? null
                             : flexRender(
@@ -750,9 +791,9 @@ export default function Timesheet() {
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="h-24 text-center"
+                      className="h-24 text-center font-bold text-xl text-secondary"
                     >
-                      No timesheets.
+                      No timesheets for now.
                     </TableCell>
                   </TableRow>
                 )}
@@ -761,7 +802,7 @@ export default function Timesheet() {
           </div>
           <div className="flex items-center justify-end space-x-2 py-4">
             <div className="flex-1 text-sm text-muted-foreground">
-              Showing {table.getState().pagination.pageIndex + 1} to{" "}
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount().toLocaleString()} out of{" "}
               {table.getRowCount().toLocaleString()} Records.
             </div>

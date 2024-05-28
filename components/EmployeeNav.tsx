@@ -37,15 +37,6 @@ function EmployeeNavMenu() {
           </Link>
 
           <Link
-            href={"/users/employee/projects"}
-            className={`link flex items-center gap-x-2 ${
-              pathname === "/users/employee/projects" ? "active" : ""
-            }`}
-          >
-            <FaCalendarCheck />
-            Projects
-          </Link>
-          <Link
             href={"/users/employee/Tasks"}
             className={`link flex items-center gap-x-2 ${
               pathname === "/users/employee/Tasks" ? "active" : ""

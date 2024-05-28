@@ -6,6 +6,7 @@ type User = {
   Name: string;
   Password: string;
   Role: string;
+  Position: string;
   Status: string;
   Surname: string;
   createdAt: string;
@@ -21,6 +22,7 @@ export const useUser = create(
       Name: "",
       Password: "",
       Role: "",
+      Position: "",
       Status: "",
       Surname: "",
       createdAt: "",
@@ -30,7 +32,7 @@ export const useUser = create(
     }),
     {
       name: "user",
-      partialize: (state) => ({ id: state.id, Email: state.Email, Name: state.Name, Surname:state.Surname }) as User,
+      partialize: (state) => ({ id: state.id, Email: state.Email, Name: state.Name, Surname:state.Surname, Position: state.Position }) as User,
     }
   )
 );

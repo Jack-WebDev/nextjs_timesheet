@@ -26,7 +26,7 @@ export async function PUT(
 ) {
     try {
         const res = await req.json();
-        const { Approval_Status } = await res;
+        const { Approval_Status, comment } = await res;
     
         // const mapped = combinedData.timesheet.map((i: any) => {
         //   return {
@@ -56,6 +56,7 @@ export async function PUT(
                     // projectName: combinedData.projectName,
                     // role: combinedData.role,
                     Approval_Status: Approval_Status,
+                    comments: comment,
                 }
             })
     

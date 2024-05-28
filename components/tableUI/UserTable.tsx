@@ -45,7 +45,7 @@ const UserTable: React.FC = () => {
 		}
 	};
 
-	const handleDelete = async (id: any) => {
+	const handleDelete = async (id: string) => {
 		try {
 			await axios.delete(`api/users/${id}`);
 			fetchUsers();

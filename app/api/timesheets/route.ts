@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
     const mapped = combinedData.timesheet.map((i: any) => {
       return {
         weekday: i.weekday.toString(),
+        typeOfDay:i.typeOfDay,
         totalHours: i.totalHours,
         tasks: {
           create: i.tasks.map((task: any) => ({
@@ -18,6 +19,7 @@ export async function POST(req: NextRequest) {
           })),
         },
         comment: i.comment,
+      
       };
     });
 
@@ -41,6 +43,7 @@ export async function POST(req: NextRequest) {
             totalHours: entry.totalHours,
             weekday: entry.weekday,
             tasks: entry.tasks,
+            typeOfDay:entry.typeOfDay,
             userId: combinedData.userID,
             tableDetailsId: detailsID.id,
           },
@@ -76,6 +79,8 @@ export async function GET() {
         },
         weeklyPeriod: true,
         Approval_Status:true,
+        comments:true,
+      
       },
     });
 

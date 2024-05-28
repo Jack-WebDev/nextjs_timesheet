@@ -82,9 +82,9 @@ function NavMenu() {
 						Reports
 					</Link>
 					<Link
-						href={"/users/settings"}
+						href={"/users/manager/settings"}
 						className={`link flex items-center gap-x-2 ${
-							pathname === "/users/settings" ? "active" : ""
+							pathname === "/users/manager/settings" ? "active" : ""
 						}`}
 					>
 						<FaGear />

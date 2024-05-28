@@ -70,6 +70,7 @@ type Task = {
 type TableRows = {
   id: string;
   totalHours: number;
+  typeOfDay: string;
   comment: string;
   tasks: Task[];
   weekday: string;
@@ -86,6 +87,7 @@ type Timesheet = {
   weeklyPeriod: string;
   tableRows: TableRows[];
   Approval_Status: string;
+  comments: string;
 };
 
 export default function Timesheet() {
@@ -108,12 +110,16 @@ export default function Timesheet() {
     await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
       Approval_Status: `Approved`,
     });
+    window.location.reload()
+
   };
 
   const handleReject = async (id: string) => {
     await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
       Approval_Status: `Rejected`,
     });
+    window.location.reload()
+
   };
 
   const columns: ColumnDef<Timesheet>[] = [
@@ -155,10 +161,10 @@ export default function Timesheet() {
                 </DialogTrigger>
                 <DialogContent className="w-[50%]">
                   <DialogHeader>
-                    <DialogTitle className="flex justify-around items-center">
-                      Timesheet Details{" "}
-                      <span>
-                        Weekly Period: <b>{timesheet.weeklyPeriod}</b>
+                    <DialogTitle className="flex justify-around items-center text-2xl">
+                      Timesheet Details
+                      <span className="text-xl">
+                        Weekly Period: <b className="text-primary">{timesheet.weeklyPeriod}</b>
                       </span>
                     </DialogTitle>
                   </DialogHeader>
@@ -167,19 +173,7 @@ export default function Timesheet() {
                       <thead>
                         <tr>
                           <th>Weekday</th>
-                          {/* <th>
-              Public/Normal Day{" "}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild className="rounded-full">
-                    <Button variant="outline">?</Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Add to library</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </th> */}
+                          <th>Type Of Day</th>
                           <th>Total Hours</th>
                           <th>Tasks Performed</th>
                           <th>Task Status</th>
@@ -190,91 +184,74 @@ export default function Timesheet() {
                         {timesheet &&
                           timesheet.tableRows &&
                           timesheet.tableRows?.map((r) => (
-                            <tr key={r.id} className="text-center">
+                            <tr
+                              key={r.id}
+                              className="text-center border-b border-secondary"
+                            >
                               <td>
                                 <p>{r.weekday}</p>
                               </td>
-                              {/* <td>
-                <select name="" id="">
-                  <option value="">Select type of day</option>
-                  <option value="publicDay">Public Holiday</option>
-                  <option value="normalDay">Work/Normal Day</option>
-                </select>
-              </td> */}
+
+                              <td>
+                                <p>{r.typeOfDay === "" ? "N/A" : r.typeOfDay}</p>
+                              </td>
+
                               <td>
                                 <p>{r.totalHours}</p>
                               </td>
-                              <td>
-                                {(r.tasks &&
-                                  r.tasks?.map((t) => (
+                              <td className="text-center">
+                                {r.tasks && r.tasks.length > 0 ? (
+                                  r.tasks.map((t) => (
                                     <div key={t.id}>
                                       <p>
-                                        Task Performed:{" "}
                                         {t.taskPerformed === ""
-                                          ? "No Tasks"
+                                          ? "N/A"
                                           : t.taskPerformed}
                                       </p>
                                     </div>
-                                  ))) || <span>No data available</span>}
+                                  ))
+                                ) : (
+                                  <p>N/A</p>
+                                )}
                               </td>
-                              <td>
-                                {(r.tasks &&
-                                  r.tasks?.map((t) => (
+
+                              <td className="text-center">
+                                {r.tasks && r.tasks.length > 0 ? (
+                                  r.tasks.map((t) => (
                                     <div key={t.id}>
-                                      <p>Task Status: {t.taskStatus}</p>
+                                      <p>{t.taskStatus}</p>
                                     </div>
-                                  ))) || <span>No data available</span>}
+                                  ))
+                                ) : (
+                                  <span>N/A</span>
+                                )}
                               </td>
-                              <td>
-                                <p>{r.comment}</p>
+                              <td className="text-center">
+                                <p>{r.comment === "" ? "N/A" : r.comment}</p>
                               </td>
                             </tr>
                           ))}
-                        {/* {tableData.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              <td>
-                  <p>{timesheet.}</p>
-              </td>
-              <td>
-                <select name="" id="">
-                  <option value="">Select type of day</option>
-                  <option value="publicDay">Public Holiday</option>
-                  <option value="normalDay">Work/Normal Day</option>
-                </select>
-              </td>
-              <td>
-                  <p>{timesheet.totalHours}</p>
-              </td>
-              <td>
-                {timesheet.tasks.map((task) => (
-                  <div key={task.tableRowId}>
-                  <p>Task Performed: {task.taskPerformed}</p>
-                  <p>Task Status: {task.taskStatus}</p>
-                  </div>
-                ))}
-              </td>
-              <td>
-                <p>{timesheet.comment}</p>
-              </td>
-            </tr>
-          ))} */}
                       </tbody>
                     </table>
 
-                    <div className="flex justify-evenly items-center border-t mt-4 border-black approval_process">
+                    <div className="flex justify-evenly items-end mt-4 approval_process">
+                      <div>
+                        <h2 className="font-semibold">Project Manager&apos;s comments:</h2>
+                        <p>{timesheet.comments === "" ? "No comment." : timesheet.comments}</p>
+                      </div>
                       <div className="btns flex items-end gap-x-4 justify-items-end">
-                        <button
+                        <Button
                           onClick={() => handleApprove(timesheet.id)}
-                          className="border border-black"
+                          className="bg-green-500 text-white rounded-xl hover:bg-green-400"
                         >
-                          <FaThumbsUp /> Approve
-                        </button>
-                        <button
+                          <FaThumbsUp color="white" className="mr-2" /> Approve
+                        </Button>
+                        <Button
                           onClick={() => handleReject(timesheet.id)}
-                          className="border border-black"
+                          className="bg-red-500 text-white rounded-xl hover:bg-red-400"
                         >
-                          <FaThumbsDown /> Reject
-                        </button>
+                          <FaThumbsDown color="white" className="mr-2" /> Reject
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -345,7 +322,7 @@ export default function Timesheet() {
   return (
     <>
       <div className="timesheets-container w-[80%] mx-auto">
-        <div className="w-full">
+        <div className="w-full bg-[#F5F5F5] p-4 rounded-xl border-2 border-primary">
           <div className="flex items-center py-4">
             <Input
               placeholder="Filter by project name...."
@@ -361,11 +338,11 @@ export default function Timesheet() {
               className="max-w-sm rounded-xl"
             />
           </div>
-          <div className="rounded-md border">
-            <Table>
+          <div>
+            <Table className="rounded-xl">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
+                  <TableRow key={headerGroup.id} className="border-b border-secondary">
                     {headerGroup.headers.map((header) => {
                       return (
                         <TableHead key={header.id}>
@@ -402,7 +379,7 @@ export default function Timesheet() {
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="h-24 text-center"
+                      className="h-24 text-center text-secondary font-semibold text-2xl"
                     >
                       No timesheets.
                     </TableCell>
@@ -413,7 +390,7 @@ export default function Timesheet() {
           </div>
           <div className="flex items-center justify-end space-x-2 py-4">
             <div className="flex-1 text-sm text-muted-foreground">
-              Showing {table.getState().pagination.pageIndex + 1} to{" "}
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount().toLocaleString()} out of{" "}
               {table.getRowCount().toLocaleString()} Records.
             </div>

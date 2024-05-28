@@ -42,7 +42,6 @@ export function LoginForm() {
 		try {
 			const res = await axios.post("api/login", values);
 			const userData = await res.data;
-			const fullName = `${userData.Name} ${userData.Surname}`;
 			useUser.setState(userData)
 			await login(userData);
 		} catch (error) {

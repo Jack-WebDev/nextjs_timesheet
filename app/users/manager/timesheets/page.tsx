@@ -46,7 +46,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useUser } from "@/app/store";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import { time } from "console";
+import ApproveTimesheet from "@/components/dialogUI/ApproveTimesheet";
+
 
 type AddTask = {
   taskPerformed: string;
@@ -55,6 +56,7 @@ type AddTask = {
 
 type TableRow = {
   weekday: string;
+  typeOfDay: string;
   totalHours: number;
   tasks: AddTask[];
   comment: string;
@@ -69,6 +71,7 @@ type Task = {
 
 type TableRows = {
   id: string;
+  typeOfDay: string;
   totalHours: number;
   comment: string;
   tasks: Task[];
@@ -86,15 +89,24 @@ type Timesheet = {
   weeklyPeriod: string;
   tableRows: TableRows[];
   Approval_Status: string;
+  comments: string;
 };
 
 export default function Timesheet() {
   const [data, setFilteredTimesheets] = useState<Timesheet[]>([]);
+  const [comment, setComment] = useState<string>("");
+  const [isOpen, setIsOpen] = useState(false);
+
   // const [task,setTasks] = useState<Task[]>([])
 
   const userZ = useUser();
 
-  console.log(data);
+  console.log(comment);
+  console.log(isOpen)
+
+  const handleCommentChange = (e:any) => {
+    setComment(e.target.value);
+  };
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -104,17 +116,6 @@ export default function Timesheet() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const handleApprove = async (id:string) => {
-    await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
-      Approval_Status: `Approved by ${userZ.Name} ${userZ.Surname}`,
-    });
-  };
-
-  const handleReject = async (id:string) => {
-    await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
-      Approval_Status: `Rejected by ${userZ.Name} ${userZ.Surname}`,
-    });
-  };
 
   const columns: ColumnDef<Timesheet>[] = [
     {
@@ -143,149 +144,10 @@ export default function Timesheet() {
       header: () => <div className="text-start">Actions</div>,
       cell: ({ row }) => {
         const timesheet = row.original;
-        console.log(timesheet.id)
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <span className="cursor-pointer">
-                    <DotsHorizontalIcon className="h-4 w-4" />
-                  </span>
-                </DialogTrigger>
-                <DialogContent className="w-[50%]">
-                  <DialogHeader>
-                    <DialogTitle className="flex justify-around items-center">
-                      Timesheet Details{" "}
-                      <span>
-                        Weekly Period: <b>{timesheet.weeklyPeriod}</b>
-                      </span>
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div>
-                    <table className="w-full">
-                      <thead>
-                        <tr>
-                          <th>Weekday</th>
-                          {/* <th>
-              Public/Normal Day{" "}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild className="rounded-full">
-                    <Button variant="outline">?</Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Add to library</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </th> */}
-                          <th>Total Hours</th>
-                          <th>Tasks Performed</th>
-                          <th>Task Status</th>
-                          <th>Comment</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {timesheet &&
-                          timesheet.tableRows &&
-                          timesheet.tableRows?.map((r) => (
-                            <tr key={r.id} className="text-center">
-                              <td>
-                                <p>{r.weekday}</p>
-                              </td>
-                              {/* <td>
-                <select name="" id="">
-                  <option value="">Select type of day</option>
-                  <option value="publicDay">Public Holiday</option>
-                  <option value="normalDay">Work/Normal Day</option>
-                </select>
-              </td> */}
-                              <td>
-                                <p>{r.totalHours}</p>
-                              </td>
-                              <td>
-                                {(r.tasks &&
-                                  r.tasks?.map((t) => (
-                                    <div key={t.id}>
-                                      <p>
-                                        Task Performed:{" "}
-                                        {t.taskPerformed === ""
-                                          ? "No Tasks"
-                                          : t.taskPerformed}
-                                      </p>
-                                    </div>
-                                  ))) || <span>No data available</span>}
-                              </td>
-                              <td>
-                                {(r.tasks &&
-                                  r.tasks?.map((t) => (
-                                    <div key={t.id}>
-                                      <p>Task Status: {t.taskStatus}</p>
-                                    </div>
-                                  ))) || <span>No data available</span>}
-                              </td>
-                              <td>
-                                <p>{r.comment}</p>
-                              </td>
-                            </tr>
-                          ))}
-                        {/* {tableData.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              <td>
-                  <p>{timesheet.}</p>
-              </td>
-              <td>
-                <select name="" id="">
-                  <option value="">Select type of day</option>
-                  <option value="publicDay">Public Holiday</option>
-                  <option value="normalDay">Work/Normal Day</option>
-                </select>
-              </td>
-              <td>
-                  <p>{timesheet.totalHours}</p>
-              </td>
-              <td>
-                {timesheet.tasks.map((task) => (
-                  <div key={task.tableRowId}>
-                  <p>Task Performed: {task.taskPerformed}</p>
-                  <p>Task Status: {task.taskStatus}</p>
-                  </div>
-                ))}
-              </td>
-              <td>
-                <p>{timesheet.comment}</p>
-              </td>
-            </tr>
-          ))} */}
-                      </tbody>
-                    </table>
+        
+          <ApproveTimesheet timesheet={timesheet}/>
 
-                    <div className="flex justify-evenly items-center border-t mt-4 border-black approval_process">
-                      <div className="grid comment">
-                        <label htmlFor="comment">Add comment</label>
-                        <textarea className="mt-4" id="comment"></textarea>
-                      </div>
-                      <div className="btns flex items-end gap-x-4 justify-items-end">
-                        <button
-                          onClick={() => handleApprove(timesheet.id)}
-                          className="border border-black"
-                        >
-                          <FaThumbsUp /> Approve
-                        </button>
-                        <button
-                          onClick={() => handleReject(timesheet.id)}
-                          className="border border-black"
-                        >
-                          <FaThumbsDown /> Reject
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </DropdownMenuTrigger>
-          </DropdownMenu>
         );
       },
     },
@@ -356,7 +218,7 @@ export default function Timesheet() {
   return (
     <>
       <div className="timesheets-container w-[80%] mx-auto">
-        <div className="w-full">
+        <div className="w-full bg-[#F5F5F5] p-4 rounded-xl border-2 border-primary">
           <div className="flex items-center py-4">
             <Input
               placeholder="Filter by project name...."
@@ -372,11 +234,14 @@ export default function Timesheet() {
               className="max-w-sm rounded-xl"
             />
           </div>
-          <div className="rounded-md border">
-            <Table>
+          <div>
+            <Table className="rounded-xl">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
+                  <TableRow
+                    key={headerGroup.id}
+                    className="border-b border-secondary"
+                  >
                     {headerGroup.headers.map((header) => {
                       return (
                         <TableHead key={header.id}>
@@ -413,7 +278,7 @@ export default function Timesheet() {
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="h-24 text-center"
+                      className="h-24 text-center text-secondary font-semibold text-2xl"
                     >
                       No timesheets.
                     </TableCell>
@@ -424,7 +289,7 @@ export default function Timesheet() {
           </div>
           <div className="flex items-center justify-end space-x-2 py-4">
             <div className="flex-1 text-sm text-muted-foreground">
-              Showing {table.getState().pagination.pageIndex + 1} to{" "}
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount().toLocaleString()} out of{" "}
               {table.getRowCount().toLocaleString()} Records.
             </div>

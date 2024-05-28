@@ -9,6 +9,7 @@ CREATE TABLE "User" (
     "departmentName" TEXT,
     "Status" TEXT NOT NULL,
     "Role" TEXT NOT NULL DEFAULT 'Employee',
+    "Position" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -75,6 +76,7 @@ CREATE TABLE "TableDetails" (
     "projectManager" TEXT NOT NULL,
     "projectName" TEXT NOT NULL,
     "Approval_Status" TEXT NOT NULL,
+    "comments" TEXT,
 
     CONSTRAINT "TableDetails_pkey" PRIMARY KEY ("id")
 );
@@ -83,6 +85,7 @@ CREATE TABLE "TableDetails" (
 CREATE TABLE "TableRow" (
     "id" TEXT NOT NULL,
     "weekday" TEXT NOT NULL,
+    "typeOfDay" TEXT NOT NULL,
     "totalHours" DOUBLE PRECISION NOT NULL,
     "comment" TEXT NOT NULL,
     "userId" TEXT NOT NULL,

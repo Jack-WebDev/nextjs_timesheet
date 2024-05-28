@@ -18,11 +18,11 @@ model User {
   departmentId   String?
   department     Department? @relation(fields: [departmentId], references: [id])
   departmentName String? // Direct field for department name
-
-  Status    String
-  Role      String     @default("Employee")
-  createdAt DateTime   @default(now())
-  tableRows TableRow[] // New relation to TableRow
+  Status         String
+  Role           String      @default("Employee")
+  Position       String?
+  createdAt      DateTime    @default(now())
+  tableRows      TableRow[] // New relation to TableRow
 }
 
 model Project {
@@ -78,11 +78,13 @@ model TableDetails {
   projectName     String
   tableRows       TableRow[]
   Approval_Status String
+  comments        String?
 }
 
 model TableRow {
   id             String       @id @default(uuid())
   weekday        String
+  typeOfDay      String
   totalHours     Float
   comment        String
   tasks          Task[]
