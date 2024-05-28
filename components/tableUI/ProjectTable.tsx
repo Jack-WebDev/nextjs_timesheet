@@ -1,37 +1,29 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { EditProject } from "../dialogUI/EditProject";
 import { AddProject } from "../dialogUI/AddProject";
 import { FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { ViewProject } from "../dialogUI/ViewProject";
+import { Project } from "../../types/projectProps";
+import useFetchProjects from "@/hooks/useFetchProjects";
+import { useRouter } from "next/navigation";
 
-type Department = {
-  id: string,
-  Department_Name: string
-}
-
-type Project = {
-  id: string;
-  Project_Name: string;
-  Project_Manager: string,
-  Client_Name: string,
-  Description: string;
-  department: Department;
-};
-
-
-
-const ProjectTable: React.FC = () => {
-  const [projects, setprojects] = useState<Project[]>([]);
-  const [filteredprojects, setFilteredprojects] = useState<Project[]>([]);
+const ProjectTable = () => {
+  const projectsData = useFetchProjects();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [filter, setFilter] = useState<string>("");
+  const router = useRouter();
 
   useEffect(() => {
-    fetchprojects();
-  }, []);
+    if (projectsData) {
+      setProjects(projectsData);
+      setFilteredProjects(projectsData);
+    }
+  }, [projectsData]);
 
   const truncateText = (text: string, wordLimit: number) => {
     if (!text) return "No Description";
@@ -51,25 +43,10 @@ const ProjectTable: React.FC = () => {
     return text.slice(0, 15) + ".....";
   };
 
-  const fetchprojects = async () => {
-    try {
-      const response = await axios.get<Project[]>(
-        "http://localhost:3000/api/projects"
-      );
-      console.log(response.data);
-      setprojects(response.data);
-      setFilteredprojects(response.data);
-    } catch (error) {
-      toast.error(
-        "An error occured while fetching projects. Please reload the screen and try again."
-      );
-    }
-  };
-
   const handleDelete = async (id: any) => {
     try {
-      await axios.delete(`http://localhost:3000/api/projects/${id}`);
-      fetchprojects();
+      await axios.delete(`/api/projects/${id}`);
+      router.refresh();
       toast.success("Project deleted successfully");
     } catch (error) {
       toast.error(
@@ -84,7 +61,7 @@ const ProjectTable: React.FC = () => {
     const filtered = projects.filter((project) =>
       project.Project_Name.toLowerCase().includes(searchTerm)
     );
-    setFilteredprojects(filtered);
+    setFilteredProjects(filtered);
   };
 
   return (
@@ -111,7 +88,7 @@ const ProjectTable: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredprojects.map((project) => (
+          {filteredProjects.map((project) => (
             <tr key={project.id}>
               <td>{truncateText(project.Project_Name, 5)}</td>
               <td>{truncateText(project.Project_Manager, 5)}</td>

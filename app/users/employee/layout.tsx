@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/popover";
 import { FaChevronDown } from "react-icons/fa";
 import Image from "next/image";
-import EmployeeNavMenu from "@/components/EmployeeNav";
+import EmployeeNav from "@/app/users/employee/_components/EmployeeNav";
 
 export default async function DashboardLayout({
 	children,
@@ -35,7 +35,7 @@ export default async function DashboardLayout({
 			</header>
 
 			<div className="content flex flex-1">
-				<EmployeeNavMenu/>
+				<EmployeeNav/>
 
 				<div className="main__content flex-1 m-12">
 					<Image
