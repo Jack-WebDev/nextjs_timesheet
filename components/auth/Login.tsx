@@ -46,7 +46,7 @@ export function LoginForm() {
 			await login(userData);
 		} catch (error) {
 			toast.error(
-				"An error occured while logging in. Please reload the screen and try again."
+				"Invalid password. Please try again."
 			);
 		}
 	}

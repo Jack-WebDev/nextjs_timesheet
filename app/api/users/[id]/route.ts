@@ -30,6 +30,7 @@ export async function DELETE(
 				id: params.id,
 			},
 		});
+		console.log(user)
 
 		return NextResponse.json(user, { status: 201 });
 	} catch (error) {
