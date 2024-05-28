@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { addDays, format } from "date-fns";
 import { DateRange } from "react-day-picker";
@@ -39,13 +38,6 @@ import {
 } from "@/components/ui/table";
 
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-
-import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -59,23 +51,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useUser } from "@/app/store";
-import { toast } from "react-toastify";
-
-type AddTask = {
-  taskPerformed: string;
-  taskStatus: string;
-};
-
-type TableRow = {
-  weekday: string;
-  typeOfDay:string;
-  totalHours: number;
-  tasks: AddTask[];
-  comment: string;
-};
+import { TimesheetProps } from "@/types/timesheetProps";
+import { Project } from "@/types/projectProps";
+import { TaskProps } from "@/types/taskProps";
+import { TableRowsProps } from "@/types/tableRowsProps";
+import useFetchTimesheets from "@/hooks/useFetchTimesheets";
+import useFetchProjects from "@/hooks/useFetchProjects";
 
 type FormDetails = {
   month: string;
@@ -85,17 +69,17 @@ type FormDetails = {
   projectName: string;
 };
 
-const initialData: TableRow[] = [
+const initialData: TableRowsProps[] = [
   {
     weekday: new Date().toISOString().split("T")[0],
-    typeOfDay:"",
+    typeOfDay: "",
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
-    typeOfDay:"",
+    typeOfDay: "",
 
     totalHours: 0,
     tasks: [],
@@ -103,7 +87,7 @@ const initialData: TableRow[] = [
   },
   {
     weekday: new Date().toISOString().split("T")[0],
-    typeOfDay:"",
+    typeOfDay: "",
 
     totalHours: 0,
     tasks: [],
@@ -111,7 +95,7 @@ const initialData: TableRow[] = [
   },
   {
     weekday: new Date().toISOString().split("T")[0],
-    typeOfDay:"",
+    typeOfDay: "",
 
     totalHours: 0,
     tasks: [],
@@ -119,7 +103,7 @@ const initialData: TableRow[] = [
   },
   {
     weekday: new Date().toISOString().split("T")[0],
-    typeOfDay:"",
+    typeOfDay: "",
 
     totalHours: 0,
     tasks: [],
@@ -127,7 +111,7 @@ const initialData: TableRow[] = [
   },
   {
     weekday: new Date().toISOString().split("T")[0],
-    typeOfDay:"",
+    typeOfDay: "",
 
     totalHours: 0,
     tasks: [],
@@ -135,7 +119,7 @@ const initialData: TableRow[] = [
   },
   {
     weekday: new Date().toISOString().split("T")[0],
-    typeOfDay:"",
+    typeOfDay: "",
 
     totalHours: 0,
     tasks: [],
@@ -143,50 +127,12 @@ const initialData: TableRow[] = [
   },
 ];
 
-type Task = {
-  id: string;
-  taskPerformed: string;
-  taskStatus: string;
-  tableRowId: string;
-};
-
-type TableRows = {
-  id: string;
-  totalHours: number;
-  comment: string;
-  tasks: Task[];
-  weekday: string;
-  userId: string;
-  typeOfDay:string;
-};
-
-type Timesheet = {
-  id: string;
-  month: string;
-  name: string;
-  role: string;
-  projectManager: string;
-  projectName: string;
-  weeklyPeriod: string;
-  tableRows: TableRows[];
-  Approval_Status: string;
-  comments: string;
-};
-
-type Project = {
-  id: string;
-  Project_Name: string;
-  Project_Manager: string;
-  Client_Name: string;
-  Description: string;
-};
-
 export default function Timesheet() {
-  const [tableData, setTableData] = useState<TableRow[]>(initialData);
-  const [data, setFilteredTimesheets] = useState<Timesheet[]>([]);
-  const [projects, setprojects] = useState<Project[]>([]);
-  const [selectedProject, setSelectedProject] = useState<string>("");
-  const [projectManager, setProjectManager] = useState<string>("");
+  const timesheetData = useFetchTimesheets();
+  const projectsData = useFetchProjects();
+  const [tableData, setTableData] = useState<TableRowsProps[]>(initialData);
+  const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const userZ = useUser();
   const fullName = `${userZ.Name} ${userZ.Surname}`;
 
@@ -198,17 +144,12 @@ export default function Timesheet() {
     projectName: "",
   });
 
-  console.log(data);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-
-  const columns: ColumnDef<Timesheet>[] = [
+  const columns: ColumnDef<TimesheetProps>[] = [
     {
       accessorKey: "Approval_Status",
       header: "Approval Status",
@@ -259,13 +200,12 @@ export default function Timesheet() {
                     <DialogTitle>Timesheet Details</DialogTitle>
                     <div className="grid text-xl">
                       <div className="flex">
-                      Approval Status:
-                      <span className={statusClass}>
-                        {timesheet.Approval_Status}
-                      </span>
+                        Approval Status:
+                        <span className={statusClass}>
+                          {timesheet.Approval_Status}
+                        </span>
                       </div>
-                   
-                      </div>
+                    </div>
                   </DialogHeader>
                   <div>
                     <table className="w-full">
@@ -291,7 +231,9 @@ export default function Timesheet() {
                                 <p>{r.weekday}</p>
                               </td>
                               <td className="text-center">
-                                <p>{r.typeOfDay === "" ? "N/A" : r.typeOfDay}</p>
+                                <p>
+                                  {r.typeOfDay === "" ? "N/A" : r.typeOfDay}
+                                </p>
                               </td>
                               <td className="text-center">
                                 <p>{r.totalHours}</p>
@@ -332,9 +274,15 @@ export default function Timesheet() {
                     </table>
 
                     <div className="mt-4">
-                        <h2 className="font-semibold">Project Manager&apos;s comments:</h2>
-                        <p>{timesheet.comments === "" ? "No comment." : timesheet.comments}</p>
-                      </div> 
+                      <h2 className="font-semibold">
+                        Project Manager&apos;s comments:
+                      </h2>
+                      <p>
+                        {timesheet.comments === ""
+                          ? "No comment."
+                          : timesheet.comments}
+                      </p>
+                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -370,10 +318,22 @@ export default function Timesheet() {
       pagination,
     },
   });
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: addDays(new Date(),0),
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: addDays(new Date(), 0),
     to: addDays(new Date(), 7),
   });
+
+  useEffect(() => {
+    if (timesheetData) {
+      setFilteredTimesheets(timesheetData);
+    }
+  }, [timesheetData]);
+
+  useEffect(() => {
+    if (projectsData) {
+      setProjects(projectsData);
+    }
+  }, [projectsData]);
 
   const f = `${date?.from?.toISOString().split("T")[0]} to ${
     date?.to?.toISOString().split("T")[0]
@@ -390,7 +350,6 @@ export default function Timesheet() {
 
   const handleProjectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedProjectId = event.target.value;
-    setSelectedProject(selectedProjectId);
 
     const selectedProject = projects.find(
       (project) => project.id === selectedProjectId
@@ -413,7 +372,7 @@ export default function Timesheet() {
   const handleChange = (
     rowIndex: number,
     taskIndex: number,
-    field: keyof Task,
+    field: keyof TaskProps,
     value: string
   ) => {
     setTableData((prevData) => {
@@ -444,7 +403,7 @@ export default function Timesheet() {
       },
     };
 
-    const res = await axios.post<TableRow, FormDetails>(
+    const res = await axios.post<TableRowsProps, FormDetails>(
       "http://localhost:3000/api/timesheets",
       {
         formData: formData,
@@ -453,44 +412,6 @@ export default function Timesheet() {
     window.location.reload();
     console.log(res);
   };
-  const fetchTimesheets = React.useCallback(async () => {
-    try {
-      const response = await axios.get<Timesheet[]>(
-        "http://localhost:3000/api/timesheets"
-      );
-
-      const timesheets = response.data;
-
-      const userTimesheets = timesheets.filter((timesheet) =>
-        timesheet.tableRows.some((user) => user.userId === userZ.id)
-      );
-      setFilteredTimesheets(userTimesheets);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }, [userZ.id]);
-
-  const fetchprojects = async () => {
-    try {
-      const response = await axios.get<Project[]>(
-        "http://localhost:3000/api/projects"
-      );
-      console.log(response.data);
-      setprojects(response.data);
-    } catch (error) {
-      toast.error(
-        "An error occured while fetching projects. Please reload the screen and try again."
-      );
-    }
-  };
-
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.getItem("user");
-    }
-    fetchprojects();
-    fetchTimesheets();
-  }, [fetchTimesheets]);
 
   return (
     <>
@@ -600,10 +521,7 @@ export default function Timesheet() {
           <thead className="pb-2">
             <tr>
               <th>Weekday</th>
-              <th>
-                Public/Normal Day{" "}
-               
-              </th>
+              <th>Public/Normal Day </th>
               <th>Total Hours</th>
               <th>Tasks Performed</th>
               <th>Comment</th>
@@ -627,14 +545,19 @@ export default function Timesheet() {
                   />
                 </td>
                 <td className="text-center">
-                  <select name="" id="" className="w-[10vw] " value={row.typeOfDay}
-    onChange={(e) =>
-      setTableData((prevData) => {
-        const newData = [...prevData];
-        newData[rowIndex].typeOfDay = e.target.value;
-        return newData;
-      })
-    }>
+                  <select
+                    name=""
+                    id=""
+                    className="w-[10vw] "
+                    value={row.typeOfDay}
+                    onChange={(e) =>
+                      setTableData((prevData) => {
+                        const newData = [...prevData];
+                        newData[rowIndex].typeOfDay = e.target.value;
+                        return newData;
+                      })
+                    }
+                  >
                     <option value="">Select type of day</option>
                     <option value="Public Holiday">Public Holiday</option>
                     <option value="Normal Day">Work/Normal Day</option>
