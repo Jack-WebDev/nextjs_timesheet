@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { EditProject } from "../dialogUI/EditProject";
 import { AddProject } from "../dialogUI/AddProject";
@@ -11,7 +11,7 @@ import { Project } from "../../types/projectProps";
 import useFetchProjects from "@/hooks/useFetchProjects";
 import { useRouter } from "next/navigation";
 
-const ProjectTable: React.FC = () => {
+const ProjectTable = () => {
   const projectsData = useFetchProjects();
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);

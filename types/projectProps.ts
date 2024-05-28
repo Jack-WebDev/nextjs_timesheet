@@ -8,4 +8,5 @@ export type Project = {
   Client_Name: string,
   Description: string;
   department: DepartmentProps;
+  assignedMembers?: string[];
 };

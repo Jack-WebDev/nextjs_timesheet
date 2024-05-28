@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
 import {
@@ -42,87 +41,48 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { useUser } from "@/app/store";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import { time } from "console";
-
-type AddTask = {
-  taskPerformed: string;
-  taskStatus: string;
-};
-
-type TableRow = {
-  weekday: string;
-  totalHours: number;
-  tasks: AddTask[];
-  comment: string;
-};
-
-type Task = {
-  id: string;
-  taskPerformed: string;
-  taskStatus: string;
-  tableRowId: string;
-};
-
-type TableRows = {
-  id: string;
-  totalHours: number;
-  typeOfDay: string;
-  comment: string;
-  tasks: Task[];
-  weekday: string;
-  userId: string;
-};
-
-type Timesheet = {
-  id: string;
-  month: string;
-  name: string;
-  role: string;
-  projectManager: string;
-  projectName: string;
-  weeklyPeriod: string;
-  tableRows: TableRows[];
-  Approval_Status: string;
-  comments: string;
-};
+import { TimesheetProps } from "@/types/timesheetProps";
+import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 
 export default function Timesheet() {
-  const [data, setFilteredTimesheets] = useState<Timesheet[]>([]);
-  // const [task,setTasks] = useState<Task[]>([])
+  const timesheetsData = useFetchTimesheets();
+  const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
 
-  const userZ = useUser();
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
-  console.log(data);
+  useEffect(() => {
+    if (timesheetsData) {
+      const userTimesheets = timesheetsData.filter((timesheet) => {
+        const isApprovedBy = timesheet.Approval_Status.includes("Approved by");
+        const isRejectedBy = timesheet.Approval_Status.includes("Rejected by");
 
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+        return (isApprovedBy || isRejectedBy);
+      });
+      setFilteredTimesheets(userTimesheets);
+    }
+  }, [timesheetsData]);
 
   const handleApprove = async (id: string) => {
     await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
       Approval_Status: `Approved`,
     });
-    window.location.reload()
-
+    window.location.reload();
   };
 
   const handleReject = async (id: string) => {
     await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
       Approval_Status: `Rejected`,
     });
-    window.location.reload()
-
+    window.location.reload();
   };
 
-  const columns: ColumnDef<Timesheet>[] = [
+  const columns: ColumnDef<TimesheetProps>[] = [
     {
       accessorKey: "Approval_Status",
       header: "Approval Status",
@@ -149,7 +109,6 @@ export default function Timesheet() {
       header: () => <div className="text-start">Actions</div>,
       cell: ({ row }) => {
         const timesheet = row.original;
-        console.log(timesheet.id);
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -164,7 +123,8 @@ export default function Timesheet() {
                     <DialogTitle className="flex justify-around items-center text-2xl">
                       Timesheet Details
                       <span className="text-xl">
-                        Weekly Period: <b className="text-primary">{timesheet.weeklyPeriod}</b>
+                        Weekly Period:{" "}
+                        <b className="text-primary">{timesheet.weeklyPeriod}</b>
                       </span>
                     </DialogTitle>
                   </DialogHeader>
@@ -193,7 +153,9 @@ export default function Timesheet() {
                               </td>
 
                               <td>
-                                <p>{r.typeOfDay === "" ? "N/A" : r.typeOfDay}</p>
+                                <p>
+                                  {r.typeOfDay === "" ? "N/A" : r.typeOfDay}
+                                </p>
                               </td>
 
                               <td>
@@ -236,8 +198,14 @@ export default function Timesheet() {
 
                     <div className="flex justify-evenly items-end mt-4 approval_process">
                       <div>
-                        <h2 className="font-semibold">Project Manager&apos;s comments:</h2>
-                        <p>{timesheet.comments === "" ? "No comment." : timesheet.comments}</p>
+                        <h2 className="font-semibold">
+                          Project Manager&apos;s comments:
+                        </h2>
+                        <p>
+                          {timesheet.comments === ""
+                            ? "No comment."
+                            : timesheet.comments}
+                        </p>
                       </div>
                       <div className="btns flex items-end gap-x-4 justify-items-end">
                         <Button
@@ -290,35 +258,6 @@ export default function Timesheet() {
     },
   });
 
-  const fetchTimesheets = React.useCallback(async () => {
-    try {
-      const response = await axios.get<Timesheet[]>(
-        "http://localhost:3000/api/timesheets"
-      );
-
-      const timesheets = response.data;
-
-      const userTimesheets = timesheets.filter((timesheet) => {
-        const isApprovedBy = timesheet.Approval_Status.includes("Approved by");
-        const isRejectedBy = timesheet.Approval_Status.includes("Rejected by");
-
-        return (isApprovedBy || isRejectedBy);
-      });
-
-      console.log(userTimesheets);
-      setFilteredTimesheets(userTimesheets);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.getItem("user");
-    }
-    fetchTimesheets();
-  }, [fetchTimesheets]);
-
   return (
     <>
       <div className="timesheets-container w-[80%] mx-auto">
@@ -342,7 +281,10 @@ export default function Timesheet() {
             <Table className="rounded-xl">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="border-b border-secondary">
+                  <TableRow
+                    key={headerGroup.id}
+                    className="border-b border-secondary"
+                  >
                     {headerGroup.headers.map((header) => {
                       return (
                         <TableHead key={header.id}>

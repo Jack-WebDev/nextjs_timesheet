@@ -1,11 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
-
+import React, { useState, useEffect } from "react";
 
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-
 
 import {
   Dialog,
@@ -42,25 +39,15 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { useUser } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Project } from "@/types/projectProps";
+import useFetchProjects from "@/hooks/useFetchProjects";
 
-
-type Project = {
-  id: string;
-  Project_Name: string;
-  Project_Manager: string,
-  Client_Name: string,
-  Description: string;
-  assignedMembers: string[];
-};
-
-const ProjectTable: React.FC = () => {
-  const [cleaned, setCleaned] = useState<Project[]>([]);
+const ProjectTable = () => {
+  const projectsData = useFetchProjects();
   const [data, setProjects] = useState<Project[]>([]);
-  const [filter, setFilter] = useState<string>("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -69,28 +56,11 @@ const ProjectTable: React.FC = () => {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const name = useUser()
-
-  const fetchprojects = useCallback(async() => {
-    try {
-      const response = await axios.get<Project[]>(
-        "http://localhost:3000/api/projects"
-      );
-
-      const projects = response.data;
-
-
-
-      setProjects(projects);
-    } catch (error) {
-      console.log(error);
-    }  }, []); 
-
   useEffect(() => {
-    fetchprojects();
-  }, [fetchprojects]); 
-
-
+    if (projectsData) {
+      setProjects(projectsData);
+    }
+  }, [projectsData]);
 
   const truncateText = (text: string, wordLimit: number) => {
     if (!text) return "No Description";
@@ -108,18 +78,6 @@ const ProjectTable: React.FC = () => {
       return text;
     }
     return text.slice(0, 15) + ".....";
-  };
-
-
-  console.log(cleaned)
-
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = e.target.value.toLowerCase();
-    setFilter(searchTerm);
-    const filtered = cleaned.filter((clean) =>
-      clean.Project_Name.toLowerCase().includes(searchTerm)
-    );
-    setProjects(filtered);
   };
 
   const columns: ColumnDef<Project>[] = [
@@ -141,7 +99,9 @@ const ProjectTable: React.FC = () => {
       accessorKey: "Project_Manager",
       header: "Project Manager",
       cell: ({ row }) => (
-        <div className="capitalize">{truncateText(row.getValue("Project_Manager"), 5)}</div>
+        <div className="capitalize">
+          {truncateText(row.getValue("Project_Manager"), 5)}
+        </div>
       ),
     },
 
@@ -161,7 +121,9 @@ const ProjectTable: React.FC = () => {
                 </DialogTrigger>
                 <DialogContent className="w-[25%]">
                   <DialogHeader>
-                    <DialogTitle className="text-2xl">Project Details</DialogTitle>
+                    <DialogTitle className="text-2xl">
+                      Project Details
+                    </DialogTitle>
                   </DialogHeader>
                   <div>
                     <div className="flex  items-center gap-4 mb-4">
@@ -194,7 +156,7 @@ const ProjectTable: React.FC = () => {
                         Project Team:
                       </Label>
                       <p className="flex">
-                        {project.assignedMembers.map((member, index) => (
+                        {project?.assignedMembers?.map((member, index) => (
                           <div key={index} className="flex">
                             <span className="text-[1.1rem]">
                               {index !== 0 && ", "}

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   FaAlignCenter,
-  FaCalendarCheck,
   FaTasks,
   FaClock,
 } from "react-icons/fa";

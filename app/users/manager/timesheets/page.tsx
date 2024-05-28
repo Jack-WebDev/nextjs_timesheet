@@ -1,8 +1,5 @@
 "use client";
 
-import * as React from "react";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -16,14 +13,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
 import { Input } from "@/components/ui/input";
 
 import {
@@ -35,89 +24,26 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
 import { Button } from "@/components/ui/button";
 
-import { useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import { useUser } from "@/app/store";
-import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import ApproveTimesheet from "@/components/dialogUI/ApproveTimesheet";
-
-
-type AddTask = {
-  taskPerformed: string;
-  taskStatus: string;
-};
-
-type TableRow = {
-  weekday: string;
-  typeOfDay: string;
-  totalHours: number;
-  tasks: AddTask[];
-  comment: string;
-};
-
-type Task = {
-  id: string;
-  taskPerformed: string;
-  taskStatus: string;
-  tableRowId: string;
-};
-
-type TableRows = {
-  id: string;
-  typeOfDay: string;
-  totalHours: number;
-  comment: string;
-  tasks: Task[];
-  weekday: string;
-  userId: string;
-};
-
-type Timesheet = {
-  id: string;
-  month: string;
-  name: string;
-  role: string;
-  projectManager: string;
-  projectName: string;
-  weeklyPeriod: string;
-  tableRows: TableRows[];
-  Approval_Status: string;
-  comments: string;
-};
+import { TimesheetProps } from "@/types/timesheetProps";
+import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 
 export default function Timesheet() {
-  const [data, setFilteredTimesheets] = useState<Timesheet[]>([]);
-  const [comment, setComment] = useState<string>("");
-  const [isOpen, setIsOpen] = useState(false);
+  const timesheetData = useFetchTimesheets();
+  const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
 
-  // const [task,setTasks] = useState<Task[]>([])
+  const user = useUser();
 
-  const userZ = useUser();
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
-  console.log(comment);
-  console.log(isOpen)
-
-  const handleCommentChange = (e:any) => {
-    setComment(e.target.value);
-  };
-
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-
-
-  const columns: ColumnDef<Timesheet>[] = [
+  const columns: ColumnDef<TimesheetProps>[] = [
     {
       accessorKey: "Approval_Status",
       header: "Approval Status",
@@ -144,11 +70,7 @@ export default function Timesheet() {
       header: () => <div className="text-start">Actions</div>,
       cell: ({ row }) => {
         const timesheet = row.original;
-        return (
-        
-          <ApproveTimesheet timesheet={timesheet}/>
-
-        );
+        return <ApproveTimesheet timesheet={timesheet} />;
       },
     },
   ];
@@ -179,19 +101,12 @@ export default function Timesheet() {
     },
   });
 
-  const fetchTimesheets = React.useCallback(async () => {
-    try {
-      const response = await axios.get<Timesheet[]>(
-        "http://localhost:3000/api/timesheets"
-      );
-
-      const timesheets = response.data;
-      // console.log(timesheets)
-
+  useEffect(() => {
+    if (timesheetData) {
       const formattedUserFullName =
-        `${userZ.Name.trim()} ${userZ.Surname.trim()}`.toLowerCase();
+        `${user.Name.trim()} ${user.Surname.trim()}`.toLowerCase();
 
-      const userTimesheets = timesheets.filter((timesheet) => {
+      const userTimesheets = timesheetData.filter((timesheet: any) => {
         const formattedProjectManagerName = timesheet.projectManager
           .trim()
           .toLowerCase();
@@ -201,19 +116,9 @@ export default function Timesheet() {
         );
       });
 
-      console.log(userTimesheets);
       setFilteredTimesheets(userTimesheets);
-    } catch (error) {
-      console.error("Error fetching data:", error);
     }
-  }, [userZ.Name, userZ.Surname]);
-
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.getItem("user");
-    }
-    fetchTimesheets();
-  }, [fetchTimesheets]);
+  }, [timesheetData, user.Name, user.Surname]);
 
   return (
     <>

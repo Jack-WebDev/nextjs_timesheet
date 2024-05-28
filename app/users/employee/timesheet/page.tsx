@@ -335,10 +335,9 @@ export default function Timesheet() {
     }
   }, [projectsData]);
 
-  const f = `${date?.from?.toISOString().split("T")[0]} to ${
+  const formattedDate = `${date?.from?.toISOString().split("T")[0]} to ${
     date?.to?.toISOString().split("T")[0]
   }`;
-  console.log(f);
 
   const handleAddTask = (index: number) => {
     setTableData((prevData) => {
@@ -396,7 +395,7 @@ export default function Timesheet() {
     const formData = {
       combinedData: {
         ...formDetails,
-        weeklyPeriod: f,
+        weeklyPeriod: formattedDate,
         timesheet: tableData,
         userID: userZ.id,
         Approval_Status: "Pending",

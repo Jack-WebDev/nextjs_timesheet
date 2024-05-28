@@ -10,10 +10,12 @@ import { DepartmentProps } from "@/types/departmentProps";
 import useFetchDepartments from "@/hooks/useFetchDepartments";
 import { useRouter } from "next/navigation";
 
-const DepartmentTable: React.FC = () => {
+const DepartmentTable= () => {
   const departmentData = useFetchDepartments();
   const [departments, setDepartments] = useState<DepartmentProps[]>([]);
-  const [filteredDepartments, setFilteredDepartments] = useState<DepartmentProps[]>([]);
+  const [filteredDepartments, setFilteredDepartments] = useState<
+    DepartmentProps[]
+  >([]);
   const [filter, setFilter] = useState<string>("");
   const router = useRouter();
 

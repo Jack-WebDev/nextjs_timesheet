@@ -1,43 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FaCalendar } from "react-icons/fa";
-import axios from "axios";
+import { FaCalendar, FaClock } from "react-icons/fa";
+import DashboardCard from "@/components/DashboardCard";
+import useFetchProjects from "@/hooks/useFetchProjects";
+import useFetchTimesheets from "@/hooks/useFetchTimesheets";
+import { useEffect, useState } from "react";
 
 export default function Dashboard() {
-	const [totalProjects, setTotalProjects] = useState<number>(0);
+  const projects = useFetchProjects();
+  const timesheetData = useFetchTimesheets();
+  const totalProjects = projects.length;
+  const [totalTimesheets, setTotalTimesheets] = useState<number>(0);
 
+  useEffect(() => {
+    if (timesheetData) {
+      const userTimesheets = timesheetData.filter((timesheet) => {
+        const isApprovedBy = timesheet.Approval_Status.includes("Approved by");
+        const isRejectedBy = timesheet.Approval_Status.includes("Rejected by");
 
-	useEffect(() => {
-		getProjects();
-	}, []);
+        return isApprovedBy || isRejectedBy;
+      });
 
+      setTotalTimesheets(userTimesheets.length);
+    }
+  }, [timesheetData]);
 
-	const getProjects = async () => {
-		const res = await axios.get("http://localhost:3000/api/projects/");
-		const projects = res.data;
-		setTotalProjects(projects.length);
-	};
-
-
-	return (
-		<div className="grid grid-cols-2 gap-12">
-			<Link href={"/users/exec/projects"}>
-				<Card className="bg-white border border-primary">
-					<CardHeader>
-						<CardTitle className="flex items-center gap-x-4 text-secondary font-bold">
-							<FaCalendar fill="#d69436" fontSize={"2rem"} />
-							Total Projects
-						</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<h2 className="font-semibold">{totalProjects}</h2>
-					</CardContent>
-				</Card>
-			</Link>
-		</div>
-	);
+  return (
+    <div className="grid grid-cols-2 gap-12">
+      <Link href={"/users/exec/projects"}>
+        <DashboardCard
+          icon={FaCalendar}
+          total={totalProjects}
+          title="Total Projects"
+        />{" "}
+      </Link>
+      <Link href={"/users/exec/timesheets"}>
+        <DashboardCard
+          icon={FaClock}
+          total={totalTimesheets}
+          title="Pending Timesheet Approvals"
+        />
+      </Link>
+    </div>
+  );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { EditUser } from "../dialogUI/EditUser";
 import { AddUser } from "../dialogUI/AddUser";
@@ -10,7 +10,7 @@ import useFetchUsers from "../../hooks/useFetchUsers";
 import { UserProps } from "@/types/userProps";
 import { useRouter } from "next/navigation";
 
-const UserTable: React.FC = () => {
+const UserTable = () => {
   const [users, setUsers] = useState<UserProps[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserProps[]>([]);
   const [filter, setFilter] = useState<string>("");

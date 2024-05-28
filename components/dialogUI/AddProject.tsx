@@ -1,5 +1,4 @@
 "use client";
-//TODO: Tags of selected users
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,50 +14,26 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaPlusCircle } from "react-icons/fa";
-import { toast } from "react-toastify";
 import { Textarea } from "../ui/textarea";
-
-type Department = {
-  id: string;
-  Department_Name: string;
-};
-
-type Project = {
-  Project_Name: string;
-  Project_Manager: string;
-  Client_Name: string;
-  Department_Id: string;
-  departmentName: string;
-  Project_Description: string;
-  assignedMembers: string[];
-};
-
+import { DepartmentProps } from "@/types/departmentProps";
+import { Project } from "@/types/projectProps";
+import useFetchDepartments from "@/hooks/useFetchDepartments";
 
 export function AddProject() {
+  const departmentsData = useFetchDepartments();
   const [Project_Name, setProject_Name] = useState("");
   const [Project_Manager, setProject_Manager] = useState("");
   const [Client_Name, setClient_Name] = useState("");
   const [Project_Team, setProject_Team] = useState("");
   const [Project_Description, setProject_Description] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState<string>("");
-  const [departments, setDepartments] = useState<Department[]>([]);
+  const [departments, setDepartments] = useState<DepartmentProps[]>([]);
 
   useEffect(() => {
-    fetchdepartments();
-  }, []);
-
-  const fetchdepartments = async () => {
-    try {
-      const response = await axios.get<Department[]>(
-        "http://localhost:3000/api/departments/"
-      );
-      setDepartments(response.data);
-    } catch (error) {
-      toast.error(
-        "An error occured while fetching departments. Please reload the screen and try again."
-      );
+    if (departmentsData) {
+      setDepartments(departmentsData);
     }
-  };
+  }, [departmentsData]);
 
   const handleDepartmentChange = async (
     event: React.ChangeEvent<{ value: unknown }>
@@ -68,7 +43,6 @@ export function AddProject() {
   };
 
   const handleSave = async () => {
-    // console.log(Project_Name, Project_Description,ClientName, Project_Manager, selectedDepartment);
     await axios.post<Project>(`http://localhost:3000/api/projects/`, {
       Project_Name: Project_Name,
       Description: Project_Description,
@@ -76,7 +50,6 @@ export function AddProject() {
       Project_Manager: Project_Manager,
       Client_Name: Client_Name,
       assignedMembers: Project_Team.split(","),
-
     });
 
     window.location.reload();
