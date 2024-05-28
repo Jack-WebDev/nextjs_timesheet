@@ -176,7 +176,7 @@ export function AddProject() {
               id="teamMembers"
               placeholder="Marc Jones, Phila Mathambo, Sizwe Shibamvu....."
               value={Project_Team}
-              className="col-span-3 rounded-xl focus:border-primary"
+              className="col-span-3 rounded-xl focus:border-primary placeholder:text-gray-400"
               onChange={(e) => setProject_Team(e.target.value)}
             />
           </div>

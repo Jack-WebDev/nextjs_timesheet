@@ -70,6 +70,7 @@ type Task = {
 type TableRows = {
   id: string;
   totalHours: number;
+  typeOfDay: string;
   comment: string;
   tasks: Task[];
   weekday: string;
@@ -86,6 +87,7 @@ type Timesheet = {
   weeklyPeriod: string;
   tableRows: TableRows[];
   Approval_Status: string;
+  comments: string;
 };
 
 export default function Timesheet() {
@@ -171,7 +173,7 @@ export default function Timesheet() {
                       <thead>
                         <tr>
                           <th>Weekday</th>
-
+                          <th>Type Of Day</th>
                           <th>Total Hours</th>
                           <th>Tasks Performed</th>
                           <th>Task Status</th>
@@ -188,6 +190,10 @@ export default function Timesheet() {
                             >
                               <td>
                                 <p>{r.weekday}</p>
+                              </td>
+
+                              <td>
+                                <p>{r.typeOfDay === "" ? "N/A" : r.typeOfDay}</p>
                               </td>
 
                               <td>
@@ -229,6 +235,10 @@ export default function Timesheet() {
                     </table>
 
                     <div className="flex justify-evenly items-end mt-4 approval_process">
+                      <div>
+                        <h2 className="font-semibold">Project Manager&apos;s comments:</h2>
+                        <p>{timesheet.comments === "" ? "No comment." : timesheet.comments}</p>
+                      </div>
                       <div className="btns flex items-end gap-x-4 justify-items-end">
                         <Button
                           onClick={() => handleApprove(timesheet.id)}
@@ -312,7 +322,7 @@ export default function Timesheet() {
   return (
     <>
       <div className="timesheets-container w-[80%] mx-auto">
-        <div className="w-full">
+        <div className="w-full bg-[#F5F5F5] p-4 rounded-xl border-2 border-primary">
           <div className="flex items-center py-4">
             <Input
               placeholder="Filter by project name...."
@@ -328,7 +338,7 @@ export default function Timesheet() {
               className="max-w-sm rounded-xl"
             />
           </div>
-          <div className="border-2 border-primary rounded-xl bg-white">
+          <div>
             <Table className="rounded-xl">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -380,7 +390,7 @@ export default function Timesheet() {
           </div>
           <div className="flex items-center justify-end space-x-2 py-4">
             <div className="flex-1 text-sm text-muted-foreground">
-              Showing {table.getState().pagination.pageIndex + 1} to{" "}
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount().toLocaleString()} out of{" "}
               {table.getRowCount().toLocaleString()} Records.
             </div>

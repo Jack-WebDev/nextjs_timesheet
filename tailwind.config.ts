@@ -18,6 +18,11 @@ const config = {
       },
     },
     extend: {
+      backgroundImage: {
+        'progress': "url('/daniel-mccullough-HtBlQdxfG9k-unsplash.jpg')",
+        "soon": "url('/huma-kabakci-oRk4Ep65tRc-unsplash.jpg')",
+
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

@@ -71,6 +71,7 @@ type AddTask = {
 
 type TableRow = {
   weekday: string;
+  typeOfDay:string;
   totalHours: number;
   tasks: AddTask[];
   comment: string;
@@ -87,42 +88,55 @@ type FormDetails = {
 const initialData: TableRow[] = [
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
+
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
+
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
+
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
+
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
+
     totalHours: 0,
     tasks: [],
     comment: "",
   },
   {
     weekday: new Date().toISOString().split("T")[0],
+    typeOfDay:"",
+
     totalHours: 0,
     tasks: [],
     comment: "",
@@ -143,6 +157,7 @@ type TableRows = {
   tasks: Task[];
   weekday: string;
   userId: string;
+  typeOfDay:string;
 };
 
 type Timesheet = {
@@ -155,6 +170,7 @@ type Timesheet = {
   weeklyPeriod: string;
   tableRows: TableRows[];
   Approval_Status: string;
+  comments: string;
 };
 
 type Project = {
@@ -177,7 +193,7 @@ export default function Timesheet() {
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
     name: fullName,
-    role: "",
+    role: userZ.Position,
     projectManager: "",
     projectName: "",
   });
@@ -217,6 +233,8 @@ export default function Timesheet() {
     {
       accessorKey: "actions",
       header: () => <div className="text-start">Actions</div>,
+      sortDescFirst: true,
+      enableSorting: true,
       cell: ({ row }) => {
         const timesheet = row.original;
         const statusClass =
@@ -239,18 +257,22 @@ export default function Timesheet() {
                 <DialogContent className="w-1/2">
                   <DialogHeader className="flex flex-row items-baseline justify-around">
                     <DialogTitle>Timesheet Details</DialogTitle>
-                    <div className="text-xl">
-                      Approval Status:{" "}
+                    <div className="grid text-xl">
+                      <div className="flex">
+                      Approval Status:
                       <span className={statusClass}>
                         {timesheet.Approval_Status}
-                      </span>{" "}
-                    </div>
+                      </span>
+                      </div>
+                   
+                      </div>
                   </DialogHeader>
                   <div>
                     <table className="w-full">
                       <thead>
                         <tr>
                           <th>Weekday</th>
+                          <th>Type Of Day</th>
                           <th>Total Hours</th>
                           <th>Tasks Performed</th>
                           <th>Task Status</th>
@@ -267,6 +289,9 @@ export default function Timesheet() {
                             >
                               <td className="text-center">
                                 <p>{r.weekday}</p>
+                              </td>
+                              <td className="text-center">
+                                <p>{r.typeOfDay === "" ? "N/A" : r.typeOfDay}</p>
                               </td>
                               <td className="text-center">
                                 <p>{r.totalHours}</p>
@@ -305,6 +330,11 @@ export default function Timesheet() {
                           ))}
                       </tbody>
                     </table>
+
+                    <div className="mt-4">
+                        <h2 className="font-semibold">Project Manager&apos;s comments:</h2>
+                        <p>{timesheet.comments === "" ? "No comment." : timesheet.comments}</p>
+                      </div> 
                   </div>
                 </DialogContent>
               </Dialog>
@@ -341,8 +371,8 @@ export default function Timesheet() {
     },
   });
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(),
-    to: addDays(new Date(), 20),
+    from: addDays(new Date(),0),
+    to: addDays(new Date(), 7),
   });
 
   const f = `${date?.from?.toISOString().split("T")[0]} to ${
@@ -486,10 +516,9 @@ export default function Timesheet() {
           <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Position:</label>
             <input
-              className="px-4 py-1 border border-black focus:outline-primary rounded-xl w-[70%]"
-              type="text"
-              value={formDetails.role}
-              onChange={(e) => handleFormChange("month", e.target.value)}
+              className="px-4 py-1 border border-black focus:outline-primary rounded-xl w-[70%] pointer-events-none"
+              value={userZ.Position}
+              readOnly
             />
           </div>
           <div className="grid w-[60%]">
@@ -561,6 +590,7 @@ export default function Timesheet() {
                   onSelect={setDate}
                   numberOfMonths={1}
                   className="border-2 border-primary rounded-xl"
+                  weekStartsOn={1}
                 />
               </PopoverContent>
             </Popover>
@@ -572,16 +602,7 @@ export default function Timesheet() {
               <th>Weekday</th>
               <th>
                 Public/Normal Day{" "}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild className="rounded-full">
-                      <Button variant="outline">?</Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Add to library</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+               
               </th>
               <th>Total Hours</th>
               <th>Tasks Performed</th>
@@ -606,10 +627,17 @@ export default function Timesheet() {
                   />
                 </td>
                 <td className="text-center">
-                  <select name="" id="" className="w-[10vw] ">
+                  <select name="" id="" className="w-[10vw] " value={row.typeOfDay}
+    onChange={(e) =>
+      setTableData((prevData) => {
+        const newData = [...prevData];
+        newData[rowIndex].typeOfDay = e.target.value;
+        return newData;
+      })
+    }>
                     <option value="">Select type of day</option>
-                    <option value="publicDay">Public Holiday</option>
-                    <option value="normalDay">Work/Normal Day</option>
+                    <option value="Public Holiday">Public Holiday</option>
+                    <option value="Normal Day">Work/Normal Day</option>
                   </select>
                 </td>
                 <td className="text-center">
@@ -699,7 +727,7 @@ export default function Timesheet() {
         Your Timesheets
       </h2>
       <div className="timesheets-container w-[80%] mx-auto">
-        <div className="w-full">
+        <div className="w-full bg-[#F5F5F5] p-4 rounded-xl border-2 border-primary">
           <div className="flex items-center py-4">
             <Input
               placeholder="Filter by project name...."
@@ -716,7 +744,7 @@ export default function Timesheet() {
             />
           </div>
 
-          <div className="border-2 border-primary rounded-xl">
+          <div>
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -774,7 +802,7 @@ export default function Timesheet() {
           </div>
           <div className="flex items-center justify-end space-x-2 py-4">
             <div className="flex-1 text-sm text-muted-foreground">
-              Showing {table.getState().pagination.pageIndex + 1} to{" "}
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount().toLocaleString()} out of{" "}
               {table.getRowCount().toLocaleString()} Records.
             </div>

@@ -1,9 +1,11 @@
-import React from 'react'
+import { FaOdysee } from "react-icons/fa6";
 
-export default function page() {
+export default function Dashboard() {
   return (
-    <div className="flex justify-center items-center h-full bg-secondary">
-    <p className="text-[#DDA83A] text-5xl font-semibold">Coming Soon!</p>
-  </div>
-  )
+    <div className="flex justify-center items-center h-full bg-secondary rounded-xl">
+      <p className="text-[#DDA83A] text-7xl font-semibold grid justify-items-center gap-y-2">
+        <FaOdysee /> Coming Soon!
+      </p>
+    </div>
+  );
 }
