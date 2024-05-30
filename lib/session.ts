@@ -20,7 +20,7 @@ export const defaultSession: SessionProp = {
 };
 
 export const sessionOptions: SessionOptions = {
-	password: process.env.SESSION_KEY || "3m5JKjozQ1NeUjAucKYwjXxyxmSba50EzuBGC9XTc44=",
+	password: process.env.SESSION_KEY!,
 	cookieName: "ndt-user_session",
 	cookieOptions: {
 		httpOnly: true,
