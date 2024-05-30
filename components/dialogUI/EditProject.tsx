@@ -48,7 +48,7 @@ export function EditProject({ id }: User) {
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:3000/api/projects/${id}`, {
+      await axios.put(`/api/projects/${id}`, {
         Project_Name: Project_Name,
         Description: Project_Description,
         Project_Manager: Project_Manager,

@@ -19,7 +19,7 @@ export function AddDepartment() {
   const [Department_Name, setDepartment_Name] = useState("");
 
   const handleSave = async () => {
-    await axios.post(`http://localhost:3000/api/departments`, {
+    await axios.post(`/api/departments`, {
       Department_Name,
     });
     window.location.reload();

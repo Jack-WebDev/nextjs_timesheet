@@ -27,7 +27,7 @@ export function AddUser() {
 
   const handleSave = async () => {
     try {
-      await axios.post(`http://localhost:3000/api/users`, {
+      await axios.post(`/api/users`, {
         name,
         surname,
         email,

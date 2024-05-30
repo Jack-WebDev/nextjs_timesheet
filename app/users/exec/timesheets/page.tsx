@@ -62,21 +62,21 @@ export default function Timesheet() {
         const isApprovedBy = timesheet.Approval_Status.includes("Approved by");
         const isRejectedBy = timesheet.Approval_Status.includes("Rejected by");
 
-        return (isApprovedBy || isRejectedBy);
+        return isApprovedBy || isRejectedBy;
       });
       setFilteredTimesheets(userTimesheets);
     }
   }, [timesheetsData]);
 
   const handleApprove = async (id: string) => {
-    await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
+    await axios.put(`/api/timesheets/${id}`, {
       Approval_Status: `Approved`,
     });
     window.location.reload();
   };
 
   const handleReject = async (id: string) => {
-    await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
+    await axios.put(`/api/timesheets/${id}`, {
       Approval_Status: `Rejected`,
     });
     window.location.reload();

@@ -403,7 +403,7 @@ export default function Timesheet() {
     };
 
     const res = await axios.post<TableRowsProps, FormDetails>(
-      "http://localhost:3000/api/timesheets",
+      "/api/timesheets",
       {
         formData: formData,
       }

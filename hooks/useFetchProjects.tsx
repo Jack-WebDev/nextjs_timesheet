@@ -7,7 +7,7 @@ export default function useFetchProjects() {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      const res = await axios.get<Project[]>("http://localhost:3000/api/projects/");
+      const res = await axios.get<Project[]>("/api/projects/");
       const projects = res.data;
       setProjects(projects);
     };
@@ -15,5 +15,5 @@ export default function useFetchProjects() {
     fetchProjects();
   }, []);
 
-  return projects ;
+  return projects;
 }

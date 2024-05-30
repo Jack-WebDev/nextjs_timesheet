@@ -43,7 +43,7 @@ export function AddProject() {
   };
 
   const handleSave = async () => {
-    await axios.post<Project>(`http://localhost:3000/api/projects/`, {
+    await axios.post<Project>(`/api/projects/`, {
       Project_Name: Project_Name,
       Description: Project_Description,
       Department_Id: selectedDepartment,

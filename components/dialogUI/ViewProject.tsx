@@ -18,9 +18,7 @@ export function ViewProject({ id }: any) {
   const [projects, setProjects] = useState<Project[]>([]);
 
   const fetchProjects = useCallback(async () => {
-    const response = await axios.get<Project[]>(
-      `http://localhost:3000/api/projects/${id}`
-    );
+    const response = await axios.get<Project[]>(`/api/projects/${id}`);
     setProjects(response.data);
   }, [id]);
 
