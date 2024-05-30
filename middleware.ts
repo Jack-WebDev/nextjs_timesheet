@@ -31,6 +31,17 @@ export function middleware(request: NextRequest) {
 	  return NextResponse.json({}, { headers: preflightHeaders })
 	}
 
+	const response = NextResponse.next()
+ 
+	if (isAllowedOrigin) {
+	  response.headers.set('Access-Control-Allow-Origin', origin)
+	}
+   
+	Object.entries(corsOptions).forEach(([key, value]) => {
+	  response.headers.set(key, value)
+	})
+   
+
 	if (token?.value) {
 		try {
 			const decoded = jwtDecode<Token>(token.value);
@@ -59,4 +70,7 @@ export function middleware(request: NextRequest) {
 			return NextResponse.rewrite(new URL("/blocked", request.url));
 		}
 	}
+
+
+	return response;
 }
