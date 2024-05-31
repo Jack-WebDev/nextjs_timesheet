@@ -105,14 +105,16 @@ export default function PersonalData() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
+        <div className="grid grid-cols-2 gap-8">
+
         <FormField
           control={form.control}
           name="firstName"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="First Name" {...field} />
+                <Input placeholder="First Name" {...field} className="rounded-xl w-full"/>
               </FormControl>
               <FormMessage color="text-red-600" />
             </FormItem>
@@ -125,20 +127,24 @@ export default function PersonalData() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Last Name" {...field} />
+                <Input placeholder="Last Name" {...field} className="rounded-xl w-full"/>
               </FormControl>
 
               <FormMessage color="text-red-600" />
             </FormItem>
           )}
         />
+        </div>
+
+        <div className="grid grid-cols-2 gap-8">
+
         <FormField
           control={form.control}
           name="mobileNumber"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Mobile Number" {...field} />
+                <Input placeholder="Mobile Number" {...field} className="rounded-xl w-full"/>
               </FormControl>
 
               <FormMessage color="text-red-600" />
@@ -152,13 +158,16 @@ export default function PersonalData() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Email Address" {...field} />
+                <Input placeholder="Email Address" {...field} className="rounded-xl w-full"/>
               </FormControl>
 
               <FormMessage color="text-red-600" />
             </FormItem>
           )}
         />
+        </div>
+
+        <div className="grid grid-cols-2 gap-8">
 
         <FormField
           control={form.control}
@@ -167,7 +176,7 @@ export default function PersonalData() {
             <FormItem>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-xl w-full">
                     <SelectValue placeholder="Marital Status" />
                   </SelectTrigger>
                 </FormControl>
@@ -191,7 +200,7 @@ export default function PersonalData() {
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
-                    <Button variant={"outline"}>
+                    <Button variant={"outline"} className="rounded-xl w-full">
                       {field.value ? (
                         format(field.value, "PPP")
                       ) : (
@@ -219,6 +228,10 @@ export default function PersonalData() {
           )}
         />
 
+        </div>
+
+        <div className="grid grid-cols-2 gap-8">
+
         <FormField
           control={form.control}
           name="gender"
@@ -226,7 +239,7 @@ export default function PersonalData() {
             <FormItem>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-xl w-full">
                     <SelectValue placeholder="Gender" />
                   </SelectTrigger>
                 </FormControl>
@@ -249,11 +262,11 @@ export default function PersonalData() {
             <FormItem>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-xl w-full">
                     <SelectValue placeholder="Nationality" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent >
                   <SelectItem value="Citizen">Citizen</SelectItem>
                   <SelectItem value="Naturalized">Naturalized</SelectItem>
                   <SelectItem value="Visa">Visa</SelectItem>
@@ -264,6 +277,10 @@ export default function PersonalData() {
             </FormItem>
           )}
         />
+        </div>
+
+
+          <>
 
         <FormField
           control={form.control}
@@ -271,24 +288,29 @@ export default function PersonalData() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Textarea placeholder="Address" {...field} />
+                <Textarea placeholder="Address" {...field} className="rounded-xl w-full" />
               </FormControl>
               <FormMessage color="text-red-600" />
             </FormItem>
           )}
         />
-        <FormField
+
+          </>
+
+          <div className="grid grid-cols-3 gap-8">
+          <FormField
           control={form.control}
           name="city"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="City" {...field} />
+                <Input placeholder="City" {...field} className="rounded-xl w-full"/>
               </FormControl>
               <FormMessage color="text-red-600" />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="province"
@@ -296,8 +318,8 @@ export default function PersonalData() {
             <FormItem>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Province" />
+                  <SelectTrigger  className="rounded-xl w-full">
+                    <SelectValue placeholder="Province"/>
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -322,12 +344,14 @@ export default function PersonalData() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Zip Code" {...field} />
+                <Input placeholder="Zip Code" {...field} className="rounded-xl w-full"/>
               </FormControl>
               <FormMessage color="text-red-600" />
             </FormItem>
           )}
         />
+          </div>
+
         <Button variant={"outline"}>Cancel</Button>
         <Button type="submit">Save</Button>
 

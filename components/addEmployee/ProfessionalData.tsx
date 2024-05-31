@@ -71,6 +71,9 @@ export default function ProfessionalData() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
+        <div className="grid grid-cols-2 gap-x-8">
+
         <FormField
           control={form.control}
           name="employeeType"
@@ -78,7 +81,7 @@ export default function ProfessionalData() {
             <FormItem>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full rounded-xl">
                     <SelectValue placeholder="Employee Type" />
                   </SelectTrigger>
                 </FormControl>
@@ -101,13 +104,16 @@ export default function ProfessionalData() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="NDT Email Address" {...field} />
+                <Input placeholder="NDT Email Address" {...field} className="w-full rounded-xl"/>
               </FormControl>
 
               <FormMessage color="text-red-600" />
             </FormItem>
           )}
         />
+        </div>
+
+        <div className="grid grid-cols-2 gap-x-8">
 
         <FormField
           control={form.control}
@@ -116,7 +122,7 @@ export default function ProfessionalData() {
             <FormItem>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full rounded-xl">
                     <SelectValue placeholder="Select Department" />
                   </SelectTrigger>
                 </FormControl>
@@ -138,13 +144,16 @@ export default function ProfessionalData() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Enter Role" {...field} />
+                <Input placeholder="Enter Role" {...field} className="w-full rounded-xl"/>
               </FormControl>
 
               <FormMessage color="text-red-600" />
             </FormItem>
           )}
         />
+        </div>
+
+
 
         <FormField
           control={form.control}
@@ -152,7 +161,7 @@ export default function ProfessionalData() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <Popover>
-                <PopoverTrigger asChild>
+                <PopoverTrigger asChild className="w-1/3 rounded-xl">
                   <FormControl>
                     <Button variant={"outline"}>
                       {field.value ? (
@@ -188,12 +197,13 @@ export default function ProfessionalData() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Textarea placeholder="Office Location" {...field} />
+                <Textarea placeholder="Office Location" {...field} className="w-full rounded-xl" />
               </FormControl>
               <FormMessage color="text-red-600" />
             </FormItem>
           )}
         />
+
 
         <Button variant={"outline"}>Cancel</Button>
         <Button type="submit">Save</Button>

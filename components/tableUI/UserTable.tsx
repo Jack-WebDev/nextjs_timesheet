@@ -9,6 +9,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import useFetchUsers from "../../hooks/useFetchUsers";
 import { UserProps } from "@/types/userProps";
 import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
 
 const UserTable = () => {
   const [users, setUsers] = useState<UserProps[]>([]);
@@ -58,7 +59,7 @@ const UserTable = () => {
           value={filter}
           onChange={handleFilterChange}
         />
-        <AddUser />
+        <Button onClick={() => router.push("/users/admin/employees/addEmployee")}>Add New User</Button>
       </div>
       <table className="w-full">
         <thead className="relative -top-4">

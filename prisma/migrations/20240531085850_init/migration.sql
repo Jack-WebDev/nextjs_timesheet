@@ -113,7 +113,7 @@ ALTER TABLE "Project" ADD CONSTRAINT "Project_Department_Id_fkey" FOREIGN KEY ("
 ALTER TABLE "Task" ADD CONSTRAINT "Task_tableRowId_fkey" FOREIGN KEY ("tableRowId") REFERENCES "TableRow"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_tableDetailsId_fkey" FOREIGN KEY ("tableDetailsId") REFERENCES "TableDetails"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_tableDetailsId_fkey" FOREIGN KEY ("tableDetailsId") REFERENCES "TableDetails"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

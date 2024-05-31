@@ -3,21 +3,21 @@ const prisma = new PrismaClient();
 async function main() {
   const department_id = await prisma.department.create({
     data: {
-      Department_Name: "I.T",
+      Department_Name: "H.R",
     },
   });
 
   await prisma.user.create({
     data: {
-      Name: "Jack",
-      Surname: "Mabaso",
-      Email: "jack@ndt.co.za",
-      Position: "Employee",
+      Name: "James",
+      Surname: "Mabuza",
+      Email: "james@ndt.co.za",
+      Position: "Admin",
       departmentId: department_id.id,
-      departmentName: "I.T",
+      departmentName: "H.R",
       Status: "Active",
-      Password: "",
-      Role: "Employee",
+      Password: null,
+      Role: "Admin",
     },
   });
 }
