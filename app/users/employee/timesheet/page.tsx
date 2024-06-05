@@ -60,6 +60,8 @@ import { TaskProps } from "@/types/taskProps";
 import { TableRowsProps } from "@/types/tableRowsProps";
 import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 import useFetchProjects from "@/hooks/useFetchProjects";
+import useFetchUsers from "@/hooks/useFetchUsers";
+import { UserProps } from "@/types/userProps";
 
 type FormDetails = {
   month: string;
@@ -130,9 +132,12 @@ const initialData: TableRowsProps[] = [
 export default function Timesheet() {
   const timesheetData = useFetchTimesheets();
   const projectsData = useFetchProjects();
+  const userData = useFetchUsers();
   const [tableData, setTableData] = useState<TableRowsProps[]>(initialData);
   const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [users, setUsers] = useState<UserProps[]>([]);
+  const [filteredUser, setFilteredUser] = useState<string>("");
   const [chosenProject, setChosenProject] = useState("")
   const userZ = useUser();
   const fullName = `${userZ.Name} ${userZ.Surname}`;
@@ -331,6 +336,12 @@ export default function Timesheet() {
   }, [timesheetData]);
 
   useEffect(() => {
+    if (userData) {
+      setUsers(userData);
+    }
+  }, [userData]);
+
+  useEffect(() => {
     if (projectsData) {
       setProjects(projectsData);
     }
@@ -340,6 +351,18 @@ export default function Timesheet() {
     date?.to?.toISOString().split("T")[0]
   }`;
 
+  const handleFilterUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedUserId = e.target.value as string;
+
+    const selectedUser = userData.find(
+      (user) => user.id === selectedUserId
+    );
+    if (selectedUser) {
+      setFilteredUser(selectedUser.Name);
+    } else {
+      setFilteredUser("No user found");
+    }
+  };
 
   const handleeChange = async (
     event: React.ChangeEvent<{ value: unknown }>
@@ -473,13 +496,16 @@ export default function Timesheet() {
           </div>
           <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">
-              Project Manager:
+              Supervisor:
             </label>
-            <input
-              className="px-4 py-1 border border-black rounded-xl pointer-events-none"
-              value={formDetails.projectManager}
-              readOnly
-            />
+              <select name="name" className="border border-black focus:outline-primary rounded-xl h-auto" value={filteredUser} onChange={handleFilterUserChange}>
+                <option value={""}>Select User</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.Name} {user.Surname}
+                  </option>
+                ))}
+              </select>
           </div>
           <div className="period grid">
             <label htmlFor="date" className="mb-1 text-[1.2rem]">
