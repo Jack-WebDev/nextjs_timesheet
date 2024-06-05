@@ -4,7 +4,7 @@ import { SessionProp, defaultSession, sessionOptions } from "@/lib/session";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { UserProps } from "./types/userProps";
+import { UserProps } from "../../types/userProps";
 
 export const getSession = async () => {
   const session = await getIronSession<SessionProp>(cookies(), sessionOptions);

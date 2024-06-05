@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { faker } from "@faker-js/faker";
 const prisma = new PrismaClient();
 async function main() {
   const department_id = await prisma.department.create({
@@ -9,15 +10,28 @@ async function main() {
 
   await prisma.user.create({
     data: {
-      Name: "James",
-      Surname: "Mabuza",
-      Email: "james@ndt.co.za",
-      Position: "Admin",
+      Name: faker.person.firstName(),
+      Surname: faker.person.lastName(),
+      Email: faker.internet.email(),
+      Position: "Administrator",
       departmentId: department_id.id,
-      departmentName: "H.R",
-      Status: "Active",
+      departmentName: "HR",
       Password: null,
       Role: "Admin",
+      Address: faker.location.streetAddress(),
+      City: faker.location.city(),
+      ZipCode: faker.location.zipCode(),
+      Province: "Gauteng",
+      DateOfBirth: null,
+      MaritalStatus: "Single",
+      Gender: faker.person.gender(),
+      Nationality: "South African",
+      EmployeeType: "Full-Time",
+      NDTEmail: "james@ndt.co.za",
+      IdNumber: "1234567890123",
+      MobileNumber: "1234567890",
+      OfficeLocation: faker.location.streetAddress(),
+      StartDate: "Today",
     },
   });
 }

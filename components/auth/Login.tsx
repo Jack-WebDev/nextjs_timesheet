@@ -14,8 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
-import { useRouter } from "next/navigation";
-import { login } from "@/actions";
+import { login } from "@/actions/auth/actions";
 import { toast } from "react-toastify";
 import { useUser } from "@/app/store";
 

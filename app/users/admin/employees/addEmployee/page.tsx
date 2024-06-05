@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PersonalData from "@/components/addEmployee/PersonalData";
 import ProfessionalData from "@/components/addEmployee/ProfessionalData";
 import Documents from "@/components/addEmployee/Documents";
-import Accounts from "@/components/addEmployee/Accounts";
 import { FaBriefcase, FaFile, FaLock, FaUser } from "react-icons/fa";
 import { useState } from "react";
 
@@ -47,15 +46,7 @@ export default function AddEmployee() {
         >
           <FaFile /> Documents
         </TabsTrigger>
-        <TabsTrigger
-          value="accounts"
-          className={`flex gap-x-2 px-0  font-medium md:text-[1rem] ${
-            activeTab === "accounts" ? "active_tab" : ""
-          }`}
-          onClick={() => handleTabClick("accounts")}
-        >
-          <FaLock /> Accounts Access
-        </TabsTrigger>
+
       </TabsList>
       <TabsContent value="personalData">
         <PersonalData />
@@ -67,9 +58,7 @@ export default function AddEmployee() {
         <Documents />
       </TabsContent>
 
-      <TabsContent value="accounts">
-        <Accounts />
-      </TabsContent>
+
     </Tabs>
   );
 }

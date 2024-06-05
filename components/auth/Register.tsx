@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { login } from "@/actions";
+import { login } from "@/actions/auth/actions";
 import { useUser } from "@/app/store";
 
 const formSchema = z.object({

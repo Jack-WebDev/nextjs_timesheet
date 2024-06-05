@@ -22,7 +22,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const user = await db.user.update({
       where: {
-        Email: email,
+        NDTEmail: email,
       },
       data: {
         Password: hashedPassword,

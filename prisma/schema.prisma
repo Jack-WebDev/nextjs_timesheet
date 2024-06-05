@@ -4,21 +4,34 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_URL")
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
 }
 
 model User {
   id             String      @id @default(uuid())
-  Name           String
-  Surname        String
-  Email          String      @unique
+  Name           String?
+  Surname        String?
+  Email          String?     @unique
+  IdNumber       String?     @unique
+  MobileNumber   String?     @unique
+  Address        String?
+  City           String?
+  ZipCode        String?
+  Province       String?
+  DateOfBirth    DateTime?
+  MaritalStatus  String?
+  Gender         String?
+  Nationality    String?
+  EmployeeType   String?
+  NDTEmail       String?     @unique
   Password       String?
   departmentId   String?
   departmentName String?
-  Status         String
-  Role           String      @default("Employee")
+  Role           String?     @default("Employee")
   Position       String?
+  StartDate      DateTime?
+  OfficeLocation String?
   createdAt      DateTime    @default(now())
   tableRows      TableRow[]
   department     Department? @relation(fields: [departmentId], references: [id])

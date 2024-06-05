@@ -133,6 +133,7 @@ export default function Timesheet() {
   const [tableData, setTableData] = useState<TableRowsProps[]>(initialData);
   const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [chosenProject, setChosenProject] = useState("")
   const userZ = useUser();
   const fullName = `${userZ.Name} ${userZ.Surname}`;
 
@@ -339,6 +340,14 @@ export default function Timesheet() {
     date?.to?.toISOString().split("T")[0]
   }`;
 
+
+  const handleeChange = async (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    const projectId = event.target.value as string;
+    setChosenProject(projectId);
+  };
+
   const handleAddTask = (index: number) => {
     setTableData((prevData) => {
       const newData = [...prevData];
@@ -348,12 +357,14 @@ export default function Timesheet() {
   };
 
   const handleProjectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedProjectId = event.target.value;
+    const selectedProjectId = event.target.value as string;
 
     const selectedProject = projects.find(
       (project) => project.id === selectedProjectId
     );
     if (selectedProject) {
+      setChosenProject(selectedProject.id)
+
       setFormDetails({
         ...formDetails,
         projectName: selectedProject.Project_Name,
@@ -412,6 +423,7 @@ export default function Timesheet() {
     console.log(res);
   };
 
+
   return (
     <>
       <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
@@ -448,7 +460,7 @@ export default function Timesheet() {
             <select
               name="name"
               className="border border-black focus:outline-primary rounded-xl h-auto"
-              value={formDetails.projectName}
+              value={chosenProject}
               onChange={handleProjectChange}
             >
               <option value={""}>Select Project</option>
@@ -541,6 +553,7 @@ export default function Timesheet() {
                         return newData;
                       })
                     }
+                    
                   />
                 </td>
                 <td className="text-center">

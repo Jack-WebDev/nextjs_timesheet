@@ -23,7 +23,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
 		const user = await db.user.findFirst({
 			where: {
-				Email: email,
+				NDTEmail: email,
 			},
 		});
 

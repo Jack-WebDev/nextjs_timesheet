@@ -3,15 +3,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useEmployee } from "@/app/store";
 
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 
@@ -36,15 +35,17 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
+import { createEmployee } from "@/actions/admin/employee/personalData";
+import { toast } from "react-toastify";
 
 const formSchema = z.object({
-  firstName: z.string().min(2, {
-    message: "First Name must be at least 2 characters.",
+  Name: z.string().min(2, {
+    message: "First Name is required.",
   }),
-  lastName: z.string().min(2, {
-    message: "Last Name must be at least 2 characters.",
+  Surname: z.string().min(2, {
+    message: "Last Name is required.",
   }),
-  mobileNumber: z
+  MobileNumber: z
     .string()
     .min(10, {
       message: "Mobile Number must have 10 digits.",
@@ -52,17 +53,20 @@ const formSchema = z.object({
     .max(10, {
       message: "Mobile Number must have 10 digits.",
     }),
-  email: z.string().email({ message: "Please add a valid email" }),
-  dob: z.coerce.date({
+  Email: z.string().email({ message: "Please add a valid email" }),
+  DateOfBirth: z.coerce.date({
     message: "Please add a date of birth.",
   }),
-  gender: z.string(),
-  nationality: z.string(),
-  maritalStatus: z.string(),
-  address: z.string().min(2, {
+  Gender: z.string(),
+  Nationality: z.string(),
+  MaritalStatus: z.string(),
+  IdNumber: z.string().min(13, {
+    message: "ID Number must have 13 digits.",
+  }),
+  Address: z.string().min(2, {
     message: "Please add an address.",
   }),
-  province: z.enum([
+  Province: z.enum([
     "Gauteng",
     "Limpopo",
     "Free State",
@@ -73,34 +77,32 @@ const formSchema = z.object({
     "Northern Cape",
     "Mpumalanga",
   ]),
-  city: z.string().min(2, {
+  City: z.string().min(2, {
     message: "Please add a city.",
   }),
-  zipCode: z.string().min(2, {
+  ZipCode: z.string().min(2, {
     message: "Please add a zip code.",
   }),
 });
 
 export default function PersonalData() {
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      mobileNumber: "",
-      email: "",
-      address: "",
-      city: "",
-      zipCode: "",
+      Name: "",
+      Surname: "",
+      MobileNumber: "",
+      Email: "",
+      Address: "",
+      IdNumber: "",
+      City: "",
+      ZipCode: "",
     },
   });
 
-  // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    useEmployee.setState(values);
+    toast.success("Personal Data has been created successfully.");
   }
 
   return (
@@ -110,27 +112,27 @@ export default function PersonalData() {
 
         <FormField
           control={form.control}
-          name="firstName"
+          name="Name"
           render={({ field }) => (
             <FormItem>
               <FormControl>
                 <Input placeholder="First Name" {...field} className="rounded-xl w-full"/>
               </FormControl>
-              <FormMessage color="text-red-600" />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
 
         <FormField
           control={form.control}
-          name="lastName"
+          name="Surname"
           render={({ field }) => (
             <FormItem>
               <FormControl>
                 <Input placeholder="Last Name" {...field} className="rounded-xl w-full"/>
               </FormControl>
 
-              <FormMessage color="text-red-600" />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
@@ -138,30 +140,31 @@ export default function PersonalData() {
 
         <div className="grid grid-cols-2 gap-8">
 
+
+
         <FormField
           control={form.control}
-          name="mobileNumber"
+          name="IdNumber"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Mobile Number" {...field} className="rounded-xl w-full"/>
+                <Input placeholder="ID Number" {...field} className="rounded-xl w-full"/>
               </FormControl>
-
-              <FormMessage color="text-red-600" />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
 
         <FormField
           control={form.control}
-          name="email"
+          name="Email"
           render={({ field }) => (
             <FormItem>
               <FormControl>
                 <Input placeholder="Email Address" {...field} className="rounded-xl w-full"/>
               </FormControl>
 
-              <FormMessage color="text-red-600" />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
@@ -171,7 +174,7 @@ export default function PersonalData() {
 
         <FormField
           control={form.control}
-          name="maritalStatus"
+          name="MaritalStatus"
           render={({ field }) => (
             <FormItem>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -187,14 +190,14 @@ export default function PersonalData() {
                 </SelectContent>
               </Select>
 
-              <FormMessage />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
 
         <FormField
           control={form.control}
-          name="dob"
+          name="DateOfBirth"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <Popover>
@@ -204,7 +207,7 @@ export default function PersonalData() {
                       {field.value ? (
                         format(field.value, "PPP")
                       ) : (
-                        <span>Pick a date</span>
+                        <span>Date of Birth</span>
                       )}
                       <FaCalendar />
                     </Button>
@@ -223,7 +226,7 @@ export default function PersonalData() {
                 </PopoverContent>
               </Popover>
 
-              <FormMessage />
+              <FormMessage style={{ color: "red" }}/>
             </FormItem>
           )}
         />
@@ -234,7 +237,7 @@ export default function PersonalData() {
 
         <FormField
           control={form.control}
-          name="gender"
+          name="Gender"
           render={({ field }) => (
             <FormItem>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -250,14 +253,14 @@ export default function PersonalData() {
                 </SelectContent>
               </Select>
 
-              <FormMessage />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
 
         <FormField
           control={form.control}
-          name="nationality"
+          name="Nationality"
           render={({ field }) => (
             <FormItem>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -273,47 +276,61 @@ export default function PersonalData() {
                 </SelectContent>
               </Select>
 
-              <FormMessage />
+              <FormMessage style={{ color: "red" }}/>
             </FormItem>
           )}
         />
         </div>
 
 
-          <>
+          <div className="grid grid-cols-2 gap-8">
 
         <FormField
           control={form.control}
-          name="address"
+          name="Address"
           render={({ field }) => (
             <FormItem>
               <FormControl>
                 <Textarea placeholder="Address" {...field} className="rounded-xl w-full" />
               </FormControl>
-              <FormMessage color="text-red-600" />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
 
-          </>
+      <FormField
+          control={form.control}
+          name="MobileNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input placeholder="Mobile Number" {...field} className="rounded-xl w-full"/>
+              </FormControl>
+
+              <FormMessage style={{ color: "red" }} />
+            </FormItem>
+          )}
+        />
+
+          </div>
 
           <div className="grid grid-cols-3 gap-8">
           <FormField
           control={form.control}
-          name="city"
+          name="City"
           render={({ field }) => (
             <FormItem>
               <FormControl>
                 <Input placeholder="City" {...field} className="rounded-xl w-full"/>
               </FormControl>
-              <FormMessage color="text-red-600" />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
 
         <FormField
           control={form.control}
-          name="province"
+          name="Province"
           render={({ field }) => (
             <FormItem>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -340,20 +357,21 @@ export default function PersonalData() {
         />
         <FormField
           control={form.control}
-          name="zipCode"
+          name="ZipCode"
           render={({ field }) => (
             <FormItem>
               <FormControl>
                 <Input placeholder="Zip Code" {...field} className="rounded-xl w-full"/>
               </FormControl>
-              <FormMessage color="text-red-600" />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
           </div>
 
-        <Button variant={"outline"}>Cancel</Button>
-        <Button type="submit">Save</Button>
+          <div className="flex items-end gap-x-4 justify-end">
+          <Button className="rounded-xl text-white" type="submit">Save</Button>
+        </div>
 
       </form>
     </Form>
