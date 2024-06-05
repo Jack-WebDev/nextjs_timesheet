@@ -7,7 +7,7 @@ export default function useFetchTimesheets() {
 
   useEffect(() => {
     const fetchTimesheets = async () => {
-      const res = await axios.get<TimesheetProps[]>("http://localhost:3000/api/timesheets/");
+      const res = await axios.get<TimesheetProps[]>("/api/timesheets/");
       const timesheets = res.data;
       setTimesheets(timesheets);
     };

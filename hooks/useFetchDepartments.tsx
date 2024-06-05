@@ -2,13 +2,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { DepartmentProps } from "../types/departmentProps";
 
-
 export default function useFetchDepartments() {
   const [departments, setDepartments] = useState<DepartmentProps[]>([]);
 
   useEffect(() => {
     const fetchDepartments = async () => {
-      const res = await axios.get<DepartmentProps[]>("http://localhost:3000/api/departments/");
+      const res = await axios.get<DepartmentProps[]>("/api/departments/");
       const departments = res.data;
       setDepartments(departments);
     };
@@ -16,5 +15,5 @@ export default function useFetchDepartments() {
     fetchDepartments();
   }, []);
 
-  return departments ;
+  return departments;
 }

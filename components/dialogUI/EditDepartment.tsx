@@ -28,12 +28,12 @@ export function EditDepartment({ id }: User) {
   }, []);
 
   const fetchDepartments = async () => {
-    await axios.get("http://localhost:3000/api/departments");
+    await axios.get("/api/departments");
   };
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:3000/api/departments/${id}`, {
+      await axios.put(`/api/departments/${id}`, {
         Department_Name: department,
       });
       window.location.reload();

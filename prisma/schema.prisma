@@ -1,4 +1,3 @@
-// schema.prisma
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
@@ -6,23 +5,36 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("POSTGRES_URL")
 }
 
 model User {
   id             String      @id @default(uuid())
-  Name           String
-  Surname        String
-  Email          String      @unique
+  Name           String?
+  Surname        String?
+  Email          String?     @unique
+  IdNumber       String?     @unique
+  MobileNumber   String?     @unique
+  Address        String?
+  City           String?
+  ZipCode        String?
+  Province       String?
+  DateOfBirth    DateTime?
+  MaritalStatus  String?
+  Gender         String?
+  Nationality    String?
+  EmployeeType   String?
+  NDTEmail       String?     @unique
   Password       String?
   departmentId   String?
-  department     Department? @relation(fields: [departmentId], references: [id])
-  departmentName String? // Direct field for department name
-  Status         String
-  Role           String      @default("Employee")
+  departmentName String?
+  Role           String?     @default("Employee")
   Position       String?
+  StartDate      DateTime?
+  OfficeLocation String?
   createdAt      DateTime    @default(now())
-  tableRows      TableRow[] // New relation to TableRow
+  tableRows      TableRow[]
+  department     Department? @relation(fields: [departmentId], references: [id])
 }
 
 model Project {
@@ -32,8 +44,8 @@ model Project {
   Client_Name     String
   Description     String
   Department_Id   String?
-  department      Department? @relation(fields: [Department_Id], references: [id])
   assignedMembers String[]
+  department      Department? @relation(fields: [Department_Id], references: [id])
 }
 
 model Department {
@@ -64,8 +76,8 @@ model Task {
   id            String   @id @default(uuid())
   taskPerformed String
   taskStatus    String
-  tableRow      TableRow @relation(fields: [tableRowId], references: [id])
   tableRowId    String
+  tableRow      TableRow @relation(fields: [tableRowId], references: [id])
 }
 
 model TableDetails {
@@ -76,9 +88,9 @@ model TableDetails {
   weeklyPeriod    String
   projectManager  String
   projectName     String
-  tableRows       TableRow[]
   Approval_Status String
   comments        String?
+  tableRows       TableRow[]
 }
 
 model TableRow {
@@ -87,9 +99,9 @@ model TableRow {
   typeOfDay      String
   totalHours     Float
   comment        String
-  tasks          Task[]
-  user           User         @relation(fields: [userId], references: [id])
-  userId         String // Foreign key to User
+  userId         String
+  tableDetailsId String
   tableDetails   TableDetails @relation(fields: [tableDetailsId], references: [id])
-  tableDetailsId String // Foreign key to TableDetails
+  user           User         @relation(fields: [userId], references: [id])
+  tasks          Task[]
 }

@@ -17,7 +17,7 @@ export default function ApproveTimesheet({ timesheet }: any) {
   const userZ = useUser();
 
   const handleApprove = async (id: string) => {
-    const res = await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
+    const res = await axios.put(`/api/timesheets/${id}`, {
       Approval_Status: `Approved by ${userZ.Name} ${userZ.Surname}, pending executive approval`,
       comment: comment,
     });
@@ -26,7 +26,7 @@ export default function ApproveTimesheet({ timesheet }: any) {
   };
 
   const handleReject = async (id: string) => {
-    await axios.put(`http://localhost:3000/api/timesheets/${id}`, {
+    await axios.put(`/api/timesheets/${id}`, {
       Approval_Status: `Rejected by ${userZ.Name} ${userZ.Surname}, pending executive approval;`,
       comment: comment,
     });

@@ -7,7 +7,7 @@ export default function useFetchUsers() {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const res = await axios.get<UserProps[]>("http://localhost:3000/api/users/");
+      const res = await axios.get<UserProps[]>("/api/users/");
       const users = res.data;
       setUsers(users);
     };

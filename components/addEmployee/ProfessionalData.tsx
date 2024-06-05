@@ -8,10 +8,8 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 
@@ -36,49 +34,91 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
+import { useEmployee } from "@/app/store";
+import { createEmployee } from "@/actions/admin/employee/personalData";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import useFetchDepartments from "@/hooks/useFetchDepartments";
+import { DepartmentProps } from "@/types/departmentProps";
+import { useEffect, useState } from "react";
+
+
 
 const formSchema = z.object({
-  employeeType: z.string(),
-  email: z.string().email({ message: "Please add a valid email" }),
+  EmployeeType: z.string(),
+  NDTEmail: z.string().email({ message: "Please add a valid email" }),
   startDate: z.coerce.date({
     message: "Please add a start date.",
   }),
-  department: z.string(),
-  role: z.string(),
-  location: z.string(),
+  departmentName: z.string(),
+  Role: z.string(),
+  OfficeLocation: z.string(),
+  Position: z.string(),
 });
 
 export default function ProfessionalData() {
-  // 1. Define your form.
+  const router = useRouter();
+  const departmentsData = useFetchDepartments();
+  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
+  const [departments, setDepartments] = useState<DepartmentProps[]>([]);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      employeeType: "",
-      email: "",
-      department: "",
-      role: "",
-      location: "",
+      EmployeeType: "",
+      NDTEmail: "",
+      departmentName: "",
+      Role: "",
+      OfficeLocation: "",
+      Position: "",
     },
   });
 
+  useEffect(() => {
+    if (departmentsData) {
+      setDepartments(departmentsData);
+    }
+  }, [departmentsData]);
+
+  const handleDepartmentChange = async (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    const departmentId = event.target.value as string;
+    setSelectedDepartment(departmentId);
+  };
+
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    const selectedDept = departments.find(dept => dept.id === selectedDepartment)
+
+    useEmployee.setState({
+      ...values,
+      departmentId: selectedDepartment,
+      departmentName: selectedDept?.Department_Name
+    });    const employeeData = localStorage.getItem("employee");
+    if (employeeData) {
+      const employee = JSON.parse(employeeData);
+      createEmployee(employee.state);
+      toast.success("Employee has been created successfully.");
+      router.replace("/users/admin/employees");
+    } else {
+      console.log("No employee data found in localStorage.");
+    }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
+        <div className="grid grid-cols-2 gap-x-8">
+
         <FormField
           control={form.control}
-          name="employeeType"
+          name="EmployeeType"
           render={({ field }) => (
             <FormItem>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full rounded-xl">
                     <SelectValue placeholder="Employee Type" />
                   </SelectTrigger>
                 </FormControl>
@@ -90,58 +130,69 @@ export default function ProfessionalData() {
                 </SelectContent>
               </Select>
 
-              <FormMessage />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
 
         <FormField
           control={form.control}
-          name="email"
+          name="NDTEmail"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="NDT Email Address" {...field} />
+                <Input placeholder="NDT Email Address" {...field} className="w-full rounded-xl"/>
               </FormControl>
 
-              <FormMessage color="text-red-600" />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
+        </div>
+
+        <div className="grid grid-cols-2 gap-x-8">
+        <select
+              name="department"
+              className="focus:border-primary"
+              value={selectedDepartment}
+              onChange={handleDepartmentChange}
+            >
+              <option value={""}>Select Department</option>
+              {departments.map((department) => (
+                <option key={department.id} value={department.id}>
+                  {department.Department_Name}
+                </option>
+              ))}
+            </select>
+
 
         <FormField
           control={form.control}
-          name="department"
-          render={({ field }) => (
-            <FormItem>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Department" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="IT">I.T</SelectItem>
-                  <SelectItem value="HR">H.R</SelectItem>
-                  <SelectItem value="Finance">Finance</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="role"
+          name="Role"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Enter Role" {...field} />
+                <Input placeholder="Enter Role" {...field} className="w-full rounded-xl"/>
               </FormControl>
 
-              <FormMessage color="text-red-600" />
+              <FormMessage style={{ color: "red" }} />
+            </FormItem>
+          )}
+        />
+        </div>
+
+
+          <div className="grid grid-cols-2 gap-x-8">
+          <FormField
+          control={form.control}
+          name="Position"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input placeholder="Enter Position" {...field} className="w-full rounded-xl"/>
+              </FormControl>
+
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
@@ -150,15 +201,15 @@ export default function ProfessionalData() {
           control={form.control}
           name="startDate"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
+            <FormItem>
               <Popover>
-                <PopoverTrigger asChild>
+                <PopoverTrigger asChild className="rounded-xl">
                   <FormControl>
                     <Button variant={"outline"}>
                       {field.value ? (
                         format(field.value, "PPP")
                       ) : (
-                        <span>Pick a date</span>
+                        <span>Employee Start Date</span>
                       )}
                       <FaCalendar />
                     </Button>
@@ -177,26 +228,28 @@ export default function ProfessionalData() {
                 </PopoverContent>
               </Popover>
 
-              <FormMessage />
+              <FormMessage style={{ color: "red" }}/>
             </FormItem>
           )}
         />
+          </div>
 
         <FormField
           control={form.control}
-          name="location"
+          name="OfficeLocation"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Textarea placeholder="Office Location" {...field} />
+                <Textarea placeholder="Office Location" {...field} className="w-full rounded-xl" />
               </FormControl>
-              <FormMessage color="text-red-600" />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
 
-        <Button variant={"outline"}>Cancel</Button>
-        <Button type="submit">Save</Button>
+        <div className="flex items-end gap-x-4 justify-end">
+          <Button className="rounded-xl text-white" type="submit">Submit</Button>
+        </div>
       </form>
     </Form>
   );

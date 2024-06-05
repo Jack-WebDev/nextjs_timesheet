@@ -12,6 +12,7 @@
 	font-weight: 600;
 }
 
+
 .side_menu {
 	grid-template-rows: 0.3fr 1fr;
 }
@@ -135,4 +136,10 @@ select {
 	left: 37%;
 	z-index: -4;
 	filter: opacity(0.2);
+}
+
+
+.active_tab {
+	color: var(--primary-color);
+	border-bottom: 2px solid var(--primary-color);
 }

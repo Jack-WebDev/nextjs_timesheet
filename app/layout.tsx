@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+// import { Roboto } from "next/font/google";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const roboto = Roboto({
-	weight: "400",
-	subsets: ["latin"],
-	display: "swap",
-});
+// const roboto = Roboto({
+// 	weight: "400",
+// 	subsets: ["latin"],
+// 	display: "swap",
+// });
 
 export const metadata: Metadata = {
 	title: "New Dawn 360 | New Dawn Technologies",
@@ -23,7 +23,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" className={roboto.className}>
+		<html lang="en" >
 			<body>
 				<ToastContainer autoClose={1000} />
 				{children}

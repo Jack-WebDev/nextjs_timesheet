@@ -1,15 +1,28 @@
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "Name" TEXT NOT NULL,
-    "Surname" TEXT NOT NULL,
-    "Email" TEXT NOT NULL,
+    "Name" TEXT,
+    "Surname" TEXT,
+    "Email" TEXT,
+    "IdNumber" TEXT,
+    "MobileNumber" TEXT,
+    "Address" TEXT,
+    "City" TEXT,
+    "ZipCode" TEXT,
+    "Province" TEXT,
+    "DateOfBirth" TIMESTAMP(3),
+    "MaritalStatus" TEXT,
+    "Gender" TEXT,
+    "Nationality" TEXT,
+    "EmployeeType" TEXT,
+    "NDTEmail" TEXT,
     "Password" TEXT,
     "departmentId" TEXT,
     "departmentName" TEXT,
-    "Status" TEXT NOT NULL,
-    "Role" TEXT NOT NULL DEFAULT 'Employee',
+    "Role" TEXT DEFAULT 'Employee',
     "Position" TEXT,
+    "StartDate" TIMESTAMP(3),
+    "OfficeLocation" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -98,6 +111,15 @@ CREATE TABLE "TableRow" (
 CREATE UNIQUE INDEX "User_Email_key" ON "User"("Email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_IdNumber_key" ON "User"("IdNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_MobileNumber_key" ON "User"("MobileNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_NDTEmail_key" ON "User"("NDTEmail");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Project_Project_Name_key" ON "Project"("Project_Name");
 
 -- CreateIndex
@@ -113,7 +135,7 @@ ALTER TABLE "Project" ADD CONSTRAINT "Project_Department_Id_fkey" FOREIGN KEY ("
 ALTER TABLE "Task" ADD CONSTRAINT "Task_tableRowId_fkey" FOREIGN KEY ("tableRowId") REFERENCES "TableRow"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_tableDetailsId_fkey" FOREIGN KEY ("tableDetailsId") REFERENCES "TableDetails"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_tableDetailsId_fkey" FOREIGN KEY ("tableDetailsId") REFERENCES "TableDetails"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
