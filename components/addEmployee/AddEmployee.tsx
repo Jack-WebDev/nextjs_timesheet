@@ -2,7 +2,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PersonalData from "./PersonalData";
 import ProfessionalData from "./ProfessionalData";
 import Documents from "./Documents";
-import Accounts from "./Accounts";
 
 export default function AddEmployee() {
   return (
@@ -13,7 +12,6 @@ export default function AddEmployee() {
           Professional Information
         </TabsTrigger>
         <TabsTrigger value="documents">Documents</TabsTrigger>
-        <TabsTrigger value="accounts">Accounts Access</TabsTrigger>
       </TabsList>
       <TabsContent value="personalData">
         <PersonalData />
@@ -25,9 +23,7 @@ export default function AddEmployee() {
         <Documents />
       </TabsContent>
 
-      <TabsContent value="accounts">
-        <Accounts />
-      </TabsContent>
+
     </Tabs>
   );
 }

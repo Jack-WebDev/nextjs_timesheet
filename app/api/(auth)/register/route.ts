@@ -10,6 +10,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const data = await req.json();
     const { email, password } = await data;
 
+    console.log(email, password);
+
     if (!isValidEmailDomain(email, "ndt.co.za")) {
       return NextResponse.json({
         message: "Invalid NDT email. Please try again",
@@ -20,12 +22,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const user = await db.user.update({
       where: {
-        Email: email,
+        NDTEmail: email,
       },
       data: {
         Password: hashedPassword,
       },
-    });
+    })
+
 
     const token = signJwt({ id: user?.id, role: user?.Role }, "JWT_KEY!", 10);
 
