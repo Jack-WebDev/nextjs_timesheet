@@ -141,6 +141,9 @@ export default function Timesheet() {
   const [chosenProject, setChosenProject] = useState("")
   const userZ = useUser();
   const fullName = `${userZ.Name} ${userZ.Surname}`;
+  const [query, setQuery] = useState<string>('');
+  const [filteredUsers, setFilteredUsers] = useState<UserProps[]>([]);
+  const [selectedUser, setSelectedUser] = useState<UserProps | null>(null);
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -351,17 +354,17 @@ export default function Timesheet() {
     date?.to?.toISOString().split("T")[0]
   }`;
 
-  const handleFilterUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedUserId = e.target.value as string;
-
-    const selectedUser = userData.find(
-      (user) => user.id === selectedUserId
+  useEffect(() => {
+    // Filter users based on the query
+    setFilteredUsers(
+      users.filter(user => user.Name.toLowerCase().includes(query.toLowerCase()))
     );
-    if (selectedUser) {
-      setFilteredUser(selectedUser.Name);
-    } else {
-      setFilteredUser("No user found");
-    }
+  }, [query, users]);
+
+  const handleSelectUser = (user: UserProps) => {
+    setSelectedUser(user);
+    setQuery('');
+    setFilteredUsers([]);
   };
 
   const handleeChange = async (
@@ -495,17 +498,33 @@ export default function Timesheet() {
             </select>
           </div>
           <div>
-            <label className="grid w-[60%] mb-1 text-[1.2rem]">
+            <div className="flex">
+
+            {/* <label className="grid w-[30%] mb-1 text-[1.2rem]">
               Supervisor:
-            </label>
-              <select name="name" className="border border-black focus:outline-primary rounded-xl h-auto" value={filteredUser} onChange={handleFilterUserChange}>
-                <option value={""}>Select User</option>
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.Name} {user.Surname}
-                  </option>
-                ))}
-              </select>
+            </label> */}
+            <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search supervisor..."
+        className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
+      />
+            </div>
+      {query && (
+        <ul>
+          {filteredUsers.map(user => (
+            <li key={user.id} onClick={() => handleSelectUser(user)}>
+              {user.Name} {user.Surname}
+            </li>
+          ))}
+        </ul>
+      )}
+      {selectedUser && (
+        <div>
+          <p className="text-secondary font-bold">{selectedUser.Name} {selectedUser.Surname}</p>
+        </div>
+      )}
           </div>
           <div className="period grid">
             <label htmlFor="date" className="mb-1 text-[1.2rem]">
