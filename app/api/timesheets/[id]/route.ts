@@ -7,7 +7,7 @@ export async function GET(
 ) {
 	try {
 
-		const timesheetData = await db.timesheet.findFirst({
+		const timesheetData = await db.tableDetails.findFirst({
 			where: {
 				id: params.id,
 			},
