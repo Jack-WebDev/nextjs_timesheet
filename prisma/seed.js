@@ -31,7 +31,7 @@ async function main() {
       IdNumber: "1234567890123",
       MobileNumber: "1234567890",
       OfficeLocation: faker.location.streetAddress(),
-      StartDate: "Today",
+      StartDate: faker.date.past(),
     },
   });
 }
