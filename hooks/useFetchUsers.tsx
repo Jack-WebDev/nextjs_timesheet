@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 import { UserProps } from "../types/userProps";
 
 export default function useFetchUsers() {
@@ -7,9 +7,19 @@ export default function useFetchUsers() {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const res = await axios.get<UserProps[]>("/api/users/");
-      const users = res.data;
-      setUsers(users);
+      try {
+        const res = await fetch("/api/users/", { next: { revalidate: 3600 } });
+        if (!res.ok) {
+          throw new Error("Network response was not ok" + res.statusText);
+        }
+        const users = await res.json();
+        setUsers(users);
+      } catch (error) {
+        console.error(
+          "There has been a problem with your fetch operation:",
+          error
+        );
+      }
     };
 
     fetchUsers();
