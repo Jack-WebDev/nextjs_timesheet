@@ -50,26 +50,6 @@ CREATE TABLE "Department" (
 );
 
 -- CreateTable
-CREATE TABLE "Timesheet" (
-    "id" TEXT NOT NULL,
-    "Full_Name" TEXT NOT NULL,
-    "Project_Name" TEXT NOT NULL,
-    "Task_performed" TEXT,
-    "Week" TEXT NOT NULL,
-    "Monday" INTEGER,
-    "Tuesday" INTEGER,
-    "Wednesday" INTEGER,
-    "Thursday" INTEGER,
-    "Friday" INTEGER,
-    "Total_hours" DOUBLE PRECISION NOT NULL DEFAULT 0.0,
-    "Approval_Status" TEXT NOT NULL DEFAULT 'Pending',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Timesheet_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Task" (
     "id" TEXT NOT NULL,
     "taskPerformed" TEXT NOT NULL,
@@ -100,6 +80,7 @@ CREATE TABLE "TableRow" (
     "weekday" TEXT NOT NULL,
     "typeOfDay" TEXT NOT NULL,
     "totalHours" DOUBLE PRECISION NOT NULL,
+    "totalMinutes" DOUBLE PRECISION NOT NULL,
     "comment" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "tableDetailsId" TEXT NOT NULL,

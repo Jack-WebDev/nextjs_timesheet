@@ -55,23 +55,6 @@ model Department {
   users           User[]
 }
 
-model Timesheet {
-  id              String   @id @default(uuid())
-  Full_Name       String
-  Project_Name    String
-  Task_performed  String?
-  Week            String
-  Monday          Int?
-  Tuesday         Int?
-  Wednesday       Int?
-  Thursday        Int?
-  Friday          Int?
-  Total_hours     Float    @default(0.0)
-  Approval_Status String   @default("Pending")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
 model Task {
   id            String   @id @default(uuid())
   taskPerformed String
@@ -98,6 +81,7 @@ model TableRow {
   weekday        String
   typeOfDay      String
   totalHours     Float
+  totalMinutes   Float
   comment        String
   userId         String
   tableDetailsId String

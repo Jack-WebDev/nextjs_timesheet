@@ -60,6 +60,8 @@ import { TaskProps } from "@/types/taskProps";
 import { TableRowsProps } from "@/types/tableRowsProps";
 import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 import useFetchProjects from "@/hooks/useFetchProjects";
+import useFetchUsers from "@/hooks/useFetchUsers";
+import { UserProps } from "@/types/userProps";
 
 type FormDetails = {
   month: string;
@@ -74,6 +76,7 @@ const initialData: TableRowsProps[] = [
     weekday: new Date().toISOString().split("T")[0],
     typeOfDay: "",
     totalHours: 0,
+    totalMinutes: 0,
     tasks: [],
     comment: "",
   },
@@ -82,6 +85,7 @@ const initialData: TableRowsProps[] = [
     typeOfDay: "",
 
     totalHours: 0,
+    totalMinutes: 0,
     tasks: [],
     comment: "",
   },
@@ -90,6 +94,7 @@ const initialData: TableRowsProps[] = [
     typeOfDay: "",
 
     totalHours: 0,
+    totalMinutes: 0,
     tasks: [],
     comment: "",
   },
@@ -98,6 +103,7 @@ const initialData: TableRowsProps[] = [
     typeOfDay: "",
 
     totalHours: 0,
+    totalMinutes: 0,
     tasks: [],
     comment: "",
   },
@@ -106,6 +112,7 @@ const initialData: TableRowsProps[] = [
     typeOfDay: "",
 
     totalHours: 0,
+    totalMinutes: 0,
     tasks: [],
     comment: "",
   },
@@ -114,6 +121,7 @@ const initialData: TableRowsProps[] = [
     typeOfDay: "",
 
     totalHours: 0,
+    totalMinutes: 0,
     tasks: [],
     comment: "",
   },
@@ -122,6 +130,7 @@ const initialData: TableRowsProps[] = [
     typeOfDay: "",
 
     totalHours: 0,
+    totalMinutes: 0,
     tasks: [],
     comment: "",
   },
@@ -130,12 +139,17 @@ const initialData: TableRowsProps[] = [
 export default function Timesheet() {
   const timesheetData = useFetchTimesheets();
   const projectsData = useFetchProjects();
+  const userData = useFetchUsers();
   const [tableData, setTableData] = useState<TableRowsProps[]>(initialData);
   const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [chosenProject, setChosenProject] = useState("")
+  const [users, setUsers] = useState<UserProps[]>([]);
+  const [chosenProject, setChosenProject] = useState("");
   const userZ = useUser();
   const fullName = `${userZ.Name} ${userZ.Surname}`;
+  const [query, setQuery] = useState<string>("");
+  const [filteredUsers, setFilteredUsers] = useState<UserProps[]>([]);
+  const [selectedUser, setSelectedUser] = useState<UserProps | null>(null);
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -214,7 +228,7 @@ export default function Timesheet() {
                         <tr>
                           <th>Weekday</th>
                           <th>Type Of Day</th>
-                          <th>Total Hours</th>
+                          <th>Total Time</th>
                           <th>Tasks Performed</th>
                           <th>Task Status</th>
                           <th>Comment</th>
@@ -237,7 +251,7 @@ export default function Timesheet() {
                                 </p>
                               </td>
                               <td className="text-center">
-                                <p>{r.totalHours}</p>
+                                <p>{`${r.totalHours} hrs ${r.totalMinutes} mins`}</p>
                               </td>
                               <td className="text-center">
                                 {r.tasks && r.tasks.length > 0 ? (
@@ -331,6 +345,12 @@ export default function Timesheet() {
   }, [timesheetData]);
 
   useEffect(() => {
+    if (userData) {
+      setUsers(userData);
+    }
+  }, [userData]);
+
+  useEffect(() => {
     if (projectsData) {
       setProjects(projectsData);
     }
@@ -340,21 +360,36 @@ export default function Timesheet() {
     date?.to?.toISOString().split("T")[0]
   }`;
 
+  useEffect(() => {
+    // Filter users based on the query
+    setFilteredUsers(
+      users.filter((user) =>
+        user.Name.toLowerCase().includes(query.toLowerCase())
+      )
+    );
+  }, [query, users]);
 
-  const handleeChange = async (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
-    const projectId = event.target.value as string;
-    setChosenProject(projectId);
+  const handleSelectUser = (user: UserProps) => {
+    setSelectedUser(user);
+    setFormDetails({
+      ...formDetails,
+      projectManager: `${user.Name} ${user.Surname}`,
+    });
+    setQuery("");
+    setFilteredUsers([]);
   };
 
   const handleAddTask = (index: number) => {
     setTableData((prevData) => {
       const newData = [...prevData];
-      newData[index].tasks.push({ taskPerformed: "", taskStatus: "" });
+      newData[index].tasks.push({ taskPerformed: "", taskStatus: "", hours: 0, minutes: 0 });
+      const { totalHours, totalMinutes } = calculateTotalTime(newData[index].tasks);
+      newData[index].totalHours = totalHours;
+      newData[index].totalMinutes = totalMinutes;
       return newData;
     });
   };
+  
 
   const handleProjectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedProjectId = event.target.value as string;
@@ -363,37 +398,34 @@ export default function Timesheet() {
       (project) => project.id === selectedProjectId
     );
     if (selectedProject) {
-      setChosenProject(selectedProject.id)
+      setChosenProject(selectedProject.id);
 
       setFormDetails({
         ...formDetails,
         projectName: selectedProject.Project_Name,
-        projectManager: selectedProject.Project_Manager,
       });
     } else {
       setFormDetails({
         ...formDetails,
         projectName: "",
-        projectManager: "",
       });
     }
   };
 
-  const handleChange = (
-    rowIndex: number,
-    taskIndex: number,
-    field: keyof TaskProps,
-    value: string
-  ) => {
+  const handleChange = (rowIndex: number, taskIndex: number, field: string, value: any) => {
     setTableData((prevData) => {
       const newData = [...prevData];
       newData[rowIndex].tasks[taskIndex] = {
         ...newData[rowIndex].tasks[taskIndex],
         [field]: value,
       };
+      const { totalHours, totalMinutes } = calculateTotalTime(newData[rowIndex].tasks);
+      newData[rowIndex].totalHours = totalHours;
+      newData[rowIndex].totalMinutes = totalMinutes;
       return newData;
     });
   };
+  
 
   const handleFormChange = (field: keyof FormDetails, value: string) => {
     setFormDetails((prevDetails) => ({
@@ -423,6 +455,15 @@ export default function Timesheet() {
     console.log(res);
   };
 
+  const calculateTotalTime = (tasks: TaskProps[]) => {
+    let totalMinutes = 0;
+    tasks.forEach((task) => {
+      totalMinutes += task.hours * 60 + task.minutes;
+    });
+    const totalHours = Math.floor(totalMinutes / 60);
+    totalMinutes = totalMinutes % 60;
+    return { totalHours, totalMinutes };
+  };
 
   return (
     <>
@@ -471,15 +512,32 @@ export default function Timesheet() {
               ))}
             </select>
           </div>
-          <div>
-            <label className="grid w-[60%] mb-1 text-[1.2rem]">
-              Project Manager:
-            </label>
-            <input
-              className="px-4 py-1 border border-black rounded-xl pointer-events-none"
-              value={formDetails.projectManager}
-              readOnly
-            />
+          <div className="grid justify-start items-end">
+            <>
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search your supervisor...."
+                className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
+              />
+            </>
+            {query && (
+              <ul>
+                {filteredUsers.map((user) => (
+                  <li className="cursor-pointer" key={user.id} onClick={() => handleSelectUser(user)}>
+                    {user.Name} {user.Surname}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {selectedUser && (
+              <div>
+                <p className="text-secondary font-bold">
+                  {selectedUser.Name} {selectedUser.Surname}
+                </p>
+              </div>
+            )}
           </div>
           <div className="period grid">
             <label htmlFor="date" className="mb-1 text-[1.2rem]">
@@ -533,121 +591,152 @@ export default function Timesheet() {
             <tr>
               <th>Weekday</th>
               <th>Public/Normal Day </th>
-              <th>Total Hours</th>
+              <th>Total Time</th>
               <th>Tasks Performed</th>
               <th>Comment</th>
             </tr>
           </thead>
           <tbody>
-            {tableData.map((row, rowIndex) => (
-              <tr key={rowIndex} className="border-b border-secondary py-2">
-                <td className="text-center">
-                  <input
-                    className="py-1 px-2 border-black focus:outline-primary rounded-xl"
-                    type="date"
-                    value={row.weekday}
-                    onChange={(e) =>
-                      setTableData((prevData) => {
-                        const newData = [...prevData];
-                        newData[rowIndex].weekday = e.target.value;
-                        return newData;
-                      })
-                    }
-                    
-                  />
-                </td>
-                <td className="text-center">
-                  <select
-                    name=""
-                    id=""
-                    className="w-[10vw] "
-                    value={row.typeOfDay}
-                    onChange={(e) =>
-                      setTableData((prevData) => {
-                        const newData = [...prevData];
-                        newData[rowIndex].typeOfDay = e.target.value;
-                        return newData;
-                      })
-                    }
-                  >
-                    <option value="">Select type of day</option>
-                    <option value="Public Holiday">Public Holiday</option>
-                    <option value="Normal Day">Work/Normal Day</option>
-                  </select>
-                </td>
-                <td className="text-center">
-                  <input
-                    className="w-[25%] py-1 pl-4 border-black focus:outline-primary rounded-xl"
-                    type="number"
-                    value={row.totalHours}
-                    onChange={(e) =>
-                      setTableData((prevData) => {
-                        const newData = [...prevData];
-                        newData[rowIndex].totalHours = parseInt(e.target.value);
-                        return newData;
-                      })
-                    }
-                  />
-                </td>
-                <td className="grid text-center">
-                  {row.tasks.map((task, taskIndex) => (
-                    <div
-                      key={taskIndex}
-                      className="flex justify-center items-center mb-2 gap-x-1"
+            {tableData.map((row, rowIndex) => {
+              return (
+                <tr key={rowIndex} className="border-b border-secondary py-2">
+                  <td className="text-center">
+                    <input
+                      className="py-1 px-2 border-black focus:outline-primary rounded-xl"
+                      type="date"
+                      value={row.weekday}
+                      onChange={(e) =>
+                        setTableData((prevData) => {
+                          const newData = [...prevData];
+                          newData[rowIndex].weekday = e.target.value;
+                          return newData;
+                        })
+                      }
+                    />
+                  </td>
+                  <td className="text-center">
+                    <select
+                      name=""
+                      id=""
+                      className="w-[10vw] "
+                      value={row.typeOfDay}
+                      onChange={(e) =>
+                        setTableData((prevData) => {
+                          const newData = [...prevData];
+                          newData[rowIndex].typeOfDay = e.target.value;
+                          return newData;
+                        })
+                      }
                     >
-                      <input
-                        className="py-1 px-4 border border-black focus:outline-primary rounded-xl w-1/2"
-                        type="text"
-                        value={task.taskPerformed}
-                        onChange={(e) =>
-                          handleChange(
-                            rowIndex,
-                            taskIndex,
-                            "taskPerformed",
-                            e.target.value
-                          )
-                        }
-                      />
-                      <select
-                        className="w-[8vw] h-auto"
-                        value={task.taskStatus}
-                        onChange={(e) =>
-                          handleChange(
-                            rowIndex,
-                            taskIndex,
-                            "taskStatus",
-                            e.target.value
-                          )
-                        }
+                      <option value="">Select type of day</option>
+                      <option value="Public Holiday">Public Holiday</option>
+                      <option value="Normal Day">Work/Normal Day</option>
+                    </select>
+                  </td>
+                  <td className="text-center w-[10%]">
+                  <input
+                  className="pointer-events-none w-[100%] px-4"
+                type="text"
+                value={`${row.totalHours} hrs ${row.totalMinutes} mins`}
+                readOnly
+              />
+                  </td>
+
+                  <td className="grid text-center">
+                    {row.tasks.map((task, taskIndex) => (
+                      <div
+                        key={taskIndex}
+                        className="flex justify-center items-end mb-2 gap-x-4"
                       >
-                        <option value="">Select status</option>
-                        <option value="In-Progress">In-Progress</option>
-                        <option value="Completed">Completed</option>
-                      </select>
-                    </div>
-                  ))}
-                  <Button
-                    onClick={() => handleAddTask(rowIndex)}
-                    className="grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold hover:bg-transparent mt-2"
-                  >
-                    Add Task
-                  </Button>
-                </td>
-                <td className="text-center">
-                  <textarea
-                    className="px-4 border border-black focus:outline-primary rounded-xl"
-                    value={row.comment}
-                    onChange={(e) =>
-                      setTableData((prevData) => {
-                        const newData = [...prevData];
-                        newData[rowIndex].comment = e.target.value;
-                        return newData;
-                      })
-                    }
-                  />
-                </td>
-              </tr>
-            ))}
+                        <input
+                          className="py-1 px-4 border border-black focus:outline-primary rounded-xl w-1/2"
+                          type="text"
+                          value={task.taskPerformed}
+                          onChange={(e) =>
+                            handleChange(
+                              rowIndex,
+                              taskIndex,
+                              "taskPerformed",
+                              e.target.value
+                            )
+                          }
+                        />
+                        <select
+                          className="w-[8vw] h-[60%]"
+                          value={task.taskStatus}
+                          onChange={(e) =>
+                            handleChange(
+                              rowIndex,
+                              taskIndex,
+                              "taskStatus",
+                              e.target.value
+                            )
+                          }
+                        >
+                          <option value="">Select status</option>
+                          <option value="In-Progress">In-Progress</option>
+                          <option value="Completed">Completed</option>
+                        </select>
+                        <div className="grid w-[10%] justify-items-center">
+                          <label htmlFor="hours">Hours</label>
+                          <input
+                            className="py-1 px-2 border border-black focus:outline-primary rounded-xl w-full"
+                            type="number"
+                            value={task.hours}
+                            onChange={(e) =>
+                              handleChange(
+                                rowIndex,
+                                taskIndex,
+                                "hours",
+                                parseInt(e.target.value, 10) || 0
+                              )
+                            }
+                            placeholder="Hours"
+                          />
+                        </div>
+                        <div className="grid w-[10%] justify-items-center">
+                          <label htmlFor="minutes">Minutes</label>
+                          <input
+                            className="py-1 px-2 border border-black focus:outline-primary rounded-xl w-full"
+                            type="number"
+                            value={task.minutes}
+                            onChange={(e) =>
+                              handleChange(
+                                rowIndex,
+                                taskIndex,
+                                "minutes",
+                                parseInt(e.target.value, 10) || 0
+                              )
+                            }
+                            placeholder="Minutes"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    <Button
+                      onClick={() => handleAddTask(rowIndex)}
+                      className="grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold hover:bg-transparent mt-2"
+                    >
+                      Add Task
+                    </Button>
+                  </td>
+
+                  <td className="text-center">
+                    <textarea
+                      className="px-4 border border-black focus:outline-primary rounded-xl"
+                      value={row.comment}
+                      onChange={(e) =>
+                        setTableData((prevData) => {
+                          const newData = [...prevData];
+                          newData[rowIndex].comment = e.target.value;
+                          return newData;
+                        })
+                      }
+                    />
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         <Button
