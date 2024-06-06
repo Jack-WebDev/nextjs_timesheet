@@ -134,7 +134,7 @@ export default function Timesheet() {
                         <tr>
                           <th>Weekday</th>
                           <th>Type Of Day</th>
-                          <th>Total Hours</th>
+                          <th>Total Time</th>
                           <th>Tasks Performed</th>
                           <th>Task Status</th>
                           <th>Comment</th>
@@ -159,7 +159,7 @@ export default function Timesheet() {
                               </td>
 
                               <td>
-                                <p>{r.totalHours}</p>
+                                <p>{`${r.totalHours} hrs ${r.totalMinutes} mins`}</p>
                               </td>
                               <td className="text-center">
                                 {r.tasks && r.tasks.length > 0 ? (

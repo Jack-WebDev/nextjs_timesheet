@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
         weekday: i.weekday.toString(),
         typeOfDay:i.typeOfDay,
         totalHours: i.totalHours,
+        totalMinutes: i.totalMinutes,
         tasks: {
           create: i.tasks.map((task: any) => ({
             taskPerformed: task.taskPerformed,
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
           })),
         },
         comment: i.comment,
-      
+        
       };
     });
 
@@ -41,6 +42,7 @@ export async function POST(req: NextRequest) {
           data: {
             comment: entry.comment,
             totalHours: entry.totalHours,
+            totalMinutes: entry.totalMinutes,
             weekday: entry.weekday,
             tasks: entry.tasks,
             typeOfDay:entry.typeOfDay,

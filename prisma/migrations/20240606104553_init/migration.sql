@@ -100,6 +100,7 @@ CREATE TABLE "TableRow" (
     "weekday" TEXT NOT NULL,
     "typeOfDay" TEXT NOT NULL,
     "totalHours" DOUBLE PRECISION NOT NULL,
+    "totalMinutes" DOUBLE PRECISION NOT NULL,
     "comment" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "tableDetailsId" TEXT NOT NULL,
