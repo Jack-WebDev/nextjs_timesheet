@@ -37,3 +37,39 @@ export async function DELETE(
 		return NextResponse.json(error, { status: 500 });
 	}
 }
+
+export async function PATCH(
+	req: NextRequest,
+	{ params }: { params: { id: string } }
+) {
+	try {
+		const res = await req.json();
+		const { Name, Surname, Email, IdNumber, MobileNumber, Address, City, ZipCode, Province, DateOfBirth, MaritalStatus, Gender, Nationality} = await res;
+
+		const user = await db.user.update({
+			where: {
+				id: params.id,
+			},
+			data: {
+				Name: Name,
+				Surname: Surname,
+				Email: Email,
+				IdNumber: IdNumber,
+				MobileNumber: MobileNumber,
+				Address: Address,
+				City: City,
+				ZipCode: ZipCode,
+				Province: Province,
+				DateOfBirth: DateOfBirth,
+				MaritalStatus: MaritalStatus,
+				Gender: Gender,
+				Nationality: Nationality,
+
+			},
+		});
+
+		return NextResponse.json(user, { status: 201 });
+	} catch (error) {
+		return NextResponse.json(error, { status: 500 });
+	}
+}

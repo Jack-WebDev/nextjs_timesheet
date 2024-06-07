@@ -66,6 +66,10 @@ const UserTable = () => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
+  const handleViewUser = (user: UserProps) => {
+    router.push(`/users/admin/employees/${user.id}`);
+  }
+
 
   const columns: ColumnDef<UserProps>[] = [
     {
@@ -119,8 +123,7 @@ const UserTable = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="bg-white rounded-xl">
-            <DropdownMenuItem className="flex gap-x-2"><FaEye/> View</DropdownMenuItem>
-            <DropdownMenuItem className="flex gap-x-2"><FaEdit/> Edit</DropdownMenuItem>
+            <DropdownMenuItem className="flex gap-x-2" onClick={() => handleViewUser(row.original)}><FaEye/> View</DropdownMenuItem>
             <DropdownMenuItem className="flex gap-x-2"><FaTrash/> Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
