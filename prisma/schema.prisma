@@ -75,7 +75,7 @@ model TableDetails {
   Approval_Status String
   comments        String?
   userId          String?
-  user            User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
   tableRows       TableRow[]
 }
 
