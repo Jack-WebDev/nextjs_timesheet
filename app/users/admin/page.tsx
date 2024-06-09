@@ -1,41 +1,31 @@
-"use client";
-
 import Link from "next/link";
 
 import { FaBuilding, FaCalendar, FaUsers } from "react-icons/fa";
-import useFetchProjects from "@/hooks/useFetchProjects";
-import useFetchDepartments from "@/hooks/useFetchDepartments";
-import useFetchUsers from "@/hooks/useFetchUsers";
-import DashboardCard from "@/components/DashboardCard";
 
-export default function Dashboard() {
-  const projects = useFetchProjects();
-  const departments = useFetchDepartments();
-  const users = useFetchUsers();
-  const totalUsers = users.length;
-  const totalDepartments = departments.length;
-  const totalProjects = projects.length;
+import DashboardCard from "@/components/DashboardCard";
+import db from "@/database";
+
+export default async function Dashboard() {
+  const projects = await db.project.count();
+  const departments = await db.department.count();
+  const users = await db.user.count();
 
   return (
     <div className="grid grid-cols-2 gap-12">
       <Link href={"/users/admin/employees"}>
-        <DashboardCard
-          icon={FaUsers}
-          total={totalUsers}
-          title="Total Employees"
-        />
+        <DashboardCard icon={FaUsers} total={users} title="Total Employees" />
       </Link>
       <Link href={"/users/admin/departments"}>
         <DashboardCard
           icon={FaBuilding}
-          total={totalDepartments}
+          total={departments}
           title="Total Departments"
         />
       </Link>
       <Link href={"/users/admin/projects"}>
         <DashboardCard
           icon={FaCalendar}
-          total={totalProjects}
+          total={projects}
           title="Total Projects"
         />
       </Link>
