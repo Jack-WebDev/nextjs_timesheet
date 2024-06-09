@@ -468,7 +468,7 @@ export default function Timesheet() {
   return (
     <>
       <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
-        <form className="grid grid-cols-3 border-b-2 border-secondary pb-8 gap-y-4">
+        <form className="grid grid-cols-3 border-b-2 border-secondary pb-8 gap-y-4 items-end">
           <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Month:</label>
             <input
@@ -500,7 +500,7 @@ export default function Timesheet() {
             </label>
             <select
               name="name"
-              className="border border-black focus:outline-primary rounded-xl h-auto"
+              className="border border-black focus:outline-primary rounded-xl h-[4vh]"
               value={chosenProject}
               onChange={handleProjectChange}
             >
@@ -512,7 +512,7 @@ export default function Timesheet() {
               ))}
             </select>
           </div>
-          <div className="grid justify-start items-end">
+          <div className="grid justify-start items-end h-[10vh]">
             <>
               <input
                 type="text"
@@ -523,17 +523,17 @@ export default function Timesheet() {
               />
             </>
             {query && (
-              <ul>
+              <ul className="bg-white rounded-xl py-2 px-4 shadow-xl mt-[10px]">
                 {filteredUsers.map((user) => (
-                  <li className="cursor-pointer" key={user.id} onClick={() => handleSelectUser(user)}>
+                  <li className="cursor-pointer borderStyle hover:bg-[#F5F5F5]" key={user.id} onClick={() => handleSelectUser(user)}>
                     {user.Name} {user.Surname}
                   </li>
                 ))}
               </ul>
             )}
             {selectedUser && (
-              <div>
-                <p className="text-secondary font-bold">
+              <div className="z-10">
+                <p className="text-secondary font-bold bg-white rounded-xl py-2 px-4 shadow-xl mt-[10px]">
                   {selectedUser.Name} {selectedUser.Surname}
                 </p>
               </div>
