@@ -47,7 +47,7 @@ import { useEffect, useState } from "react";
 const formSchema = z.object({
   EmployeeType: z.string(),
   NDTEmail: z.string().email({ message: "Please add a valid email" }),
-  startDate: z.coerce.date({
+  startDate: z.string({
     message: "Please add a start date.",
   }),
   departmentName: z.string(),
@@ -70,6 +70,7 @@ export default function ProfessionalData() {
       Role: "",
       OfficeLocation: "",
       Position: "",
+      startDate: "",
     },
   });
 
@@ -122,11 +123,11 @@ export default function ProfessionalData() {
                     <SelectValue placeholder="Employee Type" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="Intern">Intern</SelectItem>
-                  <SelectItem value="PartTime">Part-Time</SelectItem>
-                  <SelectItem value="Contract">Contract</SelectItem>
-                  <SelectItem value="Permanent">Permanent</SelectItem>
+                <SelectContent className="bg-white rounded-xl">
+                  <SelectItem value="Intern" className="cursor-pointer">Intern</SelectItem>
+                  <SelectItem value="PartTime" className="cursor-pointer">Part-Time</SelectItem>
+                  <SelectItem value="Contract" className="cursor-pointer">Contract</SelectItem>
+                  <SelectItem value="Permanent" className="cursor-pointer">Permanent</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -202,33 +203,11 @@ export default function ProfessionalData() {
           name="startDate"
           render={({ field }) => (
             <FormItem>
-              <Popover>
-                <PopoverTrigger asChild className="rounded-xl">
-                  <FormControl>
-                    <Button variant={"outline"}>
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Employee Start Date</span>
-                      )}
-                      <FaCalendar />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <FormControl>
+                <Input placeholder="YYYY-MM-DD" {...field} className="w-full rounded-xl"/>
+              </FormControl>
 
-              <FormMessage style={{ color: "red" }}/>
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />

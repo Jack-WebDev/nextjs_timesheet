@@ -11,7 +11,7 @@ type UserProps = {
   City: string;
   ZipCode: string;
   Province: string;
-  DateOfBirth: Date;
+  DateOfBirth: string;
   MaritalStatus: string;
   Gender: string;
   Nationality: string;
@@ -22,7 +22,7 @@ type UserProps = {
   departmentId: string;
   Role: string;
   Position: string;
-  StartDate: Date;
+  StartDate: string;
   OfficeLocation: string;
 };
 

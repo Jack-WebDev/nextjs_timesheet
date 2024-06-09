@@ -54,7 +54,7 @@ const formSchema = z.object({
       message: "Mobile Number must have 10 digits.",
     }),
   Email: z.string().email({ message: "Please add a valid email" }),
-  DateOfBirth: z.coerce.date({
+  DateOfBirth: z.string({
     message: "Please add a date of birth.",
   }),
   Gender: z.string(),
@@ -92,6 +92,7 @@ export default function PersonalData() {
       Name: "",
       Surname: "",
       MobileNumber: "",
+      DateOfBirth: "",
       Email: "",
       Address: "",
       IdNumber: "",
@@ -183,10 +184,10 @@ export default function PersonalData() {
                     <SelectValue placeholder="Marital Status" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="Single">Single</SelectItem>
-                  <SelectItem value="Married">Married</SelectItem>
-                  <SelectItem value="Divorced">Divorced</SelectItem>
+                <SelectContent className="bg-white rounded-xl ">
+                  <SelectItem value="Single" className="cursor-pointer">Single</SelectItem>
+                  <SelectItem value="Married" className="cursor-pointer">Married</SelectItem>
+                  <SelectItem value="Divorced" className="cursor-pointer">Divorced</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -195,38 +196,16 @@ export default function PersonalData() {
           )}
         />
 
-        <FormField
+          <FormField
           control={form.control}
           name="DateOfBirth"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button variant={"outline"} className="rounded-xl w-full">
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Date of Birth</span>
-                      )}
-                      <FaCalendar />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+            <FormItem>
+              <FormControl>
+                <Input placeholder="YYYY-MM-DD" {...field} className="rounded-xl w-full"/>
+              </FormControl>
 
-              <FormMessage style={{ color: "red" }}/>
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
@@ -246,10 +225,10 @@ export default function PersonalData() {
                     <SelectValue placeholder="Gender" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="Man">Man</SelectItem>
-                  <SelectItem value="Woman">Woman</SelectItem>
-                  <SelectItem value="NonBinary">Non-Binary</SelectItem>
+                <SelectContent className="bg-white rounded-xl">
+                  <SelectItem value="Man" className="cursor-pointer">Man</SelectItem>
+                  <SelectItem value="Woman" className="cursor-pointer">Woman</SelectItem>
+                  <SelectItem value="NonBinary" className="cursor-pointer">Non-Binary</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -269,10 +248,10 @@ export default function PersonalData() {
                     <SelectValue placeholder="Nationality" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent >
-                  <SelectItem value="Citizen">Citizen</SelectItem>
-                  <SelectItem value="Naturalized">Naturalized</SelectItem>
-                  <SelectItem value="Visa">Visa</SelectItem>
+                <SelectContent className="bg-white rounded-xl">
+                  <SelectItem value="Citizen" className="cursor-pointer">Citizen</SelectItem>
+                  <SelectItem value="Naturalized" className="cursor-pointer">Naturalized</SelectItem>
+                  <SelectItem value="Visa" className="cursor-pointer">Visa</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -339,15 +318,15 @@ export default function PersonalData() {
                     <SelectValue placeholder="Province"/>
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="Gauteng">Gauteng</SelectItem>
-                  <SelectItem value="Limpopo">Limpopo</SelectItem>
-                  <SelectItem value="Mpumalanga">Mpumalanga</SelectItem>
-                  <SelectItem value="NorthWest">North-West</SelectItem>
-                  <SelectItem value="WesternCape">Western Cape</SelectItem>
-                  <SelectItem value="EasternCape">Eastern Cape</SelectItem>
-                  <SelectItem value="Northern ape">Northern Cape</SelectItem>
-                  <SelectItem value="KwaZuluNatal">Kwa-Zulu Natal</SelectItem>
+                <SelectContent className="bg-white rounded-xl">
+                  <SelectItem value="Gauteng" className="cursor-pointer">Gauteng</SelectItem>
+                  <SelectItem value="Limpopo" className="cursor-pointer">Limpopo</SelectItem>
+                  <SelectItem value="Mpumalanga" className="cursor-pointer">Mpumalanga</SelectItem>
+                  <SelectItem value="NorthWest" className="cursor-pointer">North-West</SelectItem>
+                  <SelectItem value="WesternCape" className="cursor-pointer">Western Cape</SelectItem>
+                  <SelectItem value="EasternCape" className="cursor-pointer">Eastern Cape</SelectItem>
+                  <SelectItem value="NorthernCape" className="cursor-pointer">Northern Cape</SelectItem>
+                  <SelectItem value="KwaZuluNatal" className="cursor-pointer">Kwa-Zulu Natal</SelectItem>
                 </SelectContent>
               </Select>
 

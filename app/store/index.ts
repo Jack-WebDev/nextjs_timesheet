@@ -25,7 +25,7 @@ type Employee = {
   City: string;
   ZipCode: string;
   Province: string;
-  DateOfBirth: Date;
+  DateOfBirth: string;
   MaritalStatus: string;
   Gender: string;
   Nationality: string;
@@ -36,7 +36,7 @@ type Employee = {
   departmentName: string;
   Role: string; 
   Position: string;
-  StartDate: Date;
+  StartDate: string;
   OfficeLocation: string;
 };
 
@@ -74,7 +74,7 @@ export const useEmployee = create(
       City: "",
       ZipCode: "",
       Province: "",
-      DateOfBirth: new Date(),
+      DateOfBirth: "",
       MaritalStatus: "",
       Gender: "",
       Nationality: "",
@@ -85,7 +85,7 @@ export const useEmployee = create(
       departmentName: "",
       Role: "",
       Position: "",
-      StartDate: new Date(),
+      StartDate: "",
       OfficeLocation: "",
     }),{
       name: "employee",

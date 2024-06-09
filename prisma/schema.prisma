@@ -19,7 +19,7 @@ model User {
   City           String?
   ZipCode        String?
   Province       String?
-  DateOfBirth    DateTime?
+  DateOfBirth    String?
   MaritalStatus  String?
   Gender         String?
   Nationality    String?
@@ -30,7 +30,7 @@ model User {
   departmentName String?
   Role           String?        @default("Employee")
   Position       String?
-  StartDate      DateTime?
+  StartDate      String?
   OfficeLocation String?
   createdAt      DateTime       @default(now())
   tableRows      TableRow[]
