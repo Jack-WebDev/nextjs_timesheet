@@ -163,7 +163,6 @@ const UserTable = () => {
 
     try {
       const res = await axios.delete(`/api/users/${id}`);
-      console.log(res)
       router.refresh();
       toast.success("User deleted successfully");
     } catch (error) {

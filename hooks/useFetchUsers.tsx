@@ -8,7 +8,7 @@ export default function useFetchUsers() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch("/api/users/", { next: { revalidate: 3600 } });
+        const res = await fetch("/api/users/", { cache: "no-store" });
         if (!res.ok) {
           throw new Error("Network response was not ok" + res.statusText);
         }
