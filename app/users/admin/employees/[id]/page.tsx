@@ -1,10 +1,9 @@
-import React from 'react'
 import Profile from './(_components)/Profile'
 
-export default function page(params: { id: string }) {
+export default function Page() {
   return (
     <div>
-        <Profile id={params.id} />
+        <Profile/>
     </div>
   )
 }

@@ -31,14 +31,15 @@ export default function PersonalData() {
   const [userData, setUserData] = useState<User[]>([]);
 
   useEffect(() => {
+    const fetchUserData = async () => {
+      const res = await axios.get(`/api/users/${userID}`);
+      const usersData = await res.data;
+      setUserData(usersData);
+    };
+  
     fetchUserData();
-  }, []);
+  }, [userID]);
 
-  const fetchUserData = async () => {
-    const res = await axios.get(`/api/users/${userID}`);
-    const usersData = await res.data;
-    setUserData(usersData);
-  };
 
 
   const handleSave = async (id:string) => {
