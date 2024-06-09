@@ -1,5 +1,6 @@
 "use client";
 
+import { Label } from "@/components/ui/label";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -30,35 +31,35 @@ export default function ProfessionalData() {
         <div key={user.id}>
           <div className="grid gap-4 py-4">
             <div className="flex justify-between items-center">
-              <div className="grid items-center gap-4">
-                <label htmlFor="name">Employee Type:</label>
-                <input className="pointer-events-none"  value={user.EmployeeType} readOnly />
+              <div className="grid items-center gap-2">
+                <Label htmlFor="name">Employee Type:</Label>
+                <input className="pointer-events-none pl-4 py-1"  value={user.EmployeeType} readOnly />
               </div>
-              <div className="grid items-center gap-4">
-                <label htmlFor="name">NDT Division:</label>
-                <input className="pointer-events-none"  value={user.departmentName} readOnly />
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <div className="grid items-center gap-4">
-                <label htmlFor="name">Role:</label>
-                <input className="pointer-events-none"  value={user.Role} readOnly />
-              </div>
-              <div className="grid items-center gap-4">
-                <label htmlFor="name">Position:</label>
-                <input className="pointer-events-none"  value={user.Position} readOnly />
+              <div className="grid items-center gap-2">
+                <Label htmlFor="name">NDT Division:</Label>
+                <input className="pointer-events-none pl-4 py-1"  value={user.departmentName} readOnly />
               </div>
             </div>
 
             <div className="flex justify-between items-center">
-              <div className="grid  items-center gap-4">
-                <label htmlFor="name">Start Date:</label>
-                <input className="pointer-events-none"  value={user.StartDate} readOnly />
+              <div className="grid items-center gap-2">
+                <Label htmlFor="name">Role:</Label>
+                <input className="pointer-events-none pl-4 py-1"  value={user.Role} readOnly />
               </div>
-              <div className="grid  items-center gap-4">
-                <label htmlFor="name">Office Location:</label>
-                <input className="pointer-events-none"  value={user.OfficeLocation} readOnly />
+              <div className="grid items-center gap-2">
+                <Label htmlFor="name">Position:</Label>
+                <input className="pointer-events-none pl-4 py-1"  value={user.Position} readOnly />
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <div className="grid  items-center gap-2">
+                <Label htmlFor="name">Start Date:</Label>
+                <input className="pointer-events-none pl-4 py-1"  value={user.StartDate} readOnly />
+              </div>
+              <div className="grid  items-center gap-2">
+                <Label htmlFor="name">Office Location:</Label>
+                <input className="pointer-events-none pl-4 py-1"  value={user.OfficeLocation} readOnly />
               </div>
             </div>
           </div>

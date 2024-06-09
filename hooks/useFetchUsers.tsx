@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 // import axios from "axios";
 import { UserProps } from "../types/userProps";
+export const revalidate = 0;
 
 export default function useFetchUsers() {
   const [users, setUsers] = useState<UserProps[]>([]);

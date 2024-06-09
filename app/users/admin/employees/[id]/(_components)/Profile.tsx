@@ -27,7 +27,7 @@ export default function Profile() {
     <>
       {userData?.map((user) => (
         <div
-          className="bg-[#F5F5F5] p-8 rounded-xl w-[70%] mx-auto"
+          className="bg-[#F5F5F5] p-8 rounded-xl w-[80%] mx-auto"
           key={user.id}
         >
           <div className="flex justify-between items-center">
@@ -49,7 +49,7 @@ export default function Profile() {
             </div>
 
             <div>
-              <EditProfile id={user.id} />
+              <EditProfile  />
             </div>
           </div>
 
