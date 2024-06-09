@@ -9,12 +9,12 @@ datasource db {
 }
 
 model User {
-  id             String      @id @default(uuid())
+  id             String         @id @default(uuid())
   Name           String?
   Surname        String?
-  Email          String?     @unique
-  IdNumber       String?     @unique
-  MobileNumber   String?     @unique
+  Email          String?        @unique
+  IdNumber       String?        @unique
+  MobileNumber   String?        @unique
   Address        String?
   City           String?
   ZipCode        String?
@@ -24,17 +24,18 @@ model User {
   Gender         String?
   Nationality    String?
   EmployeeType   String?
-  NDTEmail       String?     @unique
+  NDTEmail       String?        @unique
   Password       String?
   departmentId   String?
   departmentName String?
-  Role           String?     @default("Employee")
+  Role           String?        @default("Employee")
   Position       String?
   StartDate      DateTime?
   OfficeLocation String?
-  createdAt      DateTime    @default(now())
+  createdAt      DateTime       @default(now())
   tableRows      TableRow[]
-  department     Department? @relation(fields: [departmentId], references: [id])
+  tableDetails   TableDetails[]
+  department     Department?    @relation(fields: [departmentId], references: [id])
 }
 
 model Project {
@@ -60,7 +61,7 @@ model Task {
   taskPerformed String
   taskStatus    String
   tableRowId    String
-  tableRow      TableRow @relation(fields: [tableRowId], references: [id])
+  tableRow      TableRow @relation(fields: [tableRowId], references: [id], onDelete: Cascade)
 }
 
 model TableDetails {
@@ -73,6 +74,8 @@ model TableDetails {
   projectName     String
   Approval_Status String
   comments        String?
+  userId          String?
+  user            User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
   tableRows       TableRow[]
 }
 
@@ -85,7 +88,7 @@ model TableRow {
   comment        String
   userId         String
   tableDetailsId String
-  tableDetails   TableDetails @relation(fields: [tableDetailsId], references: [id])
-  user           User         @relation(fields: [userId], references: [id])
+  tableDetails   TableDetails @relation(fields: [tableDetailsId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   tasks          Task[]
 }

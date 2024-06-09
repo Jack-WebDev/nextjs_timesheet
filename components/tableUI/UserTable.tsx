@@ -26,13 +26,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+
 
 import {
   Table,
@@ -49,9 +43,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
-import AddEmployee from "@/app/users/admin/employees/addEmployee/page";
-import { AddUser } from "../dialogUI/AddUser";
+import {FaEye, FaTrash } from "react-icons/fa";
+
 
 
 const UserTable = () => {
@@ -65,6 +58,11 @@ const UserTable = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+
+  const handleViewUser = (user: UserProps) => {
+    router.push(`/users/admin/employees/${user.id}`);
+  }
+
 
 
   const columns: ColumnDef<UserProps>[] = [
@@ -119,9 +117,8 @@ const UserTable = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="bg-white rounded-xl">
-            <DropdownMenuItem className="flex gap-x-2"><FaEye/> View</DropdownMenuItem>
-            <DropdownMenuItem className="flex gap-x-2"><FaEdit/> Edit</DropdownMenuItem>
-            <DropdownMenuItem className="flex gap-x-2"><FaTrash/> Delete</DropdownMenuItem>
+            <DropdownMenuItem className="flex gap-x-2" onClick={() => handleViewUser(row.original)}><FaEye/> View</DropdownMenuItem>
+            <DropdownMenuItem className="flex gap-x-2" onClick={() => handleDelete(row.original.id)}><FaTrash/> Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         );
@@ -163,8 +160,10 @@ const UserTable = () => {
   }, [userData]);
 
   const handleDelete = async (id: string) => {
+
     try {
-      await axios.delete(`/api/users/${id}`);
+      const res = await axios.delete(`/api/users/${id}`);
+      console.log(res)
       router.refresh();
       toast.success("User deleted successfully");
     } catch (error) {

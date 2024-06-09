@@ -143,3 +143,23 @@ select {
 	color: var(--primary-color);
 	border-bottom: 2px solid var(--primary-color);
 }
+
+.active_side-tab {
+    background-color: var(--primary-color);
+    color: white;
+    width: 100%;
+    /* border-radius: 1rem; */
+}
+
+
+
+.active_side-tab:first-child {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}
+
+.active_side-tab:last-child {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+}
+
