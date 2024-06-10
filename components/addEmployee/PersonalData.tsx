@@ -70,7 +70,7 @@ const formSchema = z.object({
     "Gauteng",
     "Limpopo",
     "Free State",
-    "North-West",
+    "North West",
     "Western Cape",
     "Eastern Cape",
     "Kwa-Zulu Natal",
@@ -202,7 +202,7 @@ export default function PersonalData() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="YYYY-MM-DD" {...field} className="rounded-xl w-full"/>
+                <Input placeholder="Enter Date of Birth (YYYY-MM-DD)" {...field} className="rounded-xl w-full"/>
               </FormControl>
 
               <FormMessage style={{ color: "red" }} />
@@ -322,10 +322,10 @@ export default function PersonalData() {
                   <SelectItem value="Gauteng" className="cursor-pointer">Gauteng</SelectItem>
                   <SelectItem value="Limpopo" className="cursor-pointer">Limpopo</SelectItem>
                   <SelectItem value="Mpumalanga" className="cursor-pointer">Mpumalanga</SelectItem>
-                  <SelectItem value="NorthWest" className="cursor-pointer">North-West</SelectItem>
-                  <SelectItem value="WesternCape" className="cursor-pointer">Western Cape</SelectItem>
-                  <SelectItem value="EasternCape" className="cursor-pointer">Eastern Cape</SelectItem>
-                  <SelectItem value="NorthernCape" className="cursor-pointer">Northern Cape</SelectItem>
+                  <SelectItem value="North West" className="cursor-pointer">North-West</SelectItem>
+                  <SelectItem value="Western Cape" className="cursor-pointer">Western Cape</SelectItem>
+                  <SelectItem value="Eastern Cape" className="cursor-pointer">Eastern Cape</SelectItem>
+                  <SelectItem value="Northern Cape" className="cursor-pointer">Northern Cape</SelectItem>
                   <SelectItem value="KwaZuluNatal" className="cursor-pointer">Kwa-Zulu Natal</SelectItem>
                 </SelectContent>
               </Select>

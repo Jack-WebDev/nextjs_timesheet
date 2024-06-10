@@ -10,7 +10,7 @@ CREATE TABLE "User" (
     "City" TEXT,
     "ZipCode" TEXT,
     "Province" TEXT,
-    "DateOfBirth" TIMESTAMP(3),
+    "DateOfBirth" TEXT,
     "MaritalStatus" TEXT,
     "Gender" TEXT,
     "Nationality" TEXT,
@@ -21,7 +21,7 @@ CREATE TABLE "User" (
     "departmentName" TEXT,
     "Role" TEXT DEFAULT 'Employee',
     "Position" TEXT,
-    "StartDate" TIMESTAMP(3),
+    "StartDate" TEXT,
     "OfficeLocation" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -70,6 +70,7 @@ CREATE TABLE "TableDetails" (
     "projectName" TEXT NOT NULL,
     "Approval_Status" TEXT NOT NULL,
     "comments" TEXT,
+    "userId" TEXT,
 
     CONSTRAINT "TableDetails_pkey" PRIMARY KEY ("id")
 );
@@ -113,10 +114,13 @@ ALTER TABLE "User" ADD CONSTRAINT "User_departmentId_fkey" FOREIGN KEY ("departm
 ALTER TABLE "Project" ADD CONSTRAINT "Project_Department_Id_fkey" FOREIGN KEY ("Department_Id") REFERENCES "Department"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Task" ADD CONSTRAINT "Task_tableRowId_fkey" FOREIGN KEY ("tableRowId") REFERENCES "TableRow"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Task" ADD CONSTRAINT "Task_tableRowId_fkey" FOREIGN KEY ("tableRowId") REFERENCES "TableRow"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_tableDetailsId_fkey" FOREIGN KEY ("tableDetailsId") REFERENCES "TableDetails"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TableDetails" ADD CONSTRAINT "TableDetails_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_tableDetailsId_fkey" FOREIGN KEY ("tableDetailsId") REFERENCES "TableDetails"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TableRow" ADD CONSTRAINT "TableRow_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

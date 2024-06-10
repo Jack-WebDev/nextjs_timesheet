@@ -14,7 +14,6 @@ export async function GET(
 				
 			},
 		});
-
 		return NextResponse.json(user, { status: 200 });
 	} catch (error) {
 		return NextResponse.json(error, { status: 500 });
@@ -45,7 +44,7 @@ export async function PATCH(
 ) {
 	try {
 		const res = await req.json();
-		const { Name, Surname, Email, IdNumber, MobileNumber, Address, City, ZipCode, Province, DateOfBirth, MaritalStatus, Gender, Nationality} = await res;
+		const { Name, Surname, Email, IdNumber, MobileNumber, Address, City, ZipCode, Province, DateOfBirth, MaritalStatus, Gender, Nationality, EmployeeType, NDTEmail, Password, departmentId, departmentName, Role, Position, StartDate, OfficeLocation } = await res;
 
 		const user = await db.user.update({
 			where: {
@@ -65,6 +64,15 @@ export async function PATCH(
 				MaritalStatus: MaritalStatus,
 				Gender: Gender,
 				Nationality: Nationality,
+				EmployeeType: EmployeeType,
+				NDTEmail: NDTEmail,
+				Password: Password,
+				departmentId: departmentId,
+				departmentName: departmentName,
+				Role: Role,
+				Position: Position,
+				StartDate: StartDate,
+				OfficeLocation: OfficeLocation,
 
 			},
 		});

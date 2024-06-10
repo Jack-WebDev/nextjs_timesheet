@@ -204,7 +204,7 @@ export default function ProfessionalData() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="YYYY-MM-DD" {...field} className="w-full rounded-xl"/>
+                <Input placeholder="Start Date (YYYY-MM-DD)" {...field} className="w-full rounded-xl"/>
               </FormControl>
 
               <FormMessage style={{ color: "red" }} />
