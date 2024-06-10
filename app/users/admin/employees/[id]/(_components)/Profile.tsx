@@ -12,6 +12,8 @@ export default function Profile() {
   const params = useParams();
   const userID = params.id;
   const [userData, setUserData] = useState<UserProps[]>([]);
+  const nameLetter = userData[0]?.Name.charAt(0);
+  const lastNameLetter = userData[0]?.Surname.charAt(0);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -31,7 +33,12 @@ export default function Profile() {
           key={user.id}
         >
           <div className="flex justify-between items-center">
-            <div className="grid">
+            <div className="flex justify-between items-center gap-x-4">
+              <div className="bg-secondary p-4 rounded-full">
+               <p className="text-2xl text-white font-bold">{nameLetter} {lastNameLetter}</p>
+              </div>
+              <div>
+
               <div className="flex items-center gap-x-2">
                 <FaUser className="mr-2 h-4 w-4" />
                 {user?.Name} {user?.Surname}
@@ -45,6 +52,7 @@ export default function Profile() {
               <div className="flex items-center gap-x-2">
                 <FaEnvelope className="mr-2 h-4 w-4" />
                 {user?.NDTEmail}
+              </div>
               </div>
             </div>
 

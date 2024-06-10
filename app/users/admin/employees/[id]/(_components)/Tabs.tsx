@@ -50,8 +50,8 @@ export function TabsDemo() {
       <TabsContent value="profile" className="w-full">
         <AddEmployee />
       </TabsContent>
-      <TabsContent value="projects">Change your password here.</TabsContent>
-      <TabsContent value="leaves">Change your password here.</TabsContent>
+      <TabsContent value="projects">Projects</TabsContent>
+      <TabsContent value="leaves">Leaves</TabsContent>
     </Tabs>
   );
 }
