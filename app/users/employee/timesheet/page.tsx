@@ -360,14 +360,17 @@ export default function Timesheet() {
     date?.to?.toISOString().split("T")[0]
   }`;
 
+
   useEffect(() => {
-    // Filter users based on the query
     setFilteredUsers(
-      users.filter((user) =>
-        user.Name.toLowerCase().includes(query.toLowerCase())
+      users.filter(
+        (user) =>
+          (user.Name.toLowerCase().includes(query.toLowerCase()) ||
+           user.Surname.toLowerCase().includes(query.toLowerCase())) &&
+          user.id !== userZ.id 
       )
     );
-  }, [query, users]);
+  }, [query, users, userZ]);
 
   const handleSelectUser = (user: UserProps) => {
     setSelectedUser(user);
