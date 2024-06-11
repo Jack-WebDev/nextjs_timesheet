@@ -526,7 +526,7 @@ export default function Timesheet() {
               />
             </>
             {query && (
-              <ul className="bg-white rounded-xl py-2 px-4 shadow-xl mt-[10px]">
+              <ul className="bg-white rounded-xl py-2 px-4 shadow-xl mt-[10px] z-10">
                 {filteredUsers.map((user) => (
                   <li className="cursor-pointer borderStyle hover:bg-[#F5F5F5]" key={user.id} onClick={() => handleSelectUser(user)}>
                     {user.Name} {user.Surname}

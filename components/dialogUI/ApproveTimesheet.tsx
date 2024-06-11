@@ -43,7 +43,7 @@ export default function ApproveTimesheet({ timesheet }: any) {
       <DialogContent className="w-[50%]">
         <DialogHeader>
           <DialogTitle className="flex justify-around items-center text-2xl">
-            Timesheet Details
+            Name: {timesheet.name}
             <span className="text-xl">
               Weekly Period:{" "}
               <b className="text-primary">{timesheet.weeklyPeriod}</b>
