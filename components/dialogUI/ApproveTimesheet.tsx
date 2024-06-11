@@ -21,7 +21,6 @@ export default function ApproveTimesheet({ timesheet }: any) {
       Approval_Status: `Approved by ${userZ.Name} ${userZ.Surname}, pending executive approval`,
       comment: comment,
     });
-    console.log(res);
     window.location.reload();
   };
 

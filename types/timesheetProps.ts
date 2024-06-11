@@ -12,4 +12,5 @@ export type TimesheetProps = {
     tableRows: TableRowsProps[];
     Approval_Status: string;
     comments: string;
+    userId: string
   };

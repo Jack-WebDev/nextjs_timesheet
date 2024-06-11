@@ -338,11 +338,13 @@ export default function Timesheet() {
     to: addDays(new Date(), 7),
   });
 
+
   useEffect(() => {
     if (timesheetData) {
-      setFilteredTimesheets(timesheetData);
+      const filteredData = timesheetData.filter(item => item.userId === userZ.id);
+      setFilteredTimesheets(filteredData);
     }
-  }, [timesheetData]);
+  }, [timesheetData, userZ.id]);
 
   useEffect(() => {
     if (userData) {
@@ -455,7 +457,6 @@ export default function Timesheet() {
       }
     );
     window.location.reload();
-    console.log(res);
   };
 
   const calculateTotalTime = (tasks: TaskProps[]) => {

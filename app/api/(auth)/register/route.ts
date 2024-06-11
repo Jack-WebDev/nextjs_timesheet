@@ -10,7 +10,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const data = await req.json();
     const { email, password } = await data;
 
-    console.log(email, password);
 
     if (!isValidEmailDomain(email, "ndt.co.za")) {
       return NextResponse.json({

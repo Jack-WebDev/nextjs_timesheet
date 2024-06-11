@@ -28,19 +28,6 @@ export async function PUT(
         const res = await req.json();
         const { Approval_Status, comment } = await res;
     
-        // const mapped = combinedData.timesheet.map((i: any) => {
-        //   return {
-        //     weekday: i.weekday.toString(),
-        //     totalHours: i.totalHours,
-        //     tasks: {
-        //       create: i.tasks.map((task: any) => ({
-        //         taskPerformed: task.taskPerformed,
-        //         taskStatus: task.taskStatus,
-        //       })),
-        //     },
-        //     comment: i.comment,
-        //   };
-        // });
     
         try {
 
@@ -49,35 +36,12 @@ export async function PUT(
                     id: params.id
                 }, 
                 data: {
-                    // month: combinedData.month,
-                    // weeklyPeriod: combinedData.weeklyPeriod,
-                    // name: combinedData.name,
-                    // projectManager: combinedData.projectManager,
-                    // projectName: combinedData.projectName,
-                    // role: combinedData.role,
                     Approval_Status: Approval_Status,
                     comments: comment,
                 }
             })
     
-          // for (const entry of mapped) {
-          //   const s = await db.tableRow.update({
-          //       where: {
-          //           id:params.id //TODO: EACH TABLE HAS IT'S OWN ID!!!!!!!!!
-          //       },
-          //       data: {
-          //           comment: entry.comment,
-          //           totalHours: entry.totalHours,
-          //           weekday: entry.weekday,
-          //           tasks: entry.tasks,
-          //           userId: combinedData.userID,
-          //           tableDetailsId: detailsID.id,
-          //         },
-          //   });
-    
-          //   console.log(s)
-          // }
-          console.log("Data inserted successfully.");
+
         } catch (error) {
           console.error("Error inserting data:", error);
         }
