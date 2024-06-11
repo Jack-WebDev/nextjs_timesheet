@@ -24,6 +24,7 @@ type UserProps = {
   Position: string;
   StartDate: string;
   OfficeLocation: string;
+  Documents: string[];
 };
 
 export const createEmployee = async (data: UserProps) => {
@@ -52,6 +53,7 @@ export const createEmployee = async (data: UserProps) => {
         Position: data.Position,
         StartDate: data.StartDate,
         OfficeLocation: data.OfficeLocation,
+        Documents: data.Documents,
       },
     });
   } catch (error) {
