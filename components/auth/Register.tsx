@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -20,14 +19,19 @@ import { login } from "@/actions/auth/actions";
 import { useUser } from "@/app/store";
 
 const formSchema = z.object({
-  email: z.string().min(2, {
-    message: "Not a valid NDT email",
+  email: z.string().email({ message: "Please add a valid email" }).refine((email) => email.endsWith('@ndt.co.za'), {
+    message: "Email must be a valid NDT email",
   }),
-  password: z.string(),
+  password:z.string().regex(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    {
+      message:
+        'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.',
+    }
+  )
 });
 
 export function RegisterForm() {
-  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,10 +46,8 @@ export function RegisterForm() {
       const user = await res.data;
       useUser.setState(user);
       await login(user);
-    } catch (error) {
-      toast.error(
-        "An error occured while registering. Please reload the screen and try again."
-      );
+    } catch (error:any) {
+      toast.error(error?.response?.data?.message);
     }
   }
 
@@ -65,7 +67,7 @@ export function RegisterForm() {
                   className="rounded-xl hover:border-primary"
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
@@ -82,7 +84,7 @@ export function RegisterForm() {
                   className="rounded-xl hover:border-primary"
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />

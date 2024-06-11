@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 type User = {
   NDTEmail: string;
@@ -58,6 +58,7 @@ export const useUser = create(
     {
       name: "user",
       partialize: (state) => ({ id: state.id, NDTEmail: state.NDTEmail, Name: state.Name, Surname:state.Surname, Position: state.Position }) as User,
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 );
@@ -112,15 +113,8 @@ export const useEmployee = create(
         Position: state.Position,
         StartDate: state.StartDate,
         OfficeLocation: state.OfficeLocation,
+      
 
-    }) as Employee,}));  
+    }) as Employee, storage: createJSONStorage(() => sessionStorage)}), );  
 
 
-const clearLocalStorageAfterTimeout = () => {
-  const timeoutDuration = 2 * 60 * 60 * 1000; 
-  setTimeout(() => {
-    localStorage.clear();
-  }, timeoutDuration);
-};
-
-clearLocalStorageAfterTimeout();
