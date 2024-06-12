@@ -733,6 +733,8 @@ export default function Timesheet() {
                           <option value="">Select status</option>
                           <option value="In-Progress">In-Progress</option>
                           <option value="Completed">Completed</option>
+                          <option value="Continuous">Continous</option>
+
                         </select>
                         <div className="grid w-[10%] justify-items-center">
                           <label htmlFor="hours">Hours</label>
