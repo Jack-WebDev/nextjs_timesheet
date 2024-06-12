@@ -51,7 +51,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useUser } from "@/app/store";
 import { TimesheetProps } from "@/types/timesheetProps";
@@ -151,6 +151,9 @@ export default function Timesheet() {
   const [query, setQuery] = useState<string>("");
   const [filteredUsers, setFilteredUsers] = useState<UserProps[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserProps | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [selectedOption, setSelectedOption] = useState<UserProps | null>(null);
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -440,6 +443,14 @@ export default function Timesheet() {
     }
   };
 
+  const handleOptionClick = (user: UserProps) => {
+    setSelectedOption(user);
+    setIsDropdownOpen(false);
+    if (inputRef.current) {
+      inputRef.current.value = `${user.Name} ${user.Surname}`;
+    }
+  };
+
   const handleChange = (
     rowIndex: number,
     taskIndex: number,
@@ -511,6 +522,23 @@ export default function Timesheet() {
     return { totalHours, totalMinutes };
   };
 
+  const handleInputsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value.toLowerCase();
+    const filtered = userData.filter(
+      (user) =>
+        user.Name.toLowerCase().includes(inputValue) ||
+        user.Surname.toLowerCase().includes(inputValue)
+    );
+    setFilteredUsers(filtered);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
   return (
     <>
       <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
@@ -559,34 +587,30 @@ export default function Timesheet() {
             </select>
           </div>
           <div className="grid justify-start items-end h-[10vh]">
-            <>
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search your supervisor...."
-                className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
-              />
-            </>
-            {query && (
-              <ul className="bg-white rounded-xl py-2 px-4 shadow-xl mt-[10px] z-10">
+            <label className="text-[1.2rem]">Supervisor:</label>
+            <input
+              type="text"
+              placeholder="Search your supervisor...."
+              onChange={(e) => {
+                handleInputsChange && handleInputsChange(e);
+              }}
+              onClick={() => toggleDropdown && toggleDropdown()}
+              ref={inputRef}
+              className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
+            />
+
+            {isDropdownOpen && (
+              <ul className="bg-white rounded-xl py-2 px-4 shadow-xl z-10">
                 {filteredUsers.map((user) => (
                   <li
-                    className="cursor-pointer borderStyle hover:bg-[#F5F5F5]"
                     key={user.id}
-                    onClick={() => handleSelectUser(user)}
+                    className="cursor-pointer borderStyle hover:bg-[#F5F5F5]"
+                    onClick={() => handleOptionClick(user)}
                   >
                     {user.Name} {user.Surname}
                   </li>
                 ))}
               </ul>
-            )}
-            {selectedUser && (
-              <div className="z-10">
-                <p className="text-secondary font-bold bg-white rounded-xl py-2 px-4 shadow-xl mt-[10px]">
-                  {selectedUser.Name} {selectedUser.Surname}
-                </p>
-              </div>
             )}
           </div>
           <div className="period grid">
@@ -686,8 +710,6 @@ export default function Timesheet() {
                       <option value="Weekend">Weekend</option>
                       <option value="Day-Off">Day-Off</option>
                       <option value="Leave">Leave</option>
-
-
                     </select>
                   </td>
                   <td className="text-center w-[10%]">
@@ -734,7 +756,6 @@ export default function Timesheet() {
                           <option value="In-Progress">In-Progress</option>
                           <option value="Completed">Completed</option>
                           <option value="Completed">Continuous</option>
-
                         </select>
                         <div className="grid w-[10%] justify-items-center">
                           <label htmlFor="hours">Hours</label>
