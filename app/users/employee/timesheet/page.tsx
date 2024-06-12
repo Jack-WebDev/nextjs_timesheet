@@ -62,6 +62,7 @@ import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 import useFetchProjects from "@/hooks/useFetchProjects";
 import useFetchUsers from "@/hooks/useFetchUsers";
 import { UserProps } from "@/types/userProps";
+import { FaTrash } from "react-icons/fa";
 
 type FormDetails = {
   month: string;
@@ -338,10 +339,11 @@ export default function Timesheet() {
     to: addDays(new Date(), 7),
   });
 
-
   useEffect(() => {
     if (timesheetData) {
-      const filteredData = timesheetData.filter(item => item.userId === userZ.id);
+      const filteredData = timesheetData.filter(
+        (item) => item.userId === userZ.id
+      );
       setFilteredTimesheets(filteredData);
     }
   }, [timesheetData, userZ.id]);
@@ -362,14 +364,13 @@ export default function Timesheet() {
     date?.to?.toISOString().split("T")[0]
   }`;
 
-
   useEffect(() => {
     setFilteredUsers(
       users.filter(
         (user) =>
           (user.Name.toLowerCase().includes(query.toLowerCase()) ||
-           user.Surname.toLowerCase().includes(query.toLowerCase())) &&
-          user.id !== userZ.id 
+            user.Surname.toLowerCase().includes(query.toLowerCase())) &&
+          user.id !== userZ.id
       )
     );
   }, [query, users, userZ]);
@@ -387,14 +388,36 @@ export default function Timesheet() {
   const handleAddTask = (index: number) => {
     setTableData((prevData) => {
       const newData = [...prevData];
-      newData[index].tasks.push({ taskPerformed: "", taskStatus: "", hours: 0, minutes: 0 });
-      const { totalHours, totalMinutes } = calculateTotalTime(newData[index].tasks);
+      newData[index].tasks.push({
+        taskPerformed: "",
+        taskStatus: "",
+        hours: 0,
+        minutes: 0,
+      });
+      const { totalHours, totalMinutes } = calculateTotalTime(
+        newData[index].tasks
+      );
       newData[index].totalHours = totalHours;
       newData[index].totalMinutes = totalMinutes;
       return newData;
     });
   };
-  
+
+  const handleDeleteTask = (rowIndex: number, taskIndex: number) => {
+    setTableData((prevData) => {
+      const newData = [...prevData];
+      newData[rowIndex].tasks.splice(taskIndex, 1);
+
+      // Recalculate total hours and minutes
+      const { totalHours, totalMinutes } = calculateTotalTime(
+        newData[rowIndex].tasks
+      );
+      newData[rowIndex].totalHours = totalHours;
+      newData[rowIndex].totalMinutes = totalMinutes;
+
+      return newData;
+    });
+  };
 
   const handleProjectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedProjectId = event.target.value as string;
@@ -417,20 +440,26 @@ export default function Timesheet() {
     }
   };
 
-  const handleChange = (rowIndex: number, taskIndex: number, field: string, value: any) => {
+  const handleChange = (
+    rowIndex: number,
+    taskIndex: number,
+    field: string,
+    value: any
+  ) => {
     setTableData((prevData) => {
       const newData = [...prevData];
       newData[rowIndex].tasks[taskIndex] = {
         ...newData[rowIndex].tasks[taskIndex],
         [field]: value,
       };
-      const { totalHours, totalMinutes } = calculateTotalTime(newData[rowIndex].tasks);
+      const { totalHours, totalMinutes } = calculateTotalTime(
+        newData[rowIndex].tasks
+      );
       newData[rowIndex].totalHours = totalHours;
       newData[rowIndex].totalMinutes = totalMinutes;
       return newData;
     });
   };
-  
 
   const handleFormChange = (field: keyof FormDetails, value: string) => {
     setFormDetails((prevDetails) => ({
@@ -457,6 +486,19 @@ export default function Timesheet() {
       }
     );
     window.location.reload();
+  };
+
+  const [isAddingTask, setIsAddingTask] = useState(false);
+
+  const validateTask = (task: TaskProps) => {
+    return (
+      task.taskPerformed.trim() !== "" &&
+      task.taskStatus.trim() !== "" &&
+      task.hours > 0 &&
+      task.hours <= 24 &&
+      task.minutes > 0 &&
+      task.minutes <= 60
+    );
   };
 
   const calculateTotalTime = (tasks: TaskProps[]) => {
@@ -529,7 +571,11 @@ export default function Timesheet() {
             {query && (
               <ul className="bg-white rounded-xl py-2 px-4 shadow-xl mt-[10px] z-10">
                 {filteredUsers.map((user) => (
-                  <li className="cursor-pointer borderStyle hover:bg-[#F5F5F5]" key={user.id} onClick={() => handleSelectUser(user)}>
+                  <li
+                    className="cursor-pointer borderStyle hover:bg-[#F5F5F5]"
+                    key={user.id}
+                    onClick={() => handleSelectUser(user)}
+                  >
                     {user.Name} {user.Surname}
                   </li>
                 ))}
@@ -594,7 +640,7 @@ export default function Timesheet() {
           <thead className="pb-2">
             <tr>
               <th>Weekday</th>
-              <th>Public/Normal Day </th>
+              <th>Type of Day </th>
               <th>Total Time</th>
               <th>Tasks Performed</th>
               <th>Comment</th>
@@ -602,6 +648,8 @@ export default function Timesheet() {
           </thead>
           <tbody>
             {tableData.map((row, rowIndex) => {
+              const allFieldsComplete = row.tasks.every(validateTask);
+
               return (
                 <tr key={rowIndex} className="border-b border-secondary py-2">
                   <td className="text-center">
@@ -634,16 +682,21 @@ export default function Timesheet() {
                     >
                       <option value="">Select type of day</option>
                       <option value="Public Holiday">Public Holiday</option>
-                      <option value="Normal Day">Work/Normal Day</option>
+                      <option value="Normal Day">Work Day</option>
+                      <option value="Weekend">Weekend</option>
+                      <option value="Day-Off">Day-Off</option>
+                      <option value="Leave">Leave</option>
+
+
                     </select>
                   </td>
                   <td className="text-center w-[10%]">
-                  <input
-                  className="pointer-events-none w-[100%] px-4"
-                type="text"
-                value={`${row.totalHours} hrs ${row.totalMinutes} mins`}
-                readOnly
-              />
+                    <input
+                      className="pointer-events-none w-[100%] px-4"
+                      type="text"
+                      value={`${row.totalHours} hrs ${row.totalMinutes} mins`}
+                      readOnly
+                    />
                   </td>
 
                   <td className="grid text-center">
@@ -719,11 +772,25 @@ export default function Timesheet() {
                             placeholder="Minutes"
                           />
                         </div>
+
+                        <FaTrash
+                          onClick={() => handleDeleteTask(rowIndex, taskIndex)}
+                          className="cursor-pointer text-red-600 text-xl relative bottom-1 right-1"
+                        />
                       </div>
                     ))}
                     <Button
-                      onClick={() => handleAddTask(rowIndex)}
-                      className="grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold hover:bg-transparent mt-2"
+                      onClick={() => {
+                        setIsAddingTask(true);
+                        handleAddTask(rowIndex);
+                        setIsAddingTask(false);
+                      }}
+                      className={`grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold hover:bg-transparent mt-2 ${
+                        isAddingTask || !allFieldsComplete
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                      disabled={isAddingTask || !allFieldsComplete}
                     >
                       Add Task
                     </Button>
