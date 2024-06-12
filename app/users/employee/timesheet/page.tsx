@@ -63,6 +63,7 @@ import useFetchProjects from "@/hooks/useFetchProjects";
 import useFetchUsers from "@/hooks/useFetchUsers";
 import { UserProps } from "@/types/userProps";
 import { FaTrash } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 type FormDetails = {
   month: string;
@@ -416,7 +417,7 @@ export default function Timesheet() {
 
     setErrors(newErrors);
     setTimeout(() => setErrors({}), 3000);
-
+    toast.error("Please fill in all required fields");
     return Object.keys(newErrors).length === 0;
   };
 
@@ -477,11 +478,41 @@ export default function Timesheet() {
         ...newData[rowIndex].tasks[taskIndex],
         [field]: value,
       };
+      
+
+      // Calculate the total time
       const { totalHours, totalMinutes } = calculateTotalTime(
         newData[rowIndex].tasks
       );
-      newData[rowIndex].totalHours = totalHours;
-      newData[rowIndex].totalMinutes = totalMinutes;
+
+      // Check if total time exceeds the maximum allowed (e.g., 24 hours)
+      const maxTotalMinutes = 24 * 60;
+      const currentTotalMinutes = totalHours * 60 + totalMinutes;
+      if (currentTotalMinutes > maxTotalMinutes) {
+        // Adjust the values to fit within the maximum allowed time
+        let remainingMinutes = maxTotalMinutes;
+        newData[rowIndex].tasks.forEach((task) => {
+          const taskMinutes = task.hours * 60 + task.minutes;
+          if (remainingMinutes - taskMinutes >= 0) {
+            remainingMinutes -= taskMinutes;
+          } else {
+            if (field === "hours") {
+              task.hours = Math.floor(remainingMinutes / 60);
+              task.minutes = remainingMinutes % 60;
+            } else if (field === "minutes") {
+              task.minutes = remainingMinutes;
+              task.hours = Math.floor(remainingMinutes / 60);
+            }
+            remainingMinutes = 0;
+          }
+        });
+      }
+
+      // Recalculate the total time with adjusted values
+      const adjustedTotalTime = calculateTotalTime(newData[rowIndex].tasks);
+      newData[rowIndex].totalHours = adjustedTotalTime.totalHours;
+      newData[rowIndex].totalMinutes = adjustedTotalTime.totalMinutes;
+
       return newData;
     });
   };
@@ -493,28 +524,8 @@ export default function Timesheet() {
     }));
   };
 
-  // const handleSubmit = async () => {
-  //   const formData = {
-  //     combinedData: {
-  //       ...formDetails,
-  //       weeklyPeriod: formattedDate,
-  //       timesheet: tableData,
-  //       userID: userZ.id,
-  //       Approval_Status: "Pending",
-  //     },
-  //   };
-
-  //   await axios.post<TableRowsProps, FormDetails>(
-  //     "/api/timesheets",
-  //     {
-  //       formData: formData,
-  //     }
-  //   );
-  //   window.location.reload();
-  // };
 
   const handleSubmit = async () => {
-
     if (validateForm()) {
       const formData = {
         combinedData: {
@@ -807,12 +818,12 @@ export default function Timesheet() {
                           <option value="Completed">Completed</option>
                           <option value="Completed">Continuous</option>
                         </select>
-                        <div className="grid w-[10%] justify-items-center">
+                        <div className="grid w-[13%] justify-items-center">
                           <label htmlFor="hours">Hours</label>
                           <input
                             className="py-1 px-2 border border-black focus:outline-primary rounded-xl w-full"
                             type="number"
-                            min={1}
+                            min={0}
                             max={24}
                             value={task.hours}
                             onChange={(e) =>
@@ -831,7 +842,7 @@ export default function Timesheet() {
                           <input
                             className="py-1 px-2 border border-black focus:outline-primary rounded-xl w-full"
                             type="number"
-                            min={1}
+                            min={0}
                             max={60}
                             value={task.minutes}
                             onChange={(e) =>
