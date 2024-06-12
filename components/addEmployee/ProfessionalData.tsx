@@ -95,14 +95,15 @@ export default function ProfessionalData() {
       ...values,
       departmentId: selectedDepartment,
       departmentName: selectedDept?.Department_Name
-    });    const employeeData = localStorage.getItem("employee");
+    });    
+    const employeeData = sessionStorage.getItem("employee");
     if (employeeData) {
       const employee = JSON.parse(employeeData);
       createEmployee(employee.state);
       toast.success("Employee has been created successfully.");
       router.replace("/users/admin/employees");
     } else {
-      console.log("No employee data found in localStorage.");
+      console.log("No employee data found in sessionStorage.");
     }
   }
 
