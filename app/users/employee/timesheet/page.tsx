@@ -154,6 +154,7 @@ export default function Timesheet() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedOption, setSelectedOption] = useState<UserProps | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -201,7 +202,7 @@ export default function Timesheet() {
           timesheet.Approval_Status === "Pending"
             ? "text-yellow-500 font-semibold"
             : timesheet.Approval_Status.includes("Rejected")
-            ? "text-red-500 font-semibold"
+            ? "text-red-500 font-semibold font-semibold"
             : timesheet.Approval_Status.includes("Approved")
             ? "text-green-700 font-semibold"
             : "";
@@ -406,6 +407,19 @@ export default function Timesheet() {
     });
   };
 
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+    if (!formDetails.month) newErrors.month = "Month is required";
+    if (!formDetails.projectName) newErrors.projectName = "Project is required";
+    if (!formDetails.projectManager)
+      newErrors.projectManager = "Supervisor is required";
+
+    setErrors(newErrors);
+    setTimeout(() => setErrors({}), 3000);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleDeleteTask = (rowIndex: number, taskIndex: number) => {
     setTableData((prevData) => {
       const newData = [...prevData];
@@ -479,24 +493,46 @@ export default function Timesheet() {
     }));
   };
 
-  const handleSubmit = async () => {
-    const formData = {
-      combinedData: {
-        ...formDetails,
-        weeklyPeriod: formattedDate,
-        timesheet: tableData,
-        userID: userZ.id,
-        Approval_Status: "Pending",
-      },
-    };
+  // const handleSubmit = async () => {
+  //   const formData = {
+  //     combinedData: {
+  //       ...formDetails,
+  //       weeklyPeriod: formattedDate,
+  //       timesheet: tableData,
+  //       userID: userZ.id,
+  //       Approval_Status: "Pending",
+  //     },
+  //   };
 
-    const res = await axios.post<TableRowsProps, FormDetails>(
-      "/api/timesheets",
-      {
-        formData: formData,
+  //   await axios.post<TableRowsProps, FormDetails>(
+  //     "/api/timesheets",
+  //     {
+  //       formData: formData,
+  //     }
+  //   );
+  //   window.location.reload();
+  // };
+
+  const handleSubmit = async () => {
+
+    if (validateForm()) {
+      const formData = {
+        combinedData: {
+          ...formDetails,
+          weeklyPeriod: formattedDate,
+          timesheet: tableData,
+          userID: userZ.id,
+          Approval_Status: "Pending",
+        },
+      };
+
+      try {
+        await axios.post("/api/timesheets", { formData });
+        window.location.reload();
+      } catch (error) {
+        console.error("Error submitting form:", error);
       }
-    );
-    window.location.reload();
+    }
   };
 
   const [isAddingTask, setIsAddingTask] = useState(false);
@@ -551,6 +587,9 @@ export default function Timesheet() {
               value={formDetails.month}
               onChange={(e) => handleFormChange("month", e.target.value)}
             />
+            {errors.month && (
+              <p className="text-red-500 font-semibold">{errors.month}</p>
+            )}
           </div>
           <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Name:</label>
@@ -585,6 +624,10 @@ export default function Timesheet() {
                 </option>
               ))}
             </select>
+
+            {errors.projectName && (
+              <p className="text-red-500 font-semibold">{errors.projectName}</p>
+            )}
           </div>
           <div className="relative grid justify-start items-end h-[10vh]">
             <label className="text-[1.2rem]">Supervisor:</label>
@@ -611,6 +654,12 @@ export default function Timesheet() {
                   </li>
                 ))}
               </ul>
+            )}
+
+            {errors.projectManager && (
+              <p className="text-red-500 font-semibold">
+                {errors.projectManager}
+              </p>
             )}
           </div>
 
