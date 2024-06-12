@@ -686,6 +686,8 @@ export default function Timesheet() {
                           <input
                             className="py-1 px-2 border border-black focus:outline-primary rounded-xl w-full"
                             type="number"
+                            min={1}
+                            max={24}
                             value={task.hours}
                             onChange={(e) =>
                               handleChange(
@@ -703,6 +705,8 @@ export default function Timesheet() {
                           <input
                             className="py-1 px-2 border border-black focus:outline-primary rounded-xl w-full"
                             type="number"
+                            min={1}
+                            max={60}
                             value={task.minutes}
                             onChange={(e) =>
                               handleChange(
