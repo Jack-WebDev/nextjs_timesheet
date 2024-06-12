@@ -586,7 +586,7 @@ export default function Timesheet() {
               ))}
             </select>
           </div>
-          <div className="grid justify-start items-end h-[10vh]">
+          <div className="relative grid justify-start items-end h-[10vh]">
             <label className="text-[1.2rem]">Supervisor:</label>
             <input
               type="text"
@@ -600,7 +600,7 @@ export default function Timesheet() {
             />
 
             {isDropdownOpen && (
-              <ul className="bg-white rounded-xl py-2 px-4 shadow-xl z-10">
+              <ul className="absolute left-[20px] top-[6rem] bg-white rounded-xl py-2 px-4 shadow-xl z-10 max-h-40 overflow-y-auto">
                 {filteredUsers.map((user) => (
                   <li
                     key={user.id}
@@ -613,6 +613,7 @@ export default function Timesheet() {
               </ul>
             )}
           </div>
+
           <div className="period grid">
             <label htmlFor="date" className="mb-1 text-[1.2rem]">
               Weekly Period:
