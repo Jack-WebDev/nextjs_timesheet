@@ -6,6 +6,7 @@ import PersonalData from "./PersonalData";
 import ProfessionalData from "./ProfessionalData";
 import { FaBriefcase, FaFile, FaUser } from "react-icons/fa";
 import { useState } from "react";
+import Documents from "./Documents";
 
 
 export default function AddEmployee() {
@@ -50,6 +51,9 @@ export default function AddEmployee() {
       </TabsContent>
       <TabsContent value="professionalData">
         <ProfessionalData />
+      </TabsContent>
+      <TabsContent value="documents">
+        <Documents />
       </TabsContent>
 
 
