@@ -64,6 +64,7 @@ import useFetchUsers from "@/hooks/useFetchUsers";
 import { UserProps } from "@/types/userProps";
 import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
+import Loading from "../loading";
 
 type FormDetails = {
   month: string;
@@ -145,19 +146,19 @@ export default function Timesheet() {
   const [tableData, setTableData] = useState<TableRowsProps[]>(initialData);
   const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [users, setUsers] = useState<UserProps[]>([]);
   const [chosenProject, setChosenProject] = useState("");
   const userZ = useUser();
   const fullName = `${userZ.Name} ${userZ.Surname}`;
   const [query, setQuery] = useState<string>("");
+  const [users, setUsers] = useState<UserProps[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserProps[]>([]);
-  const [selectedUser, setSelectedUser] = useState<UserProps | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [selectedOption, setSelectedOption] = useState<UserProps | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [date, setDate] = useState<DayPickerDateRange | undefined>(undefined);
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -189,7 +190,7 @@ export default function Timesheet() {
     },
     {
       accessorKey: "projectManager",
-      header: "Project Manager",
+      header: "Supervisor",
       cell: ({ row }) => (
         <div className="lowercase">{row.getValue("projectManager")}</div>
       ),
@@ -298,7 +299,7 @@ export default function Timesheet() {
 
                     <div className="mt-4">
                       <h2 className="font-semibold">
-                        Project Manager&apos;s comments:
+                        Supervisor&apos;s comments:
                       </h2>
                       <p>
                         {timesheet.comments === ""
@@ -358,16 +359,6 @@ export default function Timesheet() {
   }, [userData]);
 
   useEffect(() => {
-    if (projectsData) {
-      setProjects(projectsData);
-    }
-  }, [projectsData]);
-
-  const formattedDate = `${date?.from?.toISOString().split("T")[0]} to ${
-    date?.to?.toISOString().split("T")[0]
-  }`;
-
-  useEffect(() => {
     setFilteredUsers(
       users.filter(
         (user) =>
@@ -377,6 +368,18 @@ export default function Timesheet() {
       )
     );
   }, [query, users, userZ]);
+
+  useEffect(() => {
+    if (projectsData) {
+      setProjects(projectsData);
+    }
+  }, [projectsData]);
+
+  const formattedDate = `${date?.from?.toISOString().split("T")[0]} to ${
+    date?.to?.toISOString().split("T")[0]
+  }`;
+
+
 
   const handleAddTask = (index: number) => {
     setTableData((prevData) => {
@@ -404,8 +407,7 @@ export default function Timesheet() {
       newErrors.projectManager = "Supervisor is required";
 
     setErrors(newErrors);
-    setTimeout(() => setErrors({}), 3000);
-    toast.error("Please fill in all required fields");
+    setTimeout(() => setErrors({}), 10000);
     return Object.keys(newErrors).length === 0;
   };
 
@@ -451,7 +453,6 @@ export default function Timesheet() {
       ...formDetails,
       projectManager: `${user.Name} ${user.Surname}`,
     });
-    setSelectedOption(user);
     setIsDropdownOpen(false);
     if (inputRef.current) {
       inputRef.current.value = `${user.Name} ${user.Surname}`;
@@ -471,16 +472,13 @@ export default function Timesheet() {
         [field]: value,
       };
 
-      // Calculate the total time
       const { totalHours, totalMinutes } = calculateTotalTime(
         newData[rowIndex].tasks
       );
 
-      // Check if total time exceeds the maximum allowed (e.g., 24 hours)
       const maxTotalMinutes = 24 * 60;
       const currentTotalMinutes = totalHours * 60 + totalMinutes;
       if (currentTotalMinutes > maxTotalMinutes) {
-        // Adjust the values to fit within the maximum allowed time
         let remainingMinutes = maxTotalMinutes;
         newData[rowIndex].tasks.forEach((task) => {
           const taskMinutes = task.hours * 60 + task.minutes;
@@ -499,7 +497,6 @@ export default function Timesheet() {
         });
       }
 
-      // Recalculate the total time with adjusted values
       const adjustedTotalTime = calculateTotalTime(newData[rowIndex].tasks);
       newData[rowIndex].totalHours = adjustedTotalTime.totalHours;
       newData[rowIndex].totalMinutes = adjustedTotalTime.totalMinutes;
@@ -582,9 +579,13 @@ export default function Timesheet() {
       };
 
       try {
+        setLoading(true);
         await axios.post("/api/timesheets", { formData });
+        setLoading(false);
+
         window.location.reload();
       } catch (error) {
+        setLoading(false);
         console.error("Error submitting form:", error);
       }
     }
@@ -630,6 +631,7 @@ export default function Timesheet() {
 
   return (
     <>
+    {loading && <Loading />}
       <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
         <form className="grid grid-cols-3 border-b-2 border-secondary pb-8 gap-y-4 items-end">
           <div>
@@ -786,7 +788,6 @@ export default function Timesheet() {
             </Popover>
           </div>
 
-          {/* <YourComponent/> */}
         </form>
         <table className="mt-8">
           <thead className="pb-2">
@@ -884,7 +885,7 @@ export default function Timesheet() {
                           <option value="">Select status</option>
                           <option value="In-Progress">In-Progress</option>
                           <option value="Completed">Completed</option>
-                          <option value="Completed">Continuous</option>
+                          <option value="Continuous">Continuous</option>
                         </select>
                         <div className="grid w-[13%] justify-items-center">
                           <label htmlFor="hours">Hours</label>
