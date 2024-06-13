@@ -10,34 +10,66 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const data = await req.json();
     const { email, password } = await data;
 
-    console.log(email, password);
+    try {
+      if (email.length < 1) {
+        return NextResponse.json(
+          {
+            message: "Please enter a valid email!",
+          },
+          { status: 401 }
+        );
+      }
 
-    if (!isValidEmailDomain(email, "ndt.co.za")) {
-      return NextResponse.json({
-        message: "Invalid NDT email. Please try again",
+      if (!isValidEmailDomain(email, "ndt.co.za")) {
+        return NextResponse.json(
+          {
+            message: "Invalid NDT email! Please try again",
+          },
+          { status: 401 }
+        );
+      }
+
+      const user = await db.user.findFirst({
+        where: {
+          NDTEmail: email,
+        },
       });
+
+      if (!user) {
+        return NextResponse.json(
+          {
+            message: "Email not found!",
+          },
+          { status: 500 }
+        );
+      }
+
+      const hashedPassword = await hashPassword(password, 10);
+
+      const validUser = await db.user.update({
+        where: {
+          NDTEmail: email,
+        },
+        data: {
+          Password: hashedPassword,
+        },
+      });
+
+      const token = signJwt(
+        { id: validUser?.id, role: validUser?.Role },
+        "JWT_KEY!",
+        10
+      );
+
+      cookies().set("jwtToken", token, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60,
+      });
+
+      return NextResponse.json(validUser, { status: 201 });
+    } catch (error) {
+      return NextResponse.json({ message: error }, { status: 500 });
     }
-
-    const hashedPassword = await hashPassword(password, 10);
-
-    const user = await db.user.update({
-      where: {
-        NDTEmail: email,
-      },
-      data: {
-        Password: hashedPassword,
-      },
-    })
-
-
-    const token = signJwt({ id: user?.id, role: user?.Role }, "JWT_KEY!", 10);
-
-    cookies().set("jwtToken", token, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60,
-    });
-
-    return NextResponse.json(user, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: error }, { status: 500 });
   }

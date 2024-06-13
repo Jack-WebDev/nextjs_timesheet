@@ -164,7 +164,6 @@ select {
 
 .borderStyle:not(:last-child) {
   padding-block-end: 3px;
-  border-bottom: 1px solid var(--secondary-color);
 }
 
 .custom-class > *[data-ut-element="button"][data-state="uploading"]::after {

@@ -1,8 +1,8 @@
 "use client";
 
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { addDays, format } from "date-fns";
-import { DateRange } from "react-day-picker";
+import { differenceInDays, eachDayOfInterval, format } from "date-fns";
+import { DateRange as DayPickerDateRange } from "react-day-picker";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
 import {
@@ -51,7 +51,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useUser } from "@/app/store";
 import { TimesheetProps } from "@/types/timesheetProps";
@@ -62,6 +62,9 @@ import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 import useFetchProjects from "@/hooks/useFetchProjects";
 import useFetchUsers from "@/hooks/useFetchUsers";
 import { UserProps } from "@/types/userProps";
+import { FaTrash } from "react-icons/fa";
+import { toast } from "react-toastify";
+import Loading from "../loading";
 
 type FormDetails = {
   month: string;
@@ -143,13 +146,19 @@ export default function Timesheet() {
   const [tableData, setTableData] = useState<TableRowsProps[]>(initialData);
   const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [users, setUsers] = useState<UserProps[]>([]);
   const [chosenProject, setChosenProject] = useState("");
   const userZ = useUser();
   const fullName = `${userZ.Name} ${userZ.Surname}`;
   const [query, setQuery] = useState<string>("");
+  const [users, setUsers] = useState<UserProps[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserProps[]>([]);
-  const [selectedUser, setSelectedUser] = useState<UserProps | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [date, setDate] = useState<DayPickerDateRange | undefined>(undefined);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -181,7 +190,7 @@ export default function Timesheet() {
     },
     {
       accessorKey: "projectManager",
-      header: "Project Manager",
+      header: "Supervisor",
       cell: ({ row }) => (
         <div className="lowercase">{row.getValue("projectManager")}</div>
       ),
@@ -197,7 +206,7 @@ export default function Timesheet() {
           timesheet.Approval_Status === "Pending"
             ? "text-yellow-500 font-semibold"
             : timesheet.Approval_Status.includes("Rejected")
-            ? "text-red-500 font-semibold"
+            ? "text-red-500 font-semibold font-semibold"
             : timesheet.Approval_Status.includes("Approved")
             ? "text-green-700 font-semibold"
             : "";
@@ -290,7 +299,7 @@ export default function Timesheet() {
 
                     <div className="mt-4">
                       <h2 className="font-semibold">
-                        Project Manager&apos;s comments:
+                        Supervisor&apos;s comments:
                       </h2>
                       <p>
                         {timesheet.comments === ""
@@ -333,22 +342,32 @@ export default function Timesheet() {
       pagination,
     },
   });
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: addDays(new Date(), 0),
-    to: addDays(new Date(), 7),
-  });
 
   useEffect(() => {
     if (timesheetData) {
-      setFilteredTimesheets(timesheetData);
+      const filteredData = timesheetData.filter(
+        (item) => item.userId === userZ.id
+      );
+      setFilteredTimesheets(filteredData);
     }
-  }, [timesheetData]);
+  }, [timesheetData, userZ.id]);
 
   useEffect(() => {
     if (userData) {
       setUsers(userData);
     }
   }, [userData]);
+
+  useEffect(() => {
+    setFilteredUsers(
+      users.filter(
+        (user) =>
+          (user.Name.toLowerCase().includes(query.toLowerCase()) ||
+            user.Surname.toLowerCase().includes(query.toLowerCase())) &&
+          user.id !== userZ.id
+      )
+    );
+  }, [query, users, userZ]);
 
   useEffect(() => {
     if (projectsData) {
@@ -361,38 +380,52 @@ export default function Timesheet() {
   }`;
 
 
-  useEffect(() => {
-    setFilteredUsers(
-      users.filter(
-        (user) =>
-          (user.Name.toLowerCase().includes(query.toLowerCase()) ||
-           user.Surname.toLowerCase().includes(query.toLowerCase())) &&
-          user.id !== userZ.id 
-      )
-    );
-  }, [query, users, userZ]);
-
-  const handleSelectUser = (user: UserProps) => {
-    setSelectedUser(user);
-    setFormDetails({
-      ...formDetails,
-      projectManager: `${user.Name} ${user.Surname}`,
-    });
-    setQuery("");
-    setFilteredUsers([]);
-  };
 
   const handleAddTask = (index: number) => {
     setTableData((prevData) => {
       const newData = [...prevData];
-      newData[index].tasks.push({ taskPerformed: "", taskStatus: "", hours: 0, minutes: 0 });
-      const { totalHours, totalMinutes } = calculateTotalTime(newData[index].tasks);
+      newData[index].tasks.push({
+        taskPerformed: "",
+        taskStatus: "",
+        hours: 0,
+        minutes: 0,
+      });
+      const { totalHours, totalMinutes } = calculateTotalTime(
+        newData[index].tasks
+      );
       newData[index].totalHours = totalHours;
       newData[index].totalMinutes = totalMinutes;
       return newData;
     });
   };
-  
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+    if (!formDetails.month) newErrors.month = "Month is required";
+    if (!formDetails.projectName) newErrors.projectName = "Project is required";
+    if (!formDetails.projectManager)
+      newErrors.projectManager = "Supervisor is required";
+
+    setErrors(newErrors);
+    setTimeout(() => setErrors({}), 10000);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleDeleteTask = (rowIndex: number, taskIndex: number) => {
+    setTableData((prevData) => {
+      const newData = [...prevData];
+      newData[rowIndex].tasks.splice(taskIndex, 1);
+
+      // Recalculate total hours and minutes
+      const { totalHours, totalMinutes } = calculateTotalTime(
+        newData[rowIndex].tasks
+      );
+      newData[rowIndex].totalHours = totalHours;
+      newData[rowIndex].totalMinutes = totalMinutes;
+
+      return newData;
+    });
+  };
 
   const handleProjectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedProjectId = event.target.value as string;
@@ -415,47 +448,158 @@ export default function Timesheet() {
     }
   };
 
-  const handleChange = (rowIndex: number, taskIndex: number, field: string, value: any) => {
+  const handleOptionClick = (user: UserProps) => {
+    setFormDetails({
+      ...formDetails,
+      projectManager: `${user.Name} ${user.Surname}`,
+    });
+    setIsDropdownOpen(false);
+    if (inputRef.current) {
+      inputRef.current.value = `${user.Name} ${user.Surname}`;
+    }
+  };
+
+  const handleChange = (
+    rowIndex: number,
+    taskIndex: number,
+    field: string,
+    value: any
+  ) => {
     setTableData((prevData) => {
       const newData = [...prevData];
       newData[rowIndex].tasks[taskIndex] = {
         ...newData[rowIndex].tasks[taskIndex],
         [field]: value,
       };
-      const { totalHours, totalMinutes } = calculateTotalTime(newData[rowIndex].tasks);
-      newData[rowIndex].totalHours = totalHours;
-      newData[rowIndex].totalMinutes = totalMinutes;
+
+      const { totalHours, totalMinutes } = calculateTotalTime(
+        newData[rowIndex].tasks
+      );
+
+      const maxTotalMinutes = 24 * 60;
+      const currentTotalMinutes = totalHours * 60 + totalMinutes;
+      if (currentTotalMinutes > maxTotalMinutes) {
+        let remainingMinutes = maxTotalMinutes;
+        newData[rowIndex].tasks.forEach((task) => {
+          const taskMinutes = task.hours * 60 + task.minutes;
+          if (remainingMinutes - taskMinutes >= 0) {
+            remainingMinutes -= taskMinutes;
+          } else {
+            if (field === "hours") {
+              task.hours = Math.floor(remainingMinutes / 60);
+              task.minutes = remainingMinutes % 60;
+            } else if (field === "minutes") {
+              task.minutes = remainingMinutes;
+              task.hours = Math.floor(remainingMinutes / 60);
+            }
+            remainingMinutes = 0;
+          }
+        });
+      }
+
+      const adjustedTotalTime = calculateTotalTime(newData[rowIndex].tasks);
+      newData[rowIndex].totalHours = adjustedTotalTime.totalHours;
+      newData[rowIndex].totalMinutes = adjustedTotalTime.totalMinutes;
+
       return newData;
     });
   };
-  
 
   const handleFormChange = (field: keyof FormDetails, value: string) => {
+    if (field === "month") {
+      setDate(undefined);
+      setTableData([]);
+    }
     setFormDetails((prevDetails) => ({
       ...prevDetails,
       [field]: value,
     }));
   };
 
-  const handleSubmit = async () => {
-    const formData = {
-      combinedData: {
-        ...formDetails,
-        weeklyPeriod: formattedDate,
-        timesheet: tableData,
-        userID: userZ.id,
-        Approval_Status: "Pending",
-      },
-    };
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
-    const res = await axios.post<TableRowsProps, FormDetails>(
-      "/api/timesheets",
-      {
-        formData: formData,
+  const getMonthIndex = (monthName: string) => {
+    return months.indexOf(monthName);
+  };
+
+  const handleDateSelect = (range: DayPickerDateRange | undefined) => {
+    if (range?.from && range.to) {
+      const daysDifference = differenceInDays(range.to, range.from);
+      if (daysDifference > 6) {
+        toast.error("The date range cannot exceed 7 days.");
+      } else {
+        setDate(range);
+        setPopoverOpen(false);
+        generateDateRange(range.from, range.to);
       }
+    } else {
+      setDate(range);
+    }
+  };
+
+  const generateDateRange = (startDate: Date, endDate: Date) => {
+    const dates = eachDayOfInterval({ start: startDate, end: endDate });
+    const formattedDates = dates.map((date) => ({
+      weekday: format(date, "yyyy-MM-dd"),
+      totalHours: 0,
+      totalMinutes: 0,
+      comment: "",
+      tasks: [],
+      userId: "",
+      typeOfDay: "",
+    }));
+    setTableData(formattedDates);
+  };
+
+  const selectedMonthIndex = getMonthIndex(formDetails.month);
+
+  const handleSubmit = async () => {
+    if (validateForm()) {
+      const formData = {
+        combinedData: {
+          ...formDetails,
+          weeklyPeriod: formattedDate,
+          timesheet: tableData,
+          userID: userZ.id,
+          Approval_Status: "Pending",
+        },
+      };
+
+      try {
+        setLoading(true);
+        await axios.post("/api/timesheets", { formData });
+        setLoading(false);
+
+        window.location.reload();
+      } catch (error) {
+        setLoading(false);
+        console.error("Error submitting form:", error);
+      }
+    }
+  };
+
+  const [isAddingTask, setIsAddingTask] = useState(false);
+
+  const validateTask = (task: TaskProps) => {
+    return (
+      task.taskPerformed.trim() !== "" &&
+      task.taskStatus.trim() !== "" &&
+      task.hours > 0 &&
+      task.minutes > 0
     );
-    window.location.reload();
-    console.log(res);
   };
 
   const calculateTotalTime = (tasks: TaskProps[]) => {
@@ -468,18 +612,47 @@ export default function Timesheet() {
     return { totalHours, totalMinutes };
   };
 
+  const handleInputsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value.toLowerCase();
+    const filtered = userData.filter(
+      (user) =>
+        user.Name.toLowerCase().includes(inputValue) ||
+        user.Surname.toLowerCase().includes(inputValue)
+    );
+    setFilteredUsers(filtered);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
   return (
     <>
+    {loading && <Loading />}
       <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
         <form className="grid grid-cols-3 border-b-2 border-secondary pb-8 gap-y-4 items-end">
           <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Month:</label>
-            <input
+            <select
               className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
-              type="text"
               value={formDetails.month}
               onChange={(e) => handleFormChange("month", e.target.value)}
-            />
+            >
+              <option value="" disabled>
+                Select a month
+              </option>
+              {months.map((month, index) => (
+                <option key={index} value={month}>
+                  {month}
+                </option>
+              ))}
+            </select>
+            {errors.month && (
+              <p className="text-red-500 font-semibold">{errors.month}</p>
+            )}
           </div>
           <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Name:</label>
@@ -514,39 +687,50 @@ export default function Timesheet() {
                 </option>
               ))}
             </select>
+
+            {errors.projectName && (
+              <p className="text-red-500 font-semibold">{errors.projectName}</p>
+            )}
           </div>
-          <div className="grid justify-start items-end h-[10vh]">
-            <>
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search your supervisor...."
-                className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
-              />
-            </>
-            {query && (
-              <ul className="bg-white rounded-xl py-2 px-4 shadow-xl mt-[10px]">
+          <div className="relative grid justify-start items-end h-[10vh]">
+            <label className="text-[1.2rem]">Supervisor:</label>
+            <input
+              type="text"
+              placeholder="Search your supervisor...."
+              onChange={(e) => {
+                handleInputsChange && handleInputsChange(e);
+              }}
+              onClick={() => toggleDropdown && toggleDropdown()}
+              ref={inputRef}
+              className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
+            />
+
+            {isDropdownOpen && (
+              <ul className="absolute left-[20px] top-[6rem] bg-white rounded-xl py-2 px-4 shadow-xl z-10 max-h-40 overflow-y-auto">
                 {filteredUsers.map((user) => (
-                  <li className="cursor-pointer borderStyle hover:bg-[#F5F5F5]" key={user.id} onClick={() => handleSelectUser(user)}>
+                  <li
+                    key={user.id}
+                    className="cursor-pointer borderStyle hover:bg-[#F5F5F5]"
+                    onClick={() => handleOptionClick(user)}
+                  >
                     {user.Name} {user.Surname}
                   </li>
                 ))}
               </ul>
             )}
-            {selectedUser && (
-              <div className="z-10">
-                <p className="text-secondary font-bold bg-white rounded-xl py-2 px-4 shadow-xl mt-[10px]">
-                  {selectedUser.Name} {selectedUser.Surname}
-                </p>
-              </div>
+
+            {errors.projectManager && (
+              <p className="text-red-500 font-semibold">
+                {errors.projectManager}
+              </p>
             )}
           </div>
+
           <div className="period grid">
             <label htmlFor="date" className="mb-1 text-[1.2rem]">
               Weekly Period:
             </label>
-            <Popover>
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger
                 asChild
                 className=" bg-white border border-black focus:outline-primary rounded-xl"
@@ -558,6 +742,7 @@ export default function Timesheet() {
                     "w-[300px] justify-start text-left font-normal",
                     !date && "text-muted-foreground"
                   )}
+                  onClick={() => setPopoverOpen(true)}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {date?.from ? (
@@ -578,9 +763,23 @@ export default function Timesheet() {
                 <Calendar
                   initialFocus
                   mode="range"
-                  defaultMonth={date?.from}
+                  defaultMonth={
+                    selectedMonthIndex !== -1
+                      ? new Date(new Date().getFullYear(), selectedMonthIndex)
+                      : undefined
+                  }
+                  fromMonth={
+                    selectedMonthIndex !== -1
+                      ? new Date(new Date().getFullYear(), selectedMonthIndex)
+                      : undefined
+                  }
+                  toMonth={
+                    selectedMonthIndex !== -1
+                      ? new Date(new Date().getFullYear(), selectedMonthIndex)
+                      : undefined
+                  }
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={handleDateSelect}
                   numberOfMonths={1}
                   className="border-2 border-primary rounded-xl"
                   weekStartsOn={1}
@@ -588,12 +787,13 @@ export default function Timesheet() {
               </PopoverContent>
             </Popover>
           </div>
+
         </form>
         <table className="mt-8">
           <thead className="pb-2">
             <tr>
               <th>Weekday</th>
-              <th>Public/Normal Day </th>
+              <th>Type of Day </th>
               <th>Total Time</th>
               <th>Tasks Performed</th>
               <th>Comment</th>
@@ -601,6 +801,9 @@ export default function Timesheet() {
           </thead>
           <tbody>
             {tableData.map((row, rowIndex) => {
+              const allFieldsComplete = row.tasks.every(validateTask);
+              const typeOfDay = row.typeOfDay.trim() !== "";
+
               return (
                 <tr key={rowIndex} className="border-b border-secondary py-2">
                   <td className="text-center">
@@ -633,16 +836,19 @@ export default function Timesheet() {
                     >
                       <option value="">Select type of day</option>
                       <option value="Public Holiday">Public Holiday</option>
-                      <option value="Normal Day">Work/Normal Day</option>
+                      <option value="Normal Day">Work Day</option>
+                      <option value="Weekend">Weekend</option>
+                      <option value="Day-Off">Day-Off</option>
+                      <option value="Leave">Leave</option>
                     </select>
                   </td>
                   <td className="text-center w-[10%]">
-                  <input
-                  className="pointer-events-none w-[100%] px-4"
-                type="text"
-                value={`${row.totalHours} hrs ${row.totalMinutes} mins`}
-                readOnly
-              />
+                    <input
+                      className="pointer-events-none w-[100%] px-4"
+                      type="text"
+                      value={`${row.totalHours} hrs ${row.totalMinutes} mins`}
+                      readOnly
+                    />
                   </td>
 
                   <td className="grid text-center">
@@ -679,12 +885,15 @@ export default function Timesheet() {
                           <option value="">Select status</option>
                           <option value="In-Progress">In-Progress</option>
                           <option value="Completed">Completed</option>
+                          <option value="Continuous">Continuous</option>
                         </select>
-                        <div className="grid w-[10%] justify-items-center">
+                        <div className="grid w-[13%] justify-items-center">
                           <label htmlFor="hours">Hours</label>
                           <input
                             className="py-1 px-2 border border-black focus:outline-primary rounded-xl w-full"
                             type="number"
+                            min={0}
+                            max={24}
                             value={task.hours}
                             onChange={(e) =>
                               handleChange(
@@ -702,6 +911,8 @@ export default function Timesheet() {
                           <input
                             className="py-1 px-2 border border-black focus:outline-primary rounded-xl w-full"
                             type="number"
+                            min={0}
+                            max={60}
                             value={task.minutes}
                             onChange={(e) =>
                               handleChange(
@@ -714,11 +925,27 @@ export default function Timesheet() {
                             placeholder="Minutes"
                           />
                         </div>
+
+                        <FaTrash
+                          onClick={() => handleDeleteTask(rowIndex, taskIndex)}
+                          className="cursor-pointer text-red-600 text-xl relative bottom-1 right-1"
+                        />
                       </div>
                     ))}
                     <Button
-                      onClick={() => handleAddTask(rowIndex)}
-                      className="grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold hover:bg-transparent mt-2"
+                      onClick={() => {
+                        setIsAddingTask(true);
+                        handleAddTask(rowIndex);
+                        setIsAddingTask(false);
+                      }}
+                      className={`grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold hover:bg-transparent mt-2 ${
+                        isAddingTask || !allFieldsComplete || !typeOfDay
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                      disabled={
+                        isAddingTask || !allFieldsComplete || !typeOfDay
+                      }
                     >
                       Add Task
                     </Button>

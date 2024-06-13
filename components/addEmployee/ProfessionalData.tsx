@@ -98,6 +98,7 @@ export default function ProfessionalData() {
     }); 
     toast.success("Professional Data has been created successfully.");
 
+
   }
 
   return (

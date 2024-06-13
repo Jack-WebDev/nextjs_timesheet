@@ -49,14 +49,6 @@ export async function POST(req: NextRequest) {
       Department_Id,
     } = await res;
 
-    console.log(
-      Project_Name,
-      Description,
-      Project_Manager,
-      Client_Name,
-      assignedMembers,
-      Department_Id,
-    );
 
     const project = await db.project.create({
       data: {

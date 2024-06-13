@@ -19,9 +19,12 @@ import { toast } from "react-toastify";
 import { useUser } from "@/app/store";
 
 const formSchema = z.object({
-  email: z.string().min(2, {
-    message: "Not a valid NDT email",
-  }),
+  email: z
+    .string()
+    .email({ message: "Please add a valid email" })
+    .refine((email) => email.endsWith("@ndt.co.za"), {
+      message: "Email must be a valid NDT email",
+    }),
   password: z.string(),
 });
 
@@ -40,8 +43,8 @@ export function LoginForm() {
       const userData = await res.data;
       useUser.setState(userData);
       await login(userData);
-    } catch (error) {
-      toast.error("Invalid password. Please try again.");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
     }
   }
 
@@ -61,7 +64,7 @@ export function LoginForm() {
                   className="rounded-xl hover:border-primary"
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />
@@ -78,7 +81,7 @@ export function LoginForm() {
                   className="rounded-xl hover:border-primary"
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage style={{ color: "red" }} />
             </FormItem>
           )}
         />

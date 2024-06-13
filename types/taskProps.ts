@@ -13,4 +13,5 @@ export type TaskProps = {
   hours: number;       // Add hours field
   minutes: number;     // Add minutes field
   tableRowId?: string;
+  [key: string]: any; // Index signature to allow any string keys
 };

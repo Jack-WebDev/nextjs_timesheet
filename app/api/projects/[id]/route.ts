@@ -58,7 +58,6 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    console.log(params.id);
     const project = await db.project.delete({
       where: {
         id: params.id,

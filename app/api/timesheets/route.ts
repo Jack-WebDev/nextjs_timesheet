@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
           projectName: combinedData.projectName,
           role: combinedData.role,
           Approval_Status: combinedData.Approval_Status,
+          userId: combinedData.userID
         },
       });
 
@@ -51,9 +52,7 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        console.log(s)
       }
-      console.log("Data inserted successfully.");
     } catch (error) {
       console.error("Error inserting data:", error);
     }
@@ -82,6 +81,7 @@ export async function GET() {
         weeklyPeriod: true,
         Approval_Status:true,
         comments:true,
+        userId:true
       
       },
     });

@@ -29,7 +29,7 @@ model User {
   departmentId   String?
   departmentName String?
   Role           String?        @default("Employee")
-  Position       String?
+  Position       String?        @default("N/A")
   StartDate      String?
   OfficeLocation String?
   Documents      String[]
