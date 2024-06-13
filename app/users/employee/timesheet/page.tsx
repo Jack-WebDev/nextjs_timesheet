@@ -1,8 +1,8 @@
 "use client";
 
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { addDays, format } from "date-fns";
-import { DateRange } from "react-day-picker";
+import { differenceInDays, eachDayOfInterval, format } from "date-fns";
+import { DateRange as DayPickerDateRange } from "react-day-picker";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
 import {
@@ -156,6 +156,8 @@ export default function Timesheet() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedOption, setSelectedOption] = useState<UserProps | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [date, setDate] = useState<DayPickerDateRange | undefined>(undefined);
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -339,10 +341,6 @@ export default function Timesheet() {
       pagination,
     },
   });
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: addDays(new Date(), 0),
-    to: addDays(new Date(), 7),
-  });
 
   useEffect(() => {
     if (timesheetData) {
@@ -379,16 +377,6 @@ export default function Timesheet() {
       )
     );
   }, [query, users, userZ]);
-
-  const handleSelectUser = (user: UserProps) => {
-    setSelectedUser(user);
-    setFormDetails({
-      ...formDetails,
-      projectManager: `${user.Name} ${user.Surname}`,
-    });
-    setQuery("");
-    setFilteredUsers([]);
-  };
 
   const handleAddTask = (index: number) => {
     setTableData((prevData) => {
@@ -459,6 +447,10 @@ export default function Timesheet() {
   };
 
   const handleOptionClick = (user: UserProps) => {
+    setFormDetails({
+      ...formDetails,
+      projectManager: `${user.Name} ${user.Surname}`,
+    });
     setSelectedOption(user);
     setIsDropdownOpen(false);
     if (inputRef.current) {
@@ -478,7 +470,6 @@ export default function Timesheet() {
         ...newData[rowIndex].tasks[taskIndex],
         [field]: value,
       };
-      
 
       // Calculate the total time
       const { totalHours, totalMinutes } = calculateTotalTime(
@@ -518,12 +509,65 @@ export default function Timesheet() {
   };
 
   const handleFormChange = (field: keyof FormDetails, value: string) => {
+    if (field === "month") {
+      setDate(undefined);
+      setTableData([]);
+    }
     setFormDetails((prevDetails) => ({
       ...prevDetails,
       [field]: value,
     }));
   };
 
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const getMonthIndex = (monthName: string) => {
+    return months.indexOf(monthName);
+  };
+
+  const handleDateSelect = (range: DayPickerDateRange | undefined) => {
+    if (range?.from && range.to) {
+      const daysDifference = differenceInDays(range.to, range.from);
+      if (daysDifference > 6) {
+        toast.error("The date range cannot exceed 7 days.");
+      } else {
+        setDate(range);
+        setPopoverOpen(false);
+        generateDateRange(range.from, range.to);
+      }
+    } else {
+      setDate(range);
+    }
+  };
+
+  const generateDateRange = (startDate: Date, endDate: Date) => {
+    const dates = eachDayOfInterval({ start: startDate, end: endDate });
+    const formattedDates = dates.map((date) => ({
+      weekday: format(date, "yyyy-MM-dd"),
+      totalHours: 0,
+      totalMinutes: 0,
+      comment: "",
+      tasks: [],
+      userId: "",
+      typeOfDay: "",
+    }));
+    setTableData(formattedDates);
+  };
+
+  const selectedMonthIndex = getMonthIndex(formDetails.month);
 
   const handleSubmit = async () => {
     if (validateForm()) {
@@ -553,9 +597,7 @@ export default function Timesheet() {
       task.taskPerformed.trim() !== "" &&
       task.taskStatus.trim() !== "" &&
       task.hours > 0 &&
-      task.hours <= 24 &&
-      task.minutes > 0 &&
-      task.minutes <= 60
+      task.minutes > 0
     );
   };
 
@@ -592,12 +634,20 @@ export default function Timesheet() {
         <form className="grid grid-cols-3 border-b-2 border-secondary pb-8 gap-y-4 items-end">
           <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Month:</label>
-            <input
+            <select
               className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
-              type="text"
               value={formDetails.month}
               onChange={(e) => handleFormChange("month", e.target.value)}
-            />
+            >
+              <option value="" disabled>
+                Select a month
+              </option>
+              {months.map((month, index) => (
+                <option key={index} value={month}>
+                  {month}
+                </option>
+              ))}
+            </select>
             {errors.month && (
               <p className="text-red-500 font-semibold">{errors.month}</p>
             )}
@@ -678,7 +728,7 @@ export default function Timesheet() {
             <label htmlFor="date" className="mb-1 text-[1.2rem]">
               Weekly Period:
             </label>
-            <Popover>
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger
                 asChild
                 className=" bg-white border border-black focus:outline-primary rounded-xl"
@@ -690,6 +740,7 @@ export default function Timesheet() {
                     "w-[300px] justify-start text-left font-normal",
                     !date && "text-muted-foreground"
                   )}
+                  onClick={() => setPopoverOpen(true)}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {date?.from ? (
@@ -710,9 +761,23 @@ export default function Timesheet() {
                 <Calendar
                   initialFocus
                   mode="range"
-                  defaultMonth={date?.from}
+                  defaultMonth={
+                    selectedMonthIndex !== -1
+                      ? new Date(new Date().getFullYear(), selectedMonthIndex)
+                      : undefined
+                  }
+                  fromMonth={
+                    selectedMonthIndex !== -1
+                      ? new Date(new Date().getFullYear(), selectedMonthIndex)
+                      : undefined
+                  }
+                  toMonth={
+                    selectedMonthIndex !== -1
+                      ? new Date(new Date().getFullYear(), selectedMonthIndex)
+                      : undefined
+                  }
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={handleDateSelect}
                   numberOfMonths={1}
                   className="border-2 border-primary rounded-xl"
                   weekStartsOn={1}
@@ -720,6 +785,8 @@ export default function Timesheet() {
               </PopoverContent>
             </Popover>
           </div>
+
+          {/* <YourComponent/> */}
         </form>
         <table className="mt-8">
           <thead className="pb-2">
@@ -734,6 +801,7 @@ export default function Timesheet() {
           <tbody>
             {tableData.map((row, rowIndex) => {
               const allFieldsComplete = row.tasks.every(validateTask);
+              const typeOfDay = row.typeOfDay.trim() !== "";
 
               return (
                 <tr key={rowIndex} className="border-b border-secondary py-2">
@@ -870,11 +938,13 @@ export default function Timesheet() {
                         setIsAddingTask(false);
                       }}
                       className={`grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold hover:bg-transparent mt-2 ${
-                        isAddingTask || !allFieldsComplete
+                        isAddingTask || !allFieldsComplete || !typeOfDay
                           ? "opacity-50 cursor-not-allowed"
                           : ""
                       }`}
-                      disabled={isAddingTask || !allFieldsComplete}
+                      disabled={
+                        isAddingTask || !allFieldsComplete || !typeOfDay
+                      }
                     >
                       Add Task
                     </Button>
