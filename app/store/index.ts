@@ -38,6 +38,7 @@ type Employee = {
   Position: string;
   StartDate: string;
   OfficeLocation: string;
+  Documents: string[];
 };
 
 export const useUser = create(
@@ -88,6 +89,7 @@ export const useEmployee = create(
       Position: "",
       StartDate: "",
       OfficeLocation: "",
+      Documents: [],
     }),{
       name: "employee",
       partialize: (state) => ({
@@ -113,6 +115,7 @@ export const useEmployee = create(
         Position: state.Position,
         StartDate: state.StartDate,
         OfficeLocation: state.OfficeLocation,
+        Documents: state.Documents,
       
 
     }) as Employee, storage: createJSONStorage(() => sessionStorage)}), );  
