@@ -15,8 +15,11 @@ export default function Documents() {
   const [documents, setDocuments] = useState<string[]>([]);
 
   const handleSubmit = async () => {
-    useEmployee.setState({Documents: documents });
-
+    const documentObjects = documents.map((url) => ({
+      url,
+    }));
+  
+    useEmployee.setState({ documents: documentObjects });
     const employeeData = sessionStorage.getItem("employee");
     if (employeeData) {
       const employee = JSON.parse(employeeData);

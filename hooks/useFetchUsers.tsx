@@ -5,6 +5,8 @@ import { UserProps } from "../types/userProps";
 export default function useFetchUsers() {
   const [users, setUsers] = useState<UserProps[]>([]);
 
+  console.log(users)
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {

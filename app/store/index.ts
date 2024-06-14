@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+type Document = {
+  url: string;
+};
+
+
 type User = {
   NDTEmail: string;
   Name: string;
@@ -13,6 +18,7 @@ type User = {
   departmentId: string;
   departmentName: string;
   id: string;
+  documents: Document[];
 };
 
 type Employee = {
@@ -38,7 +44,7 @@ type Employee = {
   Position: string;
   StartDate: string;
   OfficeLocation: string;
-  Documents: string[];
+  documents: Document[];
 };
 
 export const useUser = create(
@@ -55,6 +61,7 @@ export const useUser = create(
       departmentId: "",
       departmentName: "",
       id: "",
+      documents: [],
     }),
     {
       name: "user",
@@ -89,7 +96,7 @@ export const useEmployee = create(
       Position: "",
       StartDate: "",
       OfficeLocation: "",
-      Documents: [],
+      documents: [],
     }),{
       name: "employee",
       partialize: (state) => ({
@@ -115,7 +122,7 @@ export const useEmployee = create(
         Position: state.Position,
         StartDate: state.StartDate,
         OfficeLocation: state.OfficeLocation,
-        Documents: state.Documents,
+        documents: state.documents,
       
 
     }) as Employee, storage: createJSONStorage(() => sessionStorage)}), );  
