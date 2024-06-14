@@ -96,15 +96,7 @@ export default function ProfessionalData() {
       departmentId: selectedDepartment,
       departmentName: selectedDept?.Department_Name
     });    
-    const employeeData = sessionStorage.getItem("employee");
-    if (employeeData) {
-      const employee = JSON.parse(employeeData);
-      createEmployee(employee.state);
-      toast.success("Employee has been created successfully.");
-      router.replace("/users/admin/employees");
-    } else {
-      console.log("No employee data found in sessionStorage.");
-    }
+    toast.success("Professional Data has been created successfully.");
   }
 
   return (
@@ -228,7 +220,7 @@ export default function ProfessionalData() {
         />
 
         <div className="flex items-end gap-x-4 justify-end">
-          <Button className="rounded-xl text-white" type="submit">Submit</Button>
+          <Button className="rounded-xl text-white" >Save</Button>
         </div>
       </form>
     </Form>
