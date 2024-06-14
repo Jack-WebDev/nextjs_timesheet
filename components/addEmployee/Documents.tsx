@@ -17,7 +17,7 @@ export default function Documents() {
   const handleSubmit = async () => {
     useEmployee.setState({Documents: documents });
 
-    const employeeData = localStorage.getItem("employee");
+    const employeeData = sessionStorage.getItem("employee");
     if (employeeData) {
       const employee = JSON.parse(employeeData);
       createEmployee(employee.state);
