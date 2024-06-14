@@ -1,3 +1,9 @@
+type Document = {
+  id: string;
+  url: string;
+};
+
+
 export type UserProps = {
   id: string;
   Name: string;
@@ -23,4 +29,5 @@ export type UserProps = {
   StartDate: Date;
   OfficeLocation: string;
   department?: string;
+  documents?: Document[];
 };

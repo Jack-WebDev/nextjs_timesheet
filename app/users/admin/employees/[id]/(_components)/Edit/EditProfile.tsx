@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import { TabsDemo } from "../Tabs";
 import PersonalData from "./PersonalData";
 import ProfessionalData from "./ProfessionalData";
+import Documents from "./Documents";
 
 export default function EditProfile() {
   const [activeTab, setActiveTab] = useState("personalData");
@@ -81,7 +82,7 @@ export default function EditProfile() {
            <ProfessionalData />
           </TabsContent>
           <TabsContent value="documents">
-            <h1>Documents</h1>
+            <Documents/>
           </TabsContent>
         </Tabs>
 

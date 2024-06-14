@@ -24,8 +24,14 @@ type UserProps = {
   Position: string;
   StartDate: string;
   OfficeLocation: string;
-  Documents: string[];
+  documents: Document[];
 };
+
+type Document = {
+  url: string;
+}
+
+
 
 export const createEmployee = async (data: UserProps) => {
   try {
@@ -53,7 +59,11 @@ export const createEmployee = async (data: UserProps) => {
         Position: data.Position,
         StartDate: data.StartDate,
         OfficeLocation: data.OfficeLocation,
-        Documents: data.Documents,
+        documents: {
+          create: data.documents.map((document) => ({
+            url: document.url,
+          })),
+        },
 
       },
     });
