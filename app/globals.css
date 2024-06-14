@@ -165,3 +165,14 @@ select {
 .borderStyle:not(:last-child) {
   padding-block-end: 3px;
 }
+
+.custom-class > *[data-ut-element="button"][data-state="uploading"] {
+  background-color: var(--primary-color);
+  color: white;
+  cursor: not-allowed;
+}
+
+/* applied to the upload indicator when uploading */
+.custom-class > *[data-ut-element="button"][data-state="uploading"]::after {
+  background-color: var(--secondary-color);
+}
