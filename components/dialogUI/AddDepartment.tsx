@@ -14,15 +14,42 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import axios from "axios";
 import { FaPlusCircle } from "react-icons/fa";
+import { z } from "zod";
+import { toast } from "react-toastify";
+
+const departmentSchema = z.object({
+  departmentName: z.string().min(1, 'Department name is required'),
+});
 
 export function AddDepartment() {
   const [Department_Name, setDepartment_Name] = useState("");
 
   const handleSave = async () => {
-    await axios.post(`/api/departments`, {
-      Department_Name,
-    });
-    window.location.reload();
+    const formData = {
+      departmentName: Department_Name,
+    };
+
+    
+    try {
+      departmentSchema.parse(formData);
+      await axios.post(`/api/departments`, {
+        Department_Name,
+      });
+      window.location.reload();
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Handle validation errors
+        console.error('Validation failed', error.errors);
+        // Display validation errors to the user (example)
+        error.errors.forEach(error => {
+          toast.error(error.message);
+        });
+      } else {
+        // Handle other errors
+        console.error('An unexpected error occurred', error);
+      }
+    }
+
   };
 
   return (

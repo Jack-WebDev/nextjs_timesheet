@@ -45,7 +45,7 @@ export function ViewProject({ id }: any) {
             </div>
             <div className="flex  items-center gap-4 mb-4">
               <Label htmlFor="projectName" className="text-[1.3rem]">
-                Project Manager:
+                Project Supervisor:
               </Label>
               <p className="text-[1.1rem]">{project.Project_Manager}</p>
             </div>
