@@ -25,7 +25,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" >
 			<body>
-				<ToastContainer autoClose={1000} />
+				<ToastContainer autoClose={2000} />
 				{children}
 			</body>
 		</html>
