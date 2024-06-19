@@ -597,8 +597,7 @@ export default function Timesheet() {
     return (
       task.taskPerformed.trim() !== "" &&
       task.taskStatus.trim() !== "" &&
-      task.hours > 0 &&
-      task.minutes > 0
+      task.hours > 0
     );
   };
 
@@ -808,7 +807,7 @@ export default function Timesheet() {
                 <tr key={rowIndex} className="border-b border-secondary py-2">
                   <td className="text-center">
                     <input
-                      className="py-1 px-2 border-black focus:outline-primary rounded-xl"
+                      className="py-1 px-2 border-black focus:outline-primary rounded-xl pointer-events-none"
                       type="date"
                       value={row.weekday}
                       onChange={(e) =>
@@ -818,6 +817,7 @@ export default function Timesheet() {
                           return newData;
                         })
                       }
+                      readOnly
                     />
                   </td>
                   <td className="text-center">
@@ -857,9 +857,9 @@ export default function Timesheet() {
                         key={taskIndex}
                         className="flex justify-center items-end mb-2 gap-x-4"
                       >
-                        <input
+                        <textarea
                           className="py-1 px-4 border border-black focus:outline-primary rounded-xl w-1/2"
-                          type="text"
+                          placeholder="Describe the task performed....."
                           value={task.taskPerformed}
                           onChange={(e) =>
                             handleChange(
@@ -954,6 +954,7 @@ export default function Timesheet() {
                   <td className="text-center">
                     <textarea
                       className="px-4 border border-black focus:outline-primary rounded-xl"
+                      placeholder="Add a comment..."
                       value={row.comment}
                       onChange={(e) =>
                         setTableData((prevData) => {
