@@ -41,7 +41,7 @@ export default function Dashboard() {
         <DashboardCard
           icon={FaClock}
           total={totalTimesheets}
-          title="Pending Timesheet Approvals"
+          title="Pending Approvals"
         />
       </Link>
     </div>
