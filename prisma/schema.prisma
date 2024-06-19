@@ -32,14 +32,14 @@ model User {
   Position       String?        @default("N/A")
   StartDate      String?
   OfficeLocation String?
-  documents      Document[]
+  documents      Documents[]
   createdAt      DateTime       @default(now())
   tableRows      TableRow[]
   tableDetails   TableDetails[]
   department     Department?    @relation(fields: [departmentId], references: [id])
 }
 
-model Document {
+model Documents {
   id        String   @id @default(uuid())
   url       String
   createdAt DateTime @default(now())

@@ -5,7 +5,7 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const res = await db.document.findMany();
+    const res = await db.documents.findMany();
 
     return NextResponse.json(res, { status: 200 });
   } catch (error) {
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
 
    await Promise.all(urls.map(async (url:string) => {
-      const dd = await db.document.create({
+      const dd = await db.documents.create({
         data: {
           url: url,
           userId: userId,

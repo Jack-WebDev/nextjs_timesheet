@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const document = await db.document.findMany();
+    const document = await db.documents.findMany();
     return NextResponse.json(document, { status: 200 });
   } catch (error) {
     return NextResponse.json(error, { status: 500 });
@@ -20,7 +20,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const document = await db.document.delete({
+    const document = await db.documents.delete({
       where: {
         id: params.id,
       },
@@ -40,7 +40,7 @@ export async function PATCH(
     const res = await req.json();
     const { url } = await res;
 
-    const document = await db.document.update({
+    const document = await db.documents.update({
       where: {
         id: params.id,
       },
