@@ -36,6 +36,7 @@ export default function Timesheet() {
   const timesheetData = useFetchTimesheets();
   const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
 
+
   const user = useUser();
 
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -55,14 +56,14 @@ export default function Timesheet() {
       accessorKey: "projectName",
       header: "Project Name",
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("projectName")}</div>
+        <div className="capitalize">{row.getValue("projectName")}</div>
       ),
     },
     {
-      accessorKey: "projectManager",
-      header: "Project Manager",
+      accessorKey: "name",
+      header: "Employee Name",
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("projectManager")}</div>
+        <div className="capitalize">{row.getValue("name")}</div>
       ),
     },
     {

@@ -22,7 +22,6 @@ export default function Documents() {
   const [loading, setLoading] = useState(false);
   const [uploads, setUploads] = useState<string[]>([]);
 
-  console.log(documents);
 
   useEffect(() => {
     fetch(`/api/documents`)
@@ -66,13 +65,11 @@ export default function Documents() {
       url,
     }));
 
-    // console.log(documentObjects)
     const res = await axios.post(`/api/documents`, {
       url: documentObjects,
       userId: params.id,
     });
     window.location.reload();
-    console.log(res);
   };
 
   return (

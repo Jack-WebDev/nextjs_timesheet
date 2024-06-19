@@ -16,7 +16,6 @@ export default function Documents() {
   const params = useParams();
   const [documents, setDocuments] = useState<[]>([]);
 
-  console.log(documents);
 
   useEffect(() => {
     const fetchData = async () => {

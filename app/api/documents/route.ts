@@ -18,11 +18,9 @@ export async function POST(req: NextRequest) {
   try {
     const res = await req.json();
     const { url, userId } = await res;
-    console.log(url, userId)
 
     const urls = url.map((item: { url: string; }) => item.url);
 
-    console.log(urls)
 
    await Promise.all(urls.map(async (url:string) => {
       const dd = await db.document.create({
@@ -32,7 +30,6 @@ export async function POST(req: NextRequest) {
         }
       });
 
-      console.log(dd)
     
     }));
 

@@ -187,14 +187,14 @@ export default function Timesheet() {
       accessorKey: "projectName",
       header: "Project Name",
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("projectName")}</div>
+        <div className="capitalize">{row.getValue("projectName")}</div>
       ),
     },
     {
       accessorKey: "projectManager",
       header: "Supervisor",
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("projectManager")}</div>
+        <div className="capitalize">{row.getValue("projectManager")}</div>
       ),
     },
     {
@@ -579,7 +579,6 @@ export default function Timesheet() {
   const selectedMonthIndex = getMonthIndex(formDetails.month);
 
   const handleSubmit = async () => {
-    console.log("first")
     if (validateForm()) {
       const formData = {
         combinedData: {
@@ -591,7 +590,6 @@ export default function Timesheet() {
         },
       };
 
-      console.log("jfj")
 
       try {
         setLoading(true);
