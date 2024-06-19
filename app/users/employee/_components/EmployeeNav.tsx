@@ -7,6 +7,7 @@ import {
   FaAlignCenter,
   FaTasks,
   FaClock,
+  FaCheck,
 } from "react-icons/fa";
 import { FaBookmark, FaGear } from "react-icons/fa6";
 
@@ -53,6 +54,16 @@ function EmployeeNavMenu() {
           >
             <FaBookmark />
             Bookings
+          </Link>
+          
+          <Link
+            href={"/users/employee/Approvals"}
+            className={`link flex items-center gap-x-2 ${
+              pathname === "/users/employee/Approvals" ? "active" : ""
+            }`}
+          >
+            <FaCheck />
+            Approvals
           </Link>
 
           <Link
