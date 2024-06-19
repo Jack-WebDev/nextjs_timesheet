@@ -44,6 +44,16 @@ export async function POST(req: NextRequest, res: NextResponse) {
         );
       }
 
+      if (user.Password && user.Password.length > 0) {
+        return NextResponse.json(
+          {
+            message: "User already exists!",
+          },
+          { status: 400 }
+        );
+      }
+
+
       const hashedPassword = await hashPassword(password, 10);
 
       const validUser = await db.user.update({
