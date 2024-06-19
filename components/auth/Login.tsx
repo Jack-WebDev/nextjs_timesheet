@@ -21,6 +21,7 @@ import { useUser } from "@/app/store";
 const formSchema = z.object({
   email: z
     .string()
+    .toLowerCase()
     .email({ message: "Please add a valid email" })
     .refine((email) => email.endsWith("@ndt.co.za"), {
       message: "Email must be a valid NDT email",
