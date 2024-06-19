@@ -20,7 +20,9 @@ import {
 
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -65,6 +67,7 @@ import { UserProps } from "@/types/userProps";
 import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Loading from "../loading";
+import { Label } from "@/components/ui/label";
 
 type FormDetails = {
   month: string;
@@ -158,7 +161,6 @@ export default function Timesheet() {
   const [date, setDate] = useState<DayPickerDateRange | undefined>(undefined);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
-
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -379,8 +381,6 @@ export default function Timesheet() {
     date?.to?.toISOString().split("T")[0]
   }`;
 
-
-
   const handleAddTask = (index: number) => {
     setTableData((prevData) => {
       const newData = [...prevData];
@@ -400,16 +400,28 @@ export default function Timesheet() {
   };
 
   const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!formDetails.month) newErrors.month = "Month is required";
-    if (!formDetails.projectName) newErrors.projectName = "Project is required";
-    if (!formDetails.projectManager)
-      newErrors.projectManager = "Supervisor is required";
-
-    setErrors(newErrors);
-    setTimeout(() => setErrors({}), 10000);
-    return Object.keys(newErrors).length === 0;
+    let isValid = true;
+  
+    if (!formDetails.month) {
+      toast.error("Month is required");
+      isValid = false;
+    }
+    if (!formDetails.projectName) {
+      toast.error("Project is required");
+      isValid = false;
+    }
+    if (!formDetails.projectManager) {
+      toast.error("Project Supervisor is required");
+      isValid = false;
+    }
+    if(!date) {
+      toast.error("Date is required");
+      isValid = false;
+    }
+  
+    return isValid;
   };
+  
 
   const handleDeleteTask = (rowIndex: number, taskIndex: number) => {
     setTableData((prevData) => {
@@ -567,6 +579,7 @@ export default function Timesheet() {
   const selectedMonthIndex = getMonthIndex(formDetails.month);
 
   const handleSubmit = async () => {
+    console.log("first")
     if (validateForm()) {
       const formData = {
         combinedData: {
@@ -577,6 +590,8 @@ export default function Timesheet() {
           Approval_Status: "Pending",
         },
       };
+
+      console.log("jfj")
 
       try {
         setLoading(true);
@@ -630,7 +645,7 @@ export default function Timesheet() {
 
   return (
     <>
-    {loading && <Loading />}
+      {loading && <Loading />}
       <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
         <form className="grid grid-cols-3 border-b-2 border-secondary pb-8 gap-y-4 items-end">
           <div>
@@ -786,7 +801,6 @@ export default function Timesheet() {
               </PopoverContent>
             </Popover>
           </div>
-
         </form>
         <table className="mt-8">
           <thead className="pb-2">
@@ -970,12 +984,84 @@ export default function Timesheet() {
             })}
           </tbody>
         </table>
-        <Button
-          onClick={handleSubmit}
-          className="w-[15%] h-[80%] text-xl grid justify-self-end mt-4 rounded-xl text-white"
-        >
-          Submit
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="default" className="mt-8 grid justify-self-end w-[15%]">Submit</Button>
+          </DialogTrigger>
+          <DialogContent className="w-[70%]">
+            <DialogHeader>
+              <DialogTitle className="text-3xl text-secondary">Are you ready to submit?</DialogTitle>
+            </DialogHeader>
+            <div>
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th>Weekday</th>
+                    <th>Type Of Day</th>
+                    <th>Total Time</th>
+                    <th>Tasks Performed</th>
+                    <th>Task Status</th>
+                    <th>Comment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tableData.length > 0
+                    ? tableData.map((r, index) => (
+                        <tr key={index} className="border-b border-secondary">
+                          <td className="text-center">
+                            <p>{r.weekday}</p>
+                          </td>
+                          <td className="text-center">
+                            <p>{r.typeOfDay === "" ? "N/A" : r.typeOfDay}</p>
+                          </td>
+                          <td className="text-center">
+                            <p>{`${r.totalHours} hrs ${r.totalMinutes} mins`}</p>
+                          </td>
+                          <td className="text-center">
+                            {r.tasks && r.tasks.length > 0 ? (
+                              r.tasks.map((t) => (
+                                <div key={t.id}>
+                                  <p>
+                                    {t.taskPerformed === ""
+                                      ? "N/A"
+                                      : t.taskPerformed}
+                                  </p>
+                                </div>
+                              ))
+                            ) : (
+                              <p>N/A</p>
+                            )}
+                          </td>
+
+                          <td className="text-center">
+                            {r.tasks && r.tasks.length > 0 ? (
+                              r.tasks.map((t) => (
+                                <div key={t.id}>
+                                  <p>{t.taskStatus}</p>
+                                </div>
+                              ))
+                            ) : (
+                              <span>N/A</span>
+                            )}
+                          </td>
+                          <td className="text-center">
+                            <p>{r.comment === "" ? "N/A" : r.comment}</p>
+                          </td>
+                        </tr>
+                      ))
+                    : null}
+                </tbody>
+              </table>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>{" "}
+              <Button type="submit" onClick={handleSubmit}>Submit</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </div>
 
       <h2 className="text-center text-5xl my-12 text-secondary font-medium">
