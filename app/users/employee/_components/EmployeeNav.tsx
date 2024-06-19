@@ -8,6 +8,7 @@ import {
   FaTasks,
   FaClock,
   FaCheck,
+  FaInfoCircle,
 } from "react-icons/fa";
 import { FaBookmark, FaGear } from "react-icons/fa6";
 
@@ -44,6 +45,16 @@ function EmployeeNavMenu() {
           >
             <FaTasks />
             Tasks
+          </Link>
+
+          <Link
+            href={"/users/employee/help"}
+            className={`link flex items-center gap-x-2 ${
+              pathname === "/users/employee/help" ? "active" : ""
+            }`}
+          >
+            <FaInfoCircle />
+            Help Desk
           </Link>
 
           <Link
