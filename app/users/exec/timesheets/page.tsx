@@ -46,10 +46,12 @@ import axios from "axios";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { TimesheetProps } from "@/types/timesheetProps";
 import useFetchTimesheets from "@/hooks/useFetchTimesheets";
+import { useUser } from "@/app/store";
 
 export default function Timesheet() {
   const timesheetsData = useFetchTimesheets();
   const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
+  const user = useUser();
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -58,15 +60,28 @@ export default function Timesheet() {
 
   useEffect(() => {
     if (timesheetsData) {
+      const formattedUserFullName =
+        `${user.Name.trim()} ${user.Surname.trim()}`.toLowerCase();
+
       const userTimesheets = timesheetsData.filter((timesheet) => {
+        const formattedProjectManagerName = timesheet.projectManager
+          .trim()
+          .toLowerCase();
+
         const isApprovedBy = timesheet.Approval_Status.includes("Approved by");
         const isRejectedBy = timesheet.Approval_Status.includes("Rejected by");
 
-        return isApprovedBy || isRejectedBy;
+        return (
+          isApprovedBy ||
+          isRejectedBy ||
+          (formattedProjectManagerName === formattedUserFullName &&
+            timesheet.Approval_Status.includes("Pending"))
+        );
       });
+
       setFilteredTimesheets(userTimesheets);
     }
-  }, [timesheetsData]);
+  }, [timesheetsData, user.Name, user.Surname]);
 
   const handleApprove = async (id: string) => {
     await axios.put(`/api/timesheets/${id}`, {
@@ -94,14 +109,14 @@ export default function Timesheet() {
       accessorKey: "projectName",
       header: "Project Name",
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("projectName")}</div>
+        <div className="capitalize">{row.getValue("projectName")}</div>
       ),
     },
     {
       accessorKey: "projectManager",
-      header: "Project Manager",
+      header: "Supervisor",
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("projectManager")}</div>
+        <div className="capitalize">{row.getValue("projectManager")}</div>
       ),
     },
     {
@@ -195,11 +210,10 @@ export default function Timesheet() {
                           ))}
                       </tbody>
                     </table>
-
                     <div className="flex justify-evenly items-end mt-4 approval_process">
                       <div>
                         <h2 className="font-semibold">
-                          Project Manager&apos;s comments:
+                          Supervisor&apos;s comments:
                         </h2>
                         <p>
                           {timesheet.comments === ""
