@@ -22,6 +22,7 @@ export const login = async (userData: UserProps) => {
 
   session.Name = fullName;
   session.success = true;
+  session.NDTEmail = userData.NDTEmail;
 
   if (userData.Role === "Admin") {
     await session.save();
