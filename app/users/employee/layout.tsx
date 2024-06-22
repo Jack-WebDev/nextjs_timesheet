@@ -17,6 +17,8 @@ export default async function DashboardLayout({
   const name = session.Name;
 
   return (
+    <EmployeeNav>
+
     <div className="flex flex-col h-screen">
       <header className="flex justify-end px-8 items-center py-8 pr-16 bg-[#a2a1a81a]">
         <div className="profile flex items-center gap-x-3">
@@ -35,19 +37,19 @@ export default async function DashboardLayout({
       </header>
 
       <div className="content flex flex-1">
-        <EmployeeNav />
 
         <div className="main__content flex-1 m-12">
-          <Image
+          {/* <Image
             src={"/ndt-technologies-web-logo.svg"}
             alt=""
             width={100}
             height={100}
             className="background__image"
-          />
+          /> */}
           {children}
         </div>
       </div>
     </div>
+    </EmployeeNav>
   );
 }
