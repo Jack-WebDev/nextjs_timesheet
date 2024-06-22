@@ -1,7 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import db from "@/database/index";
+import { getSession } from "@/actions/auth/actions";
 
 export async function POST(req: NextRequest) {
+  const session = await getSession();
+  const fullName = `${session.Name} ${session.Surname}`;
   try {
     const res = await req.json();
     const { formData } = await res;
@@ -29,7 +32,7 @@ export async function POST(req: NextRequest) {
         data: {
           month: combinedData.month,
           weeklyPeriod: combinedData.weeklyPeriod,
-          name: combinedData.name,
+          name: fullName,
           projectManager: combinedData.projectManager,
           projectName: combinedData.projectName,
           role: combinedData.role,

@@ -101,3 +101,40 @@ model TableRow {
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   tasks          Task[]
 }
+
+model AP {
+  id            String     @id @default(uuid())
+  property      String
+  contactPerson String
+  contactNo     String
+  helpDesks     HelpDesk[] @relation("APHelpDesks")
+}
+
+model Student {
+  id            String     @id @default(uuid())
+  fullName      String
+  idNumber      String
+  studentNumber String
+  contactNumber String
+  email         String
+  institution   String
+  accommodation String
+  helpDesks     HelpDesk[] @relation("StudentHelpDesks")
+}
+
+model HelpDesk {
+  id           String   @id @default(uuid())
+  apId         String?
+  studentId    String?
+  date         String
+  callDuration String
+  campus       String
+  query        String
+  callAgent    String
+  resolve      String
+  client       String
+  problem      String
+  status       String
+  ap           AP?      @relation("APHelpDesks", fields: [apId], references: [id])
+  student      Student? @relation("StudentHelpDesks", fields: [studentId], references: [id])
+}
