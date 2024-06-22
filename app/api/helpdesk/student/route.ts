@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/database/index";
+import { getSession } from "@/actions/auth/actions";
 
 
 export async function GET() {
@@ -13,6 +14,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+    const session = await getSession();
     const data = await req.json();
 
     console.log(data)
@@ -42,7 +44,7 @@ export async function POST(req: NextRequest) {
                 client: data.client,
                 problem: data.problem,
                 status: data.status,
-                callAgent: data.agent
+                callAgent: session?.NDTEmail ?? ""
             }
         })
 

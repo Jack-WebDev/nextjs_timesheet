@@ -8,7 +8,6 @@ import useFetchTickets from "@/hooks/useFetchTickets";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
-
 export default function HelpDesk() {
   const user = useUser();
   const tickets = useFetchTickets();
@@ -48,12 +47,12 @@ export default function HelpDesk() {
   const [totalTickets, setTotalTickets] = useState(0);
   const router = useRouter();
 
-
   useEffect(() => {
-    const filteredTickets = tickets.filter((ticket) => ticket.callAgent === user.NDTEmail);
-    setTotalTickets(filteredTickets.length)
+    const filteredTickets = tickets.filter(
+      (ticket) => ticket.callAgent === user.NDTEmail
+    );
+    setTotalTickets(filteredTickets.length);
   }, [tickets, user.NDTEmail]);
-  
 
   const startCall = () => {
     setStartTime(new Date());
@@ -103,6 +102,107 @@ export default function HelpDesk() {
     }));
   };
 
+  const preEndCallValidation = () => {
+    let isValid = true;
+
+    if (!helpDeskData.campus) {
+      toast.error("Campus is required");
+      isValid = false;
+    }
+    if (!helpDeskData.query) {
+      toast.error("Query is required");
+      isValid = false;
+    }
+    if (!helpDeskData.problem) {
+      toast.error("Problem is required");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  const postEndCallValidation = () => {
+    let isValid = true;
+
+    if (!helpDeskData.resolve) {
+      toast.error("Resolve is required");
+      isValid = false;
+    }
+
+    if (!selectedResolution) {
+      toast.error("Status is required");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  const validateAPData = () => {
+    let isValid = true;
+
+    if (!apData.property) {
+      toast.error("Property is required");
+      isValid = false;
+    }
+    if (!apData.contactPerson) {
+      toast.error("Contact Person is required");
+      isValid = false;
+    }
+    if (
+      !apData.contactNo ||
+      apData.contactNo.length < 10 ||
+      apData.contactNo.length > 10
+    ) {
+      toast.error("Please enter a valid Contact Number");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  const validateStudentData = () => {
+    let isValid = true;
+
+    if (!studentData.fullName) {
+      toast.error("Full Name is required");
+      isValid = false;
+    }
+    if (
+      !studentData.idNumber ||
+      studentData.idNumber.length < 13 ||
+      studentData.idNumber.length > 13
+    ) {
+      toast.error("Please enter a valid ID Number");
+      isValid = false;
+    }
+    if (!studentData.studentNumber) {
+      toast.error("Student Number is required");
+      isValid = false;
+    }
+    if (
+      !studentData.contactNumber ||
+      studentData.contactNumber.length < 10 ||
+      studentData.contactNumber.length > 10
+    ) {
+      toast.error("Please enter a valid Contact Number");
+      isValid = false;
+    }
+    if (!studentData.email || !studentData.email.includes("@")) {
+      toast.error("Please enter a valid email");
+      isValid = false;
+    }
+    if (!studentData.institution) {
+      toast.error("Institution is required");
+      isValid = false;
+    }
+    if (!studentData.accommodation) {
+      toast.error("Accommodation is required");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
   const handleStartCall = () => {
     setIsProcessing(true);
     setFormVisible(true);
@@ -110,65 +210,79 @@ export default function HelpDesk() {
   };
 
   const handleEndCall = () => {
-    setFormVisible(false);
-    setCallEnded(true);
-    endCall();
+    if (helpDeskData.client === "AP") {
+      if (validateAPData() && preEndCallValidation()) {
+        setFormVisible(false);
+        setCallEnded(true);
+        endCall();
+      }
+    } else {
+      if (validateStudentData() && preEndCallValidation()) {
+        setFormVisible(false);
+        setCallEnded(true);
+        endCall();
+      }
+    }
   };
 
   const handleCreateAPTicket = async () => {
-    const formData = {
-      property: apData.property,
-      contactPerson: apData.contactPerson,
-      contactNo: apData.contactNo,
-      date: helpDeskData.date,
-      campus: helpDeskData.campus,
-      query: helpDeskData.query,
-      problem: helpDeskData.problem,
-      resolve: helpDeskData.resolve,
-      client: helpDeskData.client,
-      duration: duration,
-      status: selectedResolution,
-      callAgent: helpDeskData.callAgent,
-    };
-    console.log(formData);
-    try {
-      const res = await axios.post("/api/helpdesk/ap", formData);
-      console.log(res);
-      setIsProcessing(false);
-      toast.success("Ticket created successfully");
-      router.refresh();
-    } catch (error) {
-      console.log(error);
+    if (postEndCallValidation()) {
+      const formData = {
+        property: apData.property,
+        contactPerson: apData.contactPerson,
+        contactNo: apData.contactNo,
+        date: helpDeskData.date,
+        campus: helpDeskData.campus,
+        query: helpDeskData.query,
+        problem: helpDeskData.problem,
+        resolve: helpDeskData.resolve,
+        client: helpDeskData.client,
+        duration: duration,
+        status: selectedResolution,
+      };
+      console.log(formData);
+      try {
+        const res = await axios.post("/api/helpdesk/ap", formData);
+        console.log(res);
+        setIsProcessing(false);
+        toast.success("Ticket created successfully");
+        router.refresh();
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
   const handleCreateStudentTicket = async () => {
-    const formData = {
-      fullName: studentData.fullName,
-      idNumber: studentData.idNumber,
-      studentNumber: studentData.studentNumber,
-      contactNumber: studentData.contactNumber,
-      email: studentData.email,
-      institution: studentData.institution,
-      accommodation: studentData.accommodation,
-      date: helpDeskData.date,
-      campus: helpDeskData.campus,
-      query: helpDeskData.query,
-      problem: helpDeskData.problem,
-      resolve: helpDeskData.resolve,
-      client: helpDeskData.client,
-      duration: duration,
-      status: selectedResolution,
-      agent: user.NDTEmail,
-    };
-    try {
-      const res = await axios.post("/api/helpdesk/student", formData);
-      console.log(res);
-      setIsProcessing(false);
-      toast.success("Ticket created successfully");
-      router.refresh();
-    } catch (error) {
-      console.log(error);
+    if (postEndCallValidation()) {
+      const formData = {
+        fullName: studentData.fullName,
+        idNumber: studentData.idNumber,
+        studentNumber: studentData.studentNumber,
+        contactNumber: studentData.contactNumber,
+        email: studentData.email,
+        institution: studentData.institution,
+        accommodation: studentData.accommodation,
+        date: helpDeskData.date,
+        campus: helpDeskData.campus,
+        query: helpDeskData.query,
+        problem: helpDeskData.problem,
+        resolve: helpDeskData.resolve,
+        client: helpDeskData.client,
+        duration: duration,
+        status: selectedResolution,
+      };
+
+      console.log(formData);
+      try {
+        const res = await axios.post("/api/helpdesk/student", formData);
+        console.log(res);
+        setIsProcessing(false);
+        toast.success("Ticket created successfully");
+        router.refresh();
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -186,7 +300,9 @@ export default function HelpDesk() {
 
         <button
           onClick={handleStartCall}
-          className="bg-green-600 text-white rounded-xl p-4"
+          className={`p-4 rounded-xl text-white ${
+            isDoneProcessing ? "bg-green-400" : "bg-green-600"
+          }`}
           disabled={isDoneProcessing}
         >
           Start Call
@@ -461,7 +577,7 @@ export default function HelpDesk() {
                           <div className="grid">
                             <label htmlFor="apField">Email:</label>
                             <input
-                              type="text"
+                              type="email"
                               id="apField"
                               className="border border-gray-300 p-2 rounded"
                               value={studentData.email}
@@ -523,32 +639,33 @@ export default function HelpDesk() {
                   <button
                     className="rounded-xl text-white bg-primary grid justify-self-center p-4 mt-12 mb-8"
                     onClick={async () => {
-                      try {
-                        await axios.post("/api/emails", {
-                          property: apData.property,
-                          contactPerson: apData.contactPerson,
-                          contactNo: apData.contactNo,
-                          date: helpDeskData.date,
-                          campus: helpDeskData.campus,
-                          query: helpDeskData.query,
-                          problem: helpDeskData.problem,
-                          resolve: helpDeskData.resolve,
-                          client: helpDeskData.client,
-                          duration: duration,
-                          status: selectedResolution,
-                          callAgent: helpDeskData.callAgent,
-                        });
+                      if (postEndCallValidation()) {
+                        try {
+                          await axios.post("/api/emails", {
+                            property: apData.property,
+                            contactPerson: apData.contactPerson,
+                            contactNo: apData.contactNo,
+                            date: helpDeskData.date,
+                            campus: helpDeskData.campus,
+                            query: helpDeskData.query,
+                            problem: helpDeskData.problem,
+                            resolve: helpDeskData.resolve,
+                            client: helpDeskData.client,
+                            duration: duration,
+                            status: selectedResolution,
+                            callAgent: helpDeskData.callAgent,
+                          });
 
-                        await handleCreateAPTicket();
-                        setIsProcessing(false);
-                        toast.success("Ticket sent to FreshDesk");
-                        router.refresh();
-                      } catch (error) {
-                        console.error(
-                          "There was an error sending the email:",
-                          error
-                        );
-                        // Optionally set some error state here to notify the user
+                          await handleCreateAPTicket();
+                          setIsProcessing(false);
+                          toast.success("Ticket sent to FreshDesk");
+                          router.refresh();
+                        } catch (error) {
+                          console.error(
+                            "There was an error sending the email:",
+                            error
+                          );
+                        }
                       }
                     }}
                   >
@@ -569,32 +686,33 @@ export default function HelpDesk() {
                   <button
                     className="rounded-xl text-white bg-primary grid justify-self-center p-4 mt-12 mb-8"
                     onClick={async () => {
-                      try {
-                        await axios.post("/api/emails", {
-                          fullName: studentData.fullName,
-                          idNumber: studentData.idNumber,
-                          studentNumber: studentData.studentNumber,
-                          contactNumber: studentData.contactNumber,
-                          email: studentData.email,
-                          institution: studentData.institution,
-                          accommodation: studentData.accommodation,
-                          date: helpDeskData.date,
-                          campus: helpDeskData.campus,
-                          query: helpDeskData.query,
-                          problem: helpDeskData.problem,
-                          resolve: helpDeskData.resolve,
-                          client: helpDeskData.client,
-                        });
-                        await handleCreateStudentTicket();
-                        setIsProcessing(true);
-                        toast.success("Ticket sent to FreshDesk");
-                        router.refresh();
-                      } catch (error) {
-                        console.error(
-                          "There was an error sending the email:",
-                          error
-                        );
-                        // Optionally set some error state here to notify the user
+                      if (postEndCallValidation()) {
+                        try {
+                          await axios.post("/api/emails", {
+                            fullName: studentData.fullName,
+                            idNumber: studentData.idNumber,
+                            studentNumber: studentData.studentNumber,
+                            contactNumber: studentData.contactNumber,
+                            email: studentData.email,
+                            institution: studentData.institution,
+                            accommodation: studentData.accommodation,
+                            date: helpDeskData.date,
+                            campus: helpDeskData.campus,
+                            query: helpDeskData.query,
+                            problem: helpDeskData.problem,
+                            resolve: helpDeskData.resolve,
+                            client: helpDeskData.client,
+                          });
+                          await handleCreateStudentTicket();
+                          setIsProcessing(true);
+                          toast.success("Ticket sent to FreshDesk");
+                          router.refresh();
+                        } catch (error) {
+                          console.error(
+                            "There was an error sending the email:",
+                            error
+                          );
+                        }
                       }
                     }}
                   >
