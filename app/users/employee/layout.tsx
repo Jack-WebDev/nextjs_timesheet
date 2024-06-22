@@ -38,7 +38,7 @@ export default async function DashboardLayout({
 
       <div className="content flex flex-1">
 
-        <div className="main__content flex-1 m-12">
+        <div className="main__content ml-[20rem] flex-1 m-12">
           {/* <Image
             src={"/ndt-technologies-web-logo.svg"}
             alt=""

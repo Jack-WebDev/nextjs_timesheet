@@ -116,15 +116,16 @@ export default function EmployeeNav({
 
   return (
     <div className='flex h-screen w-full'>
-      <div className='grid w-[20%] h-full bg-slate-500'>
+      <div className='grid w-[15%] h-full bg-[#F5F5F5] fixed'>
            <>
-      <div className="side_menu w-[15%] bg-[#a2a1a81a] grid  justify-center items-baseline">
+      <div className="side_menu bg-[#a2a1a81a]  grid  justify-center items-baseline">
         <Link href={"/users/employee"}>
           <Image
             src={"/ndt-technologies-web-logo.svg"}
             alt=""
             width={100}
             height={100}
+            className="mt-8"
             style={{ width: "auto", height: "auto" }}
           />
         </Link>
