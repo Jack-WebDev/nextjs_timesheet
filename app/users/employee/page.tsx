@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { FaClock } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 import DashboardCard from "@/components/DashboardCard";
 import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 import { useEffect, useState } from "react";
@@ -39,7 +39,7 @@ export default function Dashboard() {
 
       <Link href={"/users/employee/Approvals"}>
         <DashboardCard
-          icon={FaClock}
+          icon={FaCheck}
           total={totalTimesheets}
           title="Pending Approvals"
         />
