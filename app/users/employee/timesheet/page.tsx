@@ -161,6 +161,7 @@ export default function Timesheet() {
   const [date, setDate] = useState<DayPickerDateRange | undefined>(undefined);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -401,7 +402,7 @@ export default function Timesheet() {
 
   const validateForm = () => {
     let isValid = true;
-  
+
     if (!formDetails.month) {
       toast.error("Month is required");
       isValid = false;
@@ -414,14 +415,21 @@ export default function Timesheet() {
       toast.error("Project Supervisor is required");
       isValid = false;
     }
-    if(!date) {
+    if (!date) {
       toast.error("Date is required");
       isValid = false;
     }
-  
+
     return isValid;
   };
-  
+
+  const handleYearChange = (direction: number) => {
+    const currentYear = new Date().getFullYear();
+    setSelectedYear((prevYear) => {
+      const newYear = prevYear + direction;
+      return newYear > currentYear ? currentYear : newYear;
+    });
+  };
 
   const handleDeleteTask = (rowIndex: number, taskIndex: number) => {
     setTableData((prevData) => {
@@ -590,7 +598,6 @@ export default function Timesheet() {
         },
       };
 
-
       try {
         setLoading(true);
         await axios.post("/api/timesheets", { formData });
@@ -745,15 +752,14 @@ export default function Timesheet() {
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger
                 asChild
-                className=" bg-white border border-black focus:outline-primary rounded-xl"
+                className="bg-white border border-black focus:outline-primary rounded-xl"
               >
                 <Button
                   id="date"
                   variant={"outline"}
-                  className={cn(
-                    "w-[300px] justify-start text-left font-normal",
+                  className={`w-[300px] justify-start text-left font-normal ${
                     !date && "text-muted-foreground"
-                  )}
+                  }`}
                   onClick={() => setPopoverOpen(true)}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
@@ -772,22 +778,27 @@ export default function Timesheet() {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
+                <div className="flex justify-between items-center px-4 py-2">
+                  <button onClick={() => handleYearChange(-1)}>&lt;</button>
+                  <span>{selectedYear}</span>
+                  <button onClick={() => handleYearChange(1)}>&gt;</button>
+                </div>
                 <Calendar
                   initialFocus
                   mode="range"
                   defaultMonth={
                     selectedMonthIndex !== -1
-                      ? new Date(new Date().getFullYear(), selectedMonthIndex)
+                      ? new Date(selectedYear, selectedMonthIndex)
                       : undefined
                   }
                   fromMonth={
                     selectedMonthIndex !== -1
-                      ? new Date(new Date().getFullYear(), selectedMonthIndex)
+                      ? new Date(selectedYear, selectedMonthIndex)
                       : undefined
                   }
                   toMonth={
                     selectedMonthIndex !== -1
-                      ? new Date(new Date().getFullYear(), selectedMonthIndex)
+                      ? new Date(selectedYear, selectedMonthIndex)
                       : undefined
                   }
                   selected={date}
@@ -795,6 +806,8 @@ export default function Timesheet() {
                   numberOfMonths={1}
                   className="border-2 border-primary rounded-xl"
                   weekStartsOn={1}
+                  showOutsideDays={true}
+                  disableNavigation={true}
                 />
               </PopoverContent>
             </Popover>
@@ -984,11 +997,18 @@ export default function Timesheet() {
         </table>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="default" className="mt-8 grid justify-self-end w-[15%]">Submit</Button>
+            <Button
+              variant="default"
+              className="mt-8 grid justify-self-end w-[15%]"
+            >
+              Submit
+            </Button>
           </DialogTrigger>
           <DialogContent className="w-[70%]">
             <DialogHeader>
-              <DialogTitle className="text-3xl text-secondary">Are you ready to submit?</DialogTitle>
+              <DialogTitle className="text-3xl text-secondary">
+                Are you ready to submit?
+              </DialogTitle>
             </DialogHeader>
             <div>
               <table className="w-full">
@@ -1055,11 +1075,12 @@ export default function Timesheet() {
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>{" "}
-              <Button type="submit" onClick={handleSubmit}>Submit</Button>
+              <Button type="submit" onClick={handleSubmit}>
+                Submit
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
       </div>
 
       <h2 className="text-center text-5xl my-12 text-secondary font-medium">
