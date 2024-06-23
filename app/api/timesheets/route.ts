@@ -4,7 +4,7 @@ import { getSession } from "@/actions/auth/actions";
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
-  const fullName = `${session.Name} ${session.Surname}`;
+  const fullName = `${session.Name}`;
   try {
     const res = await req.json();
     const { formData } = await res;
