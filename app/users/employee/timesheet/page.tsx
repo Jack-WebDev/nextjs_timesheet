@@ -617,9 +617,11 @@ export default function Timesheet() {
     return (
       task.taskPerformed.trim() !== "" &&
       task.taskStatus.trim() !== "" &&
-      task.hours > 0
+      (task.hours > 0 || task.minutes > 0)
     );
   };
+  
+
 
   const calculateTotalTime = (tasks: TaskProps[]) => {
     let totalMinutes = 0;
