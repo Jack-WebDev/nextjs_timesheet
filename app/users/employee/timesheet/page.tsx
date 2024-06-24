@@ -53,7 +53,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { useEffect, useRef, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useUser } from "@/app/store";
 import { TimesheetProps } from "@/types/timesheetProps";
@@ -162,6 +162,8 @@ export default function Timesheet() {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  // const [selectedMonthIndex, setSelectedMonthIndex] = useState(-1);
+
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -423,12 +425,17 @@ export default function Timesheet() {
     return isValid;
   };
 
-  const handleYearChange = (direction: number) => {
-    const currentYear = new Date().getFullYear();
-    setSelectedYear((prevYear) => {
-      const newYear = prevYear + direction;
-      return newYear > currentYear ? currentYear : newYear;
-    });
+  // const handleYearChange = (direction: number) => {
+  //   const currentYear = new Date().getFullYear();
+  //   setSelectedYear((prevYear) => {
+  //     const newYear = prevYear + direction;
+  //     return newYear > currentYear ? currentYear : newYear;
+  //   });
+  // };
+  const handleYearChange = (year:any) => {
+    setSelectedYear(year);
+    // Reset month selection if needed
+    // setSelectedMonthIndex(-1);
   };
 
   const handleDeleteTask = (rowIndex: number, taskIndex: number) => {
@@ -551,6 +558,15 @@ export default function Timesheet() {
     "December",
   ];
 
+  const previousYears = [
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+
+  ]
+
   const getMonthIndex = (monthName: string) => {
     return months.indexOf(monthName);
   };
@@ -654,7 +670,23 @@ export default function Timesheet() {
     <>
       {loading && <Loading />}
       <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
-        <form className="grid grid-cols-3 border-b-2 border-secondary pb-8 gap-y-4 items-end">
+        <form className="grid grid-cols-4 border-b-2 border-secondary pb-8 gap-y-4 items-end">
+        <div>
+            <label className="grid w-[60%] mb-1 text-[1.2rem]">Name:</label>
+            <input
+              className="px-4 py-1 border border-black rounded-xl pointer-events-none"
+              value={fullName}
+              readOnly
+            />
+          </div>
+          <div>
+            <label className="grid w-[60%] mb-1 text-[1.2rem]">Position:</label>
+            <input
+              className="px-4 py-1 border border-black focus:outline-primary rounded-xl w-[70%] pointer-events-none"
+              value={userZ.Position}
+              readOnly
+            />
+          </div>
           <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Month:</label>
             <select
@@ -676,21 +708,117 @@ export default function Timesheet() {
             )}
           </div>
           <div>
-            <label className="grid w-[60%] mb-1 text-[1.2rem]">Name:</label>
-            <input
-              className="px-4 py-1 border border-black rounded-xl pointer-events-none"
-              value={fullName}
-              readOnly
-            />
+          <label className="grid w-[75%] mb-1 text-[1.2rem]">Previous Year(If Applicable):</label>
+      <select
+        className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
+        value={selectedYear}
+        onChange={(e) => handleYearChange(e.target.value)}
+      >
+        <option value="">
+          Select a previous year
+        </option>
+        {previousYears.map((year, index) => (
+          <option key={index} value={year}>
+            {year}
+          </option>
+        ))}
+      </select>
+
           </div>
-          <div>
-            <label className="grid w-[60%] mb-1 text-[1.2rem]">Position:</label>
-            <input
-              className="px-4 py-1 border border-black focus:outline-primary rounded-xl w-[70%] pointer-events-none"
-              value={userZ.Position}
-              readOnly
-            />
+          <div className="period grid">
+            <label htmlFor="date" className="mb-1 text-[1.2rem]">
+              Weekly Period:
+            </label>
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+              <PopoverTrigger
+                asChild
+                className="bg-white border border-black focus:outline-primary rounded-xl"
+              >
+                <Button
+                  id="date"
+                  variant={"outline"}
+                  className={`w-[300px] justify-start text-left font-normal ${
+                    !date && "text-muted-foreground"
+                  }`}
+                  onClick={() => setPopoverOpen(true)}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date?.from ? (
+                    date.to ? (
+                      <>
+                        {format(date.from, "LLL dd")} -{" "}
+                        {format(date.to, "LLL dd")}
+                      </>
+                    ) : (
+                      format(date.from, "LLL dd")
+                    )
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                {/* <div className="flex justify-between items-center px-4 py-2">
+                  <button onClick={() => handleYearChange(-1)}>&lt;</button>
+                  <span>{selectedYear}</span>
+                  <button onClick={() => handleYearChange(1)}>&gt;</button>
+                </div> */}
+                {/* <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={
+                    selectedMonthIndex !== -1
+                      ? new Date(selectedYear, selectedMonthIndex)
+                      : undefined
+                  }
+                  fromMonth={
+                    selectedMonthIndex !== -1
+                      ? new Date(selectedYear, selectedMonthIndex)
+                      : undefined
+                  }
+                  toMonth={
+                    selectedMonthIndex !== -1
+                      ? new Date(selectedYear, selectedMonthIndex)
+                      : undefined
+                  }
+                  selected={date}
+                  onSelect={handleDateSelect}
+                  numberOfMonths={1}
+                  className="border-2 border-primary rounded-xl"
+                  weekStartsOn={1}
+                  showOutsideDays={true}
+                  disableNavigation={true}
+                /> */}
+                <Calendar
+        initialFocus
+        mode="range"
+        defaultMonth={
+          selectedMonthIndex !== -1
+            ? new Date(selectedYear, selectedMonthIndex)
+            : undefined
+        }
+        fromMonth={
+          selectedMonthIndex !== -1
+            ? new Date(selectedYear, selectedMonthIndex)
+            : undefined
+        }
+        toMonth={
+          selectedMonthIndex !== -1
+            ? new Date(selectedYear, selectedMonthIndex)
+            : undefined
+        }
+        selected={date}
+        onSelect={handleDateSelect}
+        numberOfMonths={1}
+        className="border-2 border-primary rounded-xl"
+        weekStartsOn={1}
+        showOutsideDays={true}
+        disableNavigation={true}
+      />
+              </PopoverContent>
+            </Popover>
           </div>
+
           <div className="grid w-[60%]">
             <label htmlFor="name" className="mb-1 text-[1.2rem]">
               Project Name
@@ -747,73 +875,7 @@ export default function Timesheet() {
             )}
           </div>
 
-          <div className="period grid">
-            <label htmlFor="date" className="mb-1 text-[1.2rem]">
-              Weekly Period:
-            </label>
-            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-              <PopoverTrigger
-                asChild
-                className="bg-white border border-black focus:outline-primary rounded-xl"
-              >
-                <Button
-                  id="date"
-                  variant={"outline"}
-                  className={`w-[300px] justify-start text-left font-normal ${
-                    !date && "text-muted-foreground"
-                  }`}
-                  onClick={() => setPopoverOpen(true)}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date?.from ? (
-                    date.to ? (
-                      <>
-                        {format(date.from, "LLL dd")} -{" "}
-                        {format(date.to, "LLL dd")}
-                      </>
-                    ) : (
-                      format(date.from, "LLL dd")
-                    )
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <div className="flex justify-between items-center px-4 py-2">
-                  <button onClick={() => handleYearChange(-1)}>&lt;</button>
-                  <span>{selectedYear}</span>
-                  <button onClick={() => handleYearChange(1)}>&gt;</button>
-                </div>
-                <Calendar
-                  initialFocus
-                  mode="range"
-                  defaultMonth={
-                    selectedMonthIndex !== -1
-                      ? new Date(selectedYear, selectedMonthIndex)
-                      : undefined
-                  }
-                  fromMonth={
-                    selectedMonthIndex !== -1
-                      ? new Date(selectedYear, selectedMonthIndex)
-                      : undefined
-                  }
-                  toMonth={
-                    selectedMonthIndex !== -1
-                      ? new Date(selectedYear, selectedMonthIndex)
-                      : undefined
-                  }
-                  selected={date}
-                  onSelect={handleDateSelect}
-                  numberOfMonths={1}
-                  className="border-2 border-primary rounded-xl"
-                  weekStartsOn={1}
-                  showOutsideDays={true}
-                  disableNavigation={true}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
+
         </form>
         <table className="mt-8">
           <thead className="pb-2">
