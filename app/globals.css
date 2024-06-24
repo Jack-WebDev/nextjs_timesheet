@@ -7,6 +7,11 @@
   --secondary-color: #015a4a;
 }
 
+.link:hover {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
 .link.active {
   color: var(--primary-color);
   font-weight: 600;
