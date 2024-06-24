@@ -63,6 +63,7 @@ export function LoginForm() {
                   placeholder="Enter your email"
                   {...field}
                   className="rounded-xl hover:border-primary"
+                  type="email"
                 />
               </FormControl>
               <FormMessage style={{ color: "red" }} />
@@ -80,6 +81,7 @@ export function LoginForm() {
                   placeholder="Enter your password"
                   {...field}
                   className="rounded-xl hover:border-primary"
+                  type="password"
                 />
               </FormControl>
               <FormMessage style={{ color: "red" }} />
