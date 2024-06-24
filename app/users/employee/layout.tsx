@@ -29,7 +29,7 @@ export default function DashboardLayout({
 
     <div className="flex flex-col h-screen">
       <header className="flex justify-between ml-[20rem] px-8 items-center py-8 pr-16">
-      <h3>{pathname}</h3>
+      {/* <h3>{pathname}</h3> */}
         <div className="profile flex items-center gap-x-3">
           <Popover>
             <PopoverTrigger className="flex items-center gap-4 text-[#d69436]">
