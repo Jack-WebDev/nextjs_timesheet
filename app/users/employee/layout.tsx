@@ -1,3 +1,5 @@
+// "use client"
+
 import { logOut, getSession } from "@/actions/auth/actions";
 import {
   Popover,
@@ -5,14 +7,20 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { FaChevronDown } from "react-icons/fa";
-import Image from "next/image";
 import EmployeeNav from "@/app/users/employee/_components/EmployeeNav";
+// import { useUser } from "@/app/store";
+// import {usePathname} from "next/navigation"
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  
+  // const user = useUser()
+  // const fullName = `${user.Name} ${user.Surname}`
+  // const pathname = usePathname()
+
   const session = await getSession();
   const name = session.Name;
 
@@ -20,7 +28,8 @@ export default async function DashboardLayout({
     <EmployeeNav>
 
     <div className="flex flex-col h-screen">
-      <header className="flex justify-end px-8 items-center py-8 pr-16 bg-[#a2a1a81a]">
+      <header className="flex justify-end ml-[20rem] px-8 items-center py-8 pr-16">
+      {/* <h3>{pathname}</h3> */}
         <div className="profile flex items-center gap-x-3">
           <Popover>
             <PopoverTrigger className="flex items-center gap-4 text-[#d69436]">
@@ -34,6 +43,8 @@ export default async function DashboardLayout({
             </PopoverContent>
           </Popover>
         </div>
+
+        
       </header>
 
       <div className="content flex flex-1">
