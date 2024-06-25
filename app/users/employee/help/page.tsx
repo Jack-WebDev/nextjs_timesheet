@@ -242,7 +242,7 @@ export default function HelpDesk() {
         console.log(res);
         setIsProcessing(false);
         toast.success("Ticket created successfully");
-        router.refresh();
+        window.location.reload();
       } catch (error) {
         console.log(error);
       }
@@ -275,7 +275,7 @@ export default function HelpDesk() {
         console.log(res);
         setIsProcessing(false);
         toast.success("Ticket created successfully");
-        router.refresh();
+        window.location.reload();
       } catch (error) {
         console.log(error);
       }
@@ -656,7 +656,7 @@ export default function HelpDesk() {
                           await handleCreateAPTicket();
                           setIsProcessing(false);
                           toast.success("Ticket sent to FreshDesk");
-                          router.refresh();
+                          window.location.reload();
                         } catch (error) {
                           console.error(
                             "There was an error sending the email:",
@@ -703,7 +703,7 @@ export default function HelpDesk() {
                           await handleCreateStudentTicket();
                           setIsProcessing(true);
                           toast.success("Ticket sent to FreshDesk");
-                          router.refresh();
+                          window.location.reload();
                         } catch (error) {
                           console.error(
                             "There was an error sending the email:",
