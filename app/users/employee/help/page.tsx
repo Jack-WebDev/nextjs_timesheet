@@ -175,10 +175,6 @@ export default function HelpDesk() {
       toast.error("Please enter a valid ID Number");
       isValid = false;
     }
-    if (!studentData.studentNumber) {
-      toast.error("Student Number is required");
-      isValid = false;
-    }
     if (
       !studentData.contactNumber ||
       studentData.contactNumber.length < 10 ||
@@ -499,6 +495,18 @@ export default function HelpDesk() {
                           </div>
                         </div>
                         <div className="flex justify-around items-center">
+                        <div className="grid">
+                            <label htmlFor="apField">Institution:</label>
+                            <input
+                              type="text"
+                              id="apField"
+                              className="border border-gray-300 p-2 rounded"
+                              value={studentData.institution}
+                              onChange={(e) =>
+                                handleStudentData("institution", e.target.value)
+                              }
+                            />
+                          </div>
                           <div className="grid">
                             <label htmlFor="apField">Campus:</label>
                             <input
@@ -511,21 +519,7 @@ export default function HelpDesk() {
                               }
                             />
                           </div>
-                          <div className="grid">
-                            <label htmlFor="apField">Student Number:</label>
-                            <input
-                              type="text"
-                              id="apField"
-                              className="border border-gray-300 p-2 rounded"
-                              value={studentData.studentNumber}
-                              onChange={(e) =>
-                                handleStudentData(
-                                  "studentNumber",
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </div>
+
                         </div>
                         <div className="flex justify-around items-center">
                           <div className="grid">
@@ -545,14 +539,17 @@ export default function HelpDesk() {
                           </div>
 
                           <div className="grid">
-                            <label htmlFor="apField">Institution:</label>
+                            <label htmlFor="apField">Student Number:</label>
                             <input
                               type="text"
                               id="apField"
                               className="border border-gray-300 p-2 rounded"
-                              value={studentData.institution}
+                              value={studentData.studentNumber}
                               onChange={(e) =>
-                                handleStudentData("institution", e.target.value)
+                                handleStudentData(
+                                  "studentNumber",
+                                  e.target.value
+                                )
                               }
                             />
                           </div>
