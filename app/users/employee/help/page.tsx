@@ -7,6 +7,7 @@ import { useUser } from "@/app/store";
 import useFetchTickets from "@/hooks/useFetchTickets";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import Loading from "../loading";
 
 export default function HelpDesk() {
   const user = useUser();
@@ -45,6 +46,7 @@ export default function HelpDesk() {
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [duration, setDuration] = useState<string>("");
   const [totalTickets, setTotalTickets] = useState(0);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -238,12 +240,15 @@ export default function HelpDesk() {
       };
       console.log(formData);
       try {
+        setLoading(true);
         const res = await axios.post("/api/helpdesk/ap", formData);
         console.log(res);
+        setLoading(false);
         setIsProcessing(false);
         toast.success("Ticket created successfully");
         window.location.reload();
       } catch (error) {
+        setLoading(false);
         console.log(error);
       }
     }
@@ -271,12 +276,15 @@ export default function HelpDesk() {
 
       console.log(formData);
       try {
+        setLoading(true);
         const res = await axios.post("/api/helpdesk/student", formData);
         console.log(res);
+        setLoading(false);
         setIsProcessing(false);
         toast.success("Ticket created successfully");
         window.location.reload();
       } catch (error) {
+        setLoading(false);
         console.log(error);
       }
     }
@@ -287,6 +295,9 @@ export default function HelpDesk() {
   };
 
   return (
+    <>
+          {loading && <Loading />}
+
     <div className="grid rounded-xl p-4 bg-[#F5F5F5] mt-8 border-2 border-primary">
       <div className="flex justify-around items-center mb-12">
         <div className="grid rounded-xl border-2 border-secondary px-4 py-2 bg-white w-[15%] ">
@@ -729,5 +740,6 @@ export default function HelpDesk() {
         )}
       </div>
     </div>
+    </>
   );
 }
