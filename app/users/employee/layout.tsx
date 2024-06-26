@@ -38,7 +38,7 @@ export default async function DashboardLayout({
             </PopoverTrigger>
             <PopoverContent className="flex items-center gap-4 w-fit border-2 border-primary rounded-xl">
               <form action={logOut}>
-                <button type="submit">Log Out</button>
+                <button type="submit" className="text-secondary font-semibold">Log Out</button>
               </form>
             </PopoverContent>
           </Popover>

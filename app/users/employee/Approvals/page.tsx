@@ -27,13 +27,14 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@/app/store";
+import { useThemeStore, useUser } from "@/app/store";
 import ApproveTimesheet from "@/components/dialogUI/ApproveTimesheet";
 import { TimesheetProps } from "@/types/timesheetProps";
 import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 
 export default function Timesheet() {
   const timesheetData = useFetchTimesheets();
+  const { isDarkMode } = useThemeStore();
   const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
 
 
@@ -124,7 +125,7 @@ export default function Timesheet() {
   return (
     <>
       <div className="timesheets-container w-[80%] mx-auto">
-        <div className="w-full bg-[#F5F5F5] p-4 rounded-xl border-2 border-primary">
+        <div className="w-full  p-4 rounded-xl border-2 border-primary">
           <div className="flex items-center py-4">
             <Input
               placeholder="Filter by project name...."
@@ -137,11 +138,11 @@ export default function Timesheet() {
                   .getColumn("projectName")
                   ?.setFilterValue(event.target.value)
               }
-              className="max-w-sm rounded-xl"
+              className="max-w-sm rounded-xl border border-primary"
             />
           </div>
           <div>
-            <Table className="rounded-xl">
+            <Table className={`rounded-xl ${isDarkMode ? "text-white" : "text-black"}`}>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow
