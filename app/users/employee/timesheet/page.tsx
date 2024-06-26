@@ -1150,7 +1150,7 @@ export default function Timesheet() {
         Your Timesheets
       </h2>
       <div className="timesheets-container w-[80%] mx-auto">
-        <div className="w-full bg-[#F5F5F5] p-4 rounded-xl border-2 border-primary">
+        <div className="w-full p-4 rounded-xl border-2 border-primary">
           <div className="flex items-center py-4">
             <Input
               placeholder="Filter by project name...."
@@ -1173,7 +1173,6 @@ export default function Timesheet() {
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow
                     key={headerGroup.id}
-                    className="border-b border-secondary"
                   >
                     {headerGroup.headers.map((header) => {
                       return (
@@ -1199,6 +1198,7 @@ export default function Timesheet() {
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
+                      className="odd:bg-white even:bg-slate-100"
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>

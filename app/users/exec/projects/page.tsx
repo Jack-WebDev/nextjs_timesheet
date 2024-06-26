@@ -204,7 +204,8 @@ const ProjectTable = () => {
   });
 
   return (
-    <div className="w-[90%] mx-auto">
+    <>
+    <div className="w-[90%] mx-auto border-2 p-4 border-primary rounded-xl">
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter by project name...."
@@ -217,8 +218,8 @@ const ProjectTable = () => {
           className="max-w-sm rounded-xl"
         />
       </div>
-      <div className="border-2 border-primary rounded-xl bg-white">
-        <Table className="rounded-xl">
+      <div className=" bg-white">
+        <Table className="p-4 rounded-xl">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
@@ -246,6 +247,8 @@ const ProjectTable = () => {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className=" even:bg-slate-100 rounded-br-xl"
+
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -263,13 +266,14 @@ const ProjectTable = () => {
                   colSpan={columns.length}
                   className="h-24 text-center text-secondary font-semibold text-2xl"
                 >
-                  No timesheets.
+                  No projects.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+    </div>
       <div className="flex justify-center flex-col items-center gap-2 mt-12">
           <div className="flex items-center gap-4">
             <Button
@@ -313,7 +317,7 @@ const ProjectTable = () => {
             </strong>
           </span>
         </div>
-    </div>
+    </>
   );
 };
 
