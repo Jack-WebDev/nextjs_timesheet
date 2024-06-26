@@ -4,6 +4,12 @@ import { CalendarIcon } from "@radix-ui/react-icons";
 import { addDays, differenceInDays, eachDayOfInterval, format } from "date-fns";
 import { DateRange as DayPickerDateRange } from "react-day-picker";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import {
+  ChevronsRight,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronLeft,
+} from "lucide-react";
 
 import {
   ColumnDef,
@@ -1217,31 +1223,49 @@ export default function Timesheet() {
               </TableBody>
             </Table>
           </div>
-          <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount().toLocaleString()} out of{" "}
-              {table.getRowCount().toLocaleString()} Records.
-            </div>
-            <div className="space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                Next
-              </Button>
-            </div>
+        </div>
+        <div className="flex justify-center flex-col items-center gap-2 mt-12">
+          <div className="flex items-center gap-4">
+            <Button
+              variant={"default"}
+              className="border rounded p-1"
+              onClick={() => table.firstPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronsLeft />
+            </Button>
+            <Button
+              variant={"default"}
+              className="border rounded p-1"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronLeft />
+            </Button>
+            <Button
+              variant={"default"}
+              className="border rounded p-1"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronRight />
+            </Button>
+            <Button
+              variant={"default"}
+              className="border rounded p-1"
+              onClick={() => table.lastPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronsRight />
+            </Button>
           </div>
+          <span className="flex items-center gap-1">
+            <div>Page</div>
+            <strong>
+              {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount().toLocaleString()}
+            </strong>
+          </span>
         </div>
       </div>
     </>
