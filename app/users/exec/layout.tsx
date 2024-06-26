@@ -16,8 +16,11 @@ export default async function DashboardLayout({
   const session = await getSession();
   const name = session.Name;
   return (
+        <ExecNav>
+
     <div className="flex flex-col h-screen">
-      <header className="flex justify-end px-8 items-center py-8 pr-16 bg-[#a2a1a81a]">
+    <header className="flex justify-end ml-[20rem] px-8 items-center py-8 pr-16">
+      {/* <h3>{pathname}</h3> */}
         <div className="profile flex items-center gap-x-3">
           <Popover>
             <PopoverTrigger className="flex items-center gap-4 text-[#d69436]">
@@ -31,15 +34,18 @@ export default async function DashboardLayout({
             </PopoverContent>
           </Popover>
         </div>
+
+        
       </header>
 
       <div className="content flex flex-1">
-        <ExecNav />
 
-        <div className="main__content flex-1 m-12">
-          {children}
-        </div>
+      <div className="main__content ml-[20rem] flex-1 m-12">
+
+{children}
+</div>
       </div>
     </div>
+        </ExecNav>
   );
 }
