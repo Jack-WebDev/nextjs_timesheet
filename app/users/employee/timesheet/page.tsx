@@ -1,7 +1,7 @@
 "use client";
 
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { differenceInDays, eachDayOfInterval, format } from "date-fns";
+import { addDays, differenceInDays, eachDayOfInterval, format } from "date-fns";
 import { DateRange as DayPickerDateRange } from "react-day-picker";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
@@ -163,7 +163,6 @@ export default function Timesheet() {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   // const [selectedMonthIndex, setSelectedMonthIndex] = useState(-1);
-
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -380,8 +379,14 @@ export default function Timesheet() {
     }
   }, [projectsData]);
 
-  const formattedDate = `${date?.from?.toISOString().split("T")[0]} to ${
-    date?.to?.toISOString().split("T")[0]
+  const formattedDate = `${
+    addDays(date?.from ?? new Date(), 1)
+      .toISOString()
+      .split("T")[0]
+  } to ${
+    addDays(date?.to ?? new Date(), 1)
+      .toISOString()
+      .split("T")[0]
   }`;
 
   const handleAddTask = (index: number) => {
@@ -432,7 +437,7 @@ export default function Timesheet() {
   //     return newYear > currentYear ? currentYear : newYear;
   //   });
   // };
-  const handleYearChange = (year:any) => {
+  const handleYearChange = (year: any) => {
     setSelectedYear(year);
     // Reset month selection if needed
     // setSelectedMonthIndex(-1);
@@ -558,14 +563,7 @@ export default function Timesheet() {
     "December",
   ];
 
-  const previousYears = [
-    "2019",
-    "2020",
-    "2021",
-    "2022",
-    "2023",
-
-  ]
+  const previousYears = ["2019", "2020", "2021", "2022", "2023"];
 
   const getMonthIndex = (monthName: string) => {
     return months.indexOf(monthName);
@@ -636,8 +634,6 @@ export default function Timesheet() {
       (task.hours > 0 || task.minutes > 0)
     );
   };
-  
-
 
   const calculateTotalTime = (tasks: TaskProps[]) => {
     let totalMinutes = 0;
@@ -671,7 +667,7 @@ export default function Timesheet() {
       {loading && <Loading />}
       <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
         <form className="grid grid-cols-4 border-b-2 border-secondary pb-8 gap-y-4 items-end">
-        <div>
+          <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Name:</label>
             <input
               className="px-4 py-1 border border-black rounded-xl pointer-events-none"
@@ -708,22 +704,21 @@ export default function Timesheet() {
             )}
           </div>
           <div>
-          <label className="grid w-[75%] mb-1 text-[1.2rem]">Previous Year(If Applicable):</label>
-      <select
-        className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
-        value={selectedYear}
-        onChange={(e) => handleYearChange(e.target.value)}
-      >
-        <option value="">
-          Select a previous year
-        </option>
-        {previousYears.map((year, index) => (
-          <option key={index} value={year}>
-            {year}
-          </option>
-        ))}
-      </select>
-
+            <label className="grid w-[75%] mb-1 text-[1.2rem]">
+              Previous Year(If Applicable):
+            </label>
+            <select
+              className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
+              value={selectedYear}
+              onChange={(e) => handleYearChange(e.target.value)}
+            >
+              <option value="">Select a previous year</option>
+              {previousYears.map((year, index) => (
+                <option key={index} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="period grid">
             <label htmlFor="date" className="mb-1 text-[1.2rem]">
@@ -790,31 +785,31 @@ export default function Timesheet() {
                   disableNavigation={true}
                 /> */}
                 <Calendar
-        initialFocus
-        mode="range"
-        defaultMonth={
-          selectedMonthIndex !== -1
-            ? new Date(selectedYear, selectedMonthIndex)
-            : undefined
-        }
-        fromMonth={
-          selectedMonthIndex !== -1
-            ? new Date(selectedYear, selectedMonthIndex)
-            : undefined
-        }
-        toMonth={
-          selectedMonthIndex !== -1
-            ? new Date(selectedYear, selectedMonthIndex)
-            : undefined
-        }
-        selected={date}
-        onSelect={handleDateSelect}
-        numberOfMonths={1}
-        className="border-2 border-primary rounded-xl"
-        weekStartsOn={1}
-        showOutsideDays={true}
-        disableNavigation={true}
-      />
+                  initialFocus
+                  mode="range"
+                  defaultMonth={
+                    selectedMonthIndex !== -1
+                      ? new Date(selectedYear, selectedMonthIndex)
+                      : undefined
+                  }
+                  fromMonth={
+                    selectedMonthIndex !== -1
+                      ? new Date(selectedYear, selectedMonthIndex)
+                      : undefined
+                  }
+                  toMonth={
+                    selectedMonthIndex !== -1
+                      ? new Date(selectedYear, selectedMonthIndex)
+                      : undefined
+                  }
+                  selected={date}
+                  onSelect={handleDateSelect}
+                  numberOfMonths={1}
+                  className="border-2 border-primary rounded-xl"
+                  weekStartsOn={1}
+                  showOutsideDays={true}
+                  disableNavigation={true}
+                />
               </PopoverContent>
             </Popover>
           </div>
@@ -874,8 +869,6 @@ export default function Timesheet() {
               </p>
             )}
           </div>
-
-
         </form>
         <table className="mt-8">
           <thead className="pb-2">
