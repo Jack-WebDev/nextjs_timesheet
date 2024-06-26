@@ -11,7 +11,7 @@ import {
   FaMoon,
   FaSun,
 } from "react-icons/fa";
-import { FaBookmark, FaGear } from "react-icons/fa6";
+import { FaBookmark, FaGear, FaS } from "react-icons/fa6";
 import Image from "next/image";
 import React from "react";
 import { useThemeStore } from "@/app/store";
@@ -114,16 +114,16 @@ export default function EmployeeNav({
           </ul>
           <div className="flex items-center justify-center">
       <button
-        className={`flex items-center gap-x-1  py-2 px-4 rounded-s-xl ${isDarkMode ? "bg-gray-100 text-black" : "bg-primary text-white"}`}
+        className={`flex items-center gap-x-1  py-2 px-4 rounded-s-xl ${isDarkMode ? "bg-[rgba(162,161,168,0.1)] text-light" : "bg-primary text-white"}`}
         onClick={toggleTheme}
       >
-        Light
+       <FaSun /> Light
       </button>
       <button
-        className={`flex items-center gap-x-1 py-2 px-4 rounded-e-xl ${isDarkMode ? "bg-primary text-white" : " text-black"}`}
+        className={`flex items-center gap-x-1 py-2 px-4 rounded-e-xl ${isDarkMode ? "bg-primary text-white" : "bg-[rgba(162,161,168,0.1)] text-black"}`}
         onClick={toggleTheme}
       >
-        Dark
+        <FaMoon /> Dark
       </button>
     </div>
         </>

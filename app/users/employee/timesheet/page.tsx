@@ -53,9 +53,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { SetStateAction, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { useUser } from "@/app/store";
+import { useThemeStore, useUser } from "@/app/store";
 import { TimesheetProps } from "@/types/timesheetProps";
 import { Project } from "@/types/projectProps";
 import { TaskProps } from "@/types/taskProps";
@@ -67,7 +67,6 @@ import { UserProps } from "@/types/userProps";
 import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Loading from "../loading";
-import { Label } from "@/components/ui/label";
 
 type FormDetails = {
   month: string;
@@ -146,6 +145,7 @@ export default function Timesheet() {
   const timesheetData = useFetchTimesheets();
   const projectsData = useFetchProjects();
   const userData = useFetchUsers();
+  const {isDarkMode} = useThemeStore();
   const [tableData, setTableData] = useState<TableRowsProps[]>(initialData);
   const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -225,7 +225,7 @@ export default function Timesheet() {
                   </span>
                 </DialogTrigger>
                 <DialogContent className="w-1/2">
-                  <DialogHeader className="flex flex-row items-baseline justify-around">
+                  <DialogHeader className="flex flex-row items-baseline justify-around text-black">
                     <DialogTitle>Timesheet Details</DialogTitle>
                     <div className="grid text-xl">
                       <div className="flex">
@@ -238,7 +238,7 @@ export default function Timesheet() {
                   </DialogHeader>
                   <div>
                     <table className="w-full">
-                      <thead>
+                      <thead className="text-black">
                         <tr>
                           <th>Weekday</th>
                           <th>Type Of Day</th>
@@ -256,18 +256,18 @@ export default function Timesheet() {
                               key={r.id}
                               className="border-b border-secondary"
                             >
-                              <td className="text-center">
+                              <td className="text-black text-center">
                                 <p>{r.weekday}</p>
                               </td>
-                              <td className="text-center">
+                              <td className="text-black text-center">
                                 <p>
                                   {r.typeOfDay === "" ? "N/A" : r.typeOfDay}
                                 </p>
                               </td>
-                              <td className="text-center">
+                              <td className="text-black text-center">
                                 <p>{`${r.totalHours} hrs ${r.totalMinutes} mins`}</p>
                               </td>
-                              <td className="text-center">
+                              <td className="text-black text-center">
                                 {r.tasks && r.tasks.length > 0 ? (
                                   r.tasks.map((t) => (
                                     <div key={t.id}>
@@ -283,7 +283,7 @@ export default function Timesheet() {
                                 )}
                               </td>
 
-                              <td className="text-center">
+                              <td className="text-black text-center">
                                 {r.tasks && r.tasks.length > 0 ? (
                                   r.tasks.map((t) => (
                                     <div key={t.id}>
@@ -294,7 +294,7 @@ export default function Timesheet() {
                                   <span>N/A</span>
                                 )}
                               </td>
-                              <td className="text-center">
+                              <td className="text-center text-black">
                                 <p>{r.comment === "" ? "N/A" : r.comment}</p>
                               </td>
                             </tr>
@@ -303,10 +303,10 @@ export default function Timesheet() {
                     </table>
 
                     <div className="mt-4">
-                      <h2 className="font-semibold">
+                      <h2 className="font-semibold text-black">
                         Supervisor&apos;s comments:
                       </h2>
-                      <p>
+                      <p className="text-black">
                         {timesheet.comments === ""
                           ? "No comment."
                           : timesheet.comments}
@@ -425,17 +425,10 @@ export default function Timesheet() {
     return isValid;
   };
 
-  // const handleYearChange = (direction: number) => {
-  //   const currentYear = new Date().getFullYear();
-  //   setSelectedYear((prevYear) => {
-  //     const newYear = prevYear + direction;
-  //     return newYear > currentYear ? currentYear : newYear;
-  //   });
-  // };
+
   const handleYearChange = (year:any) => {
     setSelectedYear(year);
-    // Reset month selection if needed
-    // setSelectedMonthIndex(-1);
+
   };
 
   const handleDeleteTask = (rowIndex: number, taskIndex: number) => {
@@ -443,7 +436,6 @@ export default function Timesheet() {
       const newData = [...prevData];
       newData[rowIndex].tasks.splice(taskIndex, 1);
 
-      // Recalculate total hours and minutes
       const { totalHours, totalMinutes } = calculateTotalTime(
         newData[rowIndex].tasks
       );
@@ -669,12 +661,12 @@ export default function Timesheet() {
   return (
     <>
       {loading && <Loading />}
-      <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
+      <div className="grid border-2 border-primary p-8 rounded-xl">
         <form className="grid grid-cols-4 border-b-2 border-secondary pb-8 gap-y-4 items-end">
         <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Name:</label>
             <input
-              className="px-4 py-1 border border-black rounded-xl pointer-events-none"
+              className="px-4 py-1 border border-primary bg-transparent rounded-xl pointer-events-none"
               value={fullName}
               readOnly
             />
@@ -682,7 +674,7 @@ export default function Timesheet() {
           <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Position:</label>
             <input
-              className="px-4 py-1 border border-black focus:outline-primary rounded-xl w-[70%] pointer-events-none"
+              className="px-4 py-1 border border-primary bg-transparent focus:outline-primary rounded-xl w-[70%] pointer-events-none"
               value={userZ.Position}
               readOnly
             />
@@ -690,7 +682,7 @@ export default function Timesheet() {
           <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Month:</label>
             <select
-              className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
+              className={`px-4 py-1 border border-primary bg-transparent focus:outline-primary rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
               value={formDetails.month}
               onChange={(e) => handleFormChange("month", e.target.value)}
             >
@@ -710,8 +702,8 @@ export default function Timesheet() {
           <div>
           <label className="grid w-[75%] mb-1 text-[1.2rem]">Previous Year(If Applicable):</label>
       <select
-        className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
-        value={selectedYear}
+              className={`px-4 py-1 border border-primary bg-transparent focus:outline-primary rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
+              value={selectedYear}
         onChange={(e) => handleYearChange(e.target.value)}
       >
         <option value="">
@@ -732,7 +724,7 @@ export default function Timesheet() {
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger
                 asChild
-                className="bg-white border border-black focus:outline-primary rounded-xl"
+                className="border border-primary bg-transparent focus:outline-primary rounded-xl"
               >
                 <Button
                   id="date"
@@ -758,37 +750,6 @@ export default function Timesheet() {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                {/* <div className="flex justify-between items-center px-4 py-2">
-                  <button onClick={() => handleYearChange(-1)}>&lt;</button>
-                  <span>{selectedYear}</span>
-                  <button onClick={() => handleYearChange(1)}>&gt;</button>
-                </div> */}
-                {/* <Calendar
-                  initialFocus
-                  mode="range"
-                  defaultMonth={
-                    selectedMonthIndex !== -1
-                      ? new Date(selectedYear, selectedMonthIndex)
-                      : undefined
-                  }
-                  fromMonth={
-                    selectedMonthIndex !== -1
-                      ? new Date(selectedYear, selectedMonthIndex)
-                      : undefined
-                  }
-                  toMonth={
-                    selectedMonthIndex !== -1
-                      ? new Date(selectedYear, selectedMonthIndex)
-                      : undefined
-                  }
-                  selected={date}
-                  onSelect={handleDateSelect}
-                  numberOfMonths={1}
-                  className="border-2 border-primary rounded-xl"
-                  weekStartsOn={1}
-                  showOutsideDays={true}
-                  disableNavigation={true}
-                /> */}
                 <Calendar
         initialFocus
         mode="range"
@@ -810,7 +771,7 @@ export default function Timesheet() {
         selected={date}
         onSelect={handleDateSelect}
         numberOfMonths={1}
-        className="border-2 border-primary rounded-xl"
+        className={`px-4 py-1 border border-primary bg-transparent focus:outline-primary rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
         weekStartsOn={1}
         showOutsideDays={true}
         disableNavigation={true}
@@ -825,7 +786,7 @@ export default function Timesheet() {
             </label>
             <select
               name="name"
-              className="border border-black focus:outline-primary rounded-xl h-[4vh]"
+              className={`border border-primary bg-transparent focus:outline-primary rounded-xl h-[4vh] ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
               value={chosenProject}
               onChange={handleProjectChange}
             >
@@ -851,15 +812,15 @@ export default function Timesheet() {
               }}
               onClick={() => toggleDropdown && toggleDropdown()}
               ref={inputRef}
-              className="px-4 py-1 border border-black focus:outline-primary rounded-xl"
+              className="px-4 py-1 border border-primary bg-transparent focus:outline-primary rounded-xl"
             />
 
             {isDropdownOpen && (
-              <ul className="absolute left-[20px] top-[6rem] bg-white rounded-xl py-2 px-4 shadow-xl z-10 max-h-40 overflow-y-auto">
+              <ul className={`absolute left-[20px] top-[6rem]  rounded-xl py-2 px-4 shadow-xl z-10 max-h-40 overflow-y-auto ${isDarkMode ? "bg-[#A2A1A8]" : "bg-white"}`}>
                 {filteredUsers.map((user) => (
                   <li
                     key={user.id}
-                    className="cursor-pointer borderStyle hover:bg-[#F5F5F5]"
+                    className={`cursor-pointer borderStyle ${isDarkMode ? "hover:text-black" : "hover:bg-[#F5F5F5]"}`}
                     onClick={() => handleOptionClick(user)}
                   >
                     {user.Name} {user.Surname}
@@ -896,7 +857,7 @@ export default function Timesheet() {
                 <tr key={rowIndex} className="border-b border-secondary py-2">
                   <td className="text-center">
                     <input
-                      className="py-1 px-2 border-black focus:outline-primary rounded-xl pointer-events-none"
+                      className="py-1 px-2 border border-primary bg-transparent focus:outline-primary rounded-xl pointer-events-none"
                       type="date"
                       value={row.weekday}
                       onChange={(e) =>
@@ -913,7 +874,7 @@ export default function Timesheet() {
                     <select
                       name=""
                       id=""
-                      className="w-[10vw] "
+                      className={`w-[10vw] border border-primary bg-transparent ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
                       value={row.typeOfDay}
                       onChange={(e) =>
                         setTableData((prevData) => {
@@ -933,7 +894,7 @@ export default function Timesheet() {
                   </td>
                   <td className="text-center w-[10%]">
                     <input
-                      className="pointer-events-none w-[100%] px-4"
+                      className="pointer-events-none w-[100%] px-4 border border-primary bg-transparent"
                       type="text"
                       value={`${row.totalHours} hrs ${row.totalMinutes} mins`}
                       readOnly
@@ -947,7 +908,7 @@ export default function Timesheet() {
                         className="flex justify-center items-end mb-2 gap-x-4"
                       >
                         <textarea
-                          className="py-1 px-4 border border-black focus:outline-primary rounded-xl w-1/2"
+                          className={`py-1 px-4 border border-black focus:outline-primary rounded-xl w-1/2 ${isDarkMode ? "text-black" : "text-black"}`}
                           placeholder="Describe the task performed....."
                           value={task.taskPerformed}
                           onChange={(e) =>
@@ -960,7 +921,7 @@ export default function Timesheet() {
                           }
                         />
                         <select
-                          className="w-[8vw] h-[60%]"
+                          className={`w-[8vw] h-[60%] border border-primary bg-transparent  ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
                           value={task.taskStatus}
                           onChange={(e) =>
                             handleChange(
@@ -979,7 +940,7 @@ export default function Timesheet() {
                         <div className="grid w-[13%] justify-items-center">
                           <label htmlFor="hours">Hours</label>
                           <input
-                            className="py-1 px-2 border border-black focus:outline-primary rounded-xl w-full"
+                            className={`py-1 px-2 border border-black focus:outline-primary rounded-xl w-full ${isDarkMode ? "text-black" : "text-black"}`}
                             type="number"
                             min={0}
                             max={24}
@@ -998,7 +959,7 @@ export default function Timesheet() {
                         <div className="grid w-[10%] justify-items-center">
                           <label htmlFor="minutes">Minutes</label>
                           <input
-                            className="py-1 px-2 border border-black focus:outline-primary rounded-xl w-full"
+                            className={`py-1 px-2 border border-black focus:outline-primary rounded-xl w-full ${isDarkMode ? "text-black" : "text-black"}`}
                             type="number"
                             min={0}
                             max={60}
@@ -1027,7 +988,7 @@ export default function Timesheet() {
                         handleAddTask(rowIndex);
                         setIsAddingTask(false);
                       }}
-                      className={`grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold hover:bg-transparent mt-2 ${
+                      className={`grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold  mt-2 ${isDarkMode ? "hover:bg-white" : "hover:bg-transparent"} ${
                         isAddingTask || !allFieldsComplete || !typeOfDay
                           ? "opacity-50 cursor-not-allowed"
                           : ""
@@ -1042,7 +1003,7 @@ export default function Timesheet() {
 
                   <td className="text-center">
                     <textarea
-                      className="px-4 border border-black focus:outline-primary rounded-xl"
+                      className={`px-4 py-2 border border-black  focus:outline-primary rounded-xl ${isDarkMode ? "text-black" : "text-white"}`}
                       placeholder="Add a comment..."
                       value={row.comment}
                       onChange={(e) =>
@@ -1068,15 +1029,15 @@ export default function Timesheet() {
               Submit
             </Button>
           </DialogTrigger>
-          <DialogContent className="w-[70%]">
+          <DialogContent className="w-[70%] ">
             <DialogHeader>
               <DialogTitle className="text-3xl text-secondary">
                 Are you ready to submit?
               </DialogTitle>
             </DialogHeader>
             <div>
-              <table className="w-full">
-                <thead>
+              <table className="w-full ">
+                <thead className="text-black">
                   <tr>
                     <th>Weekday</th>
                     <th>Type Of Day</th>
@@ -1086,20 +1047,20 @@ export default function Timesheet() {
                     <th>Comment</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody >
                   {tableData.length > 0
                     ? tableData.map((r, index) => (
                         <tr key={index} className="border-b border-secondary">
-                          <td className="text-center">
+                          <td className="text-center text-black">
                             <p>{r.weekday}</p>
                           </td>
-                          <td className="text-center">
+                          <td className="text-center text-black">
                             <p>{r.typeOfDay === "" ? "N/A" : r.typeOfDay}</p>
                           </td>
-                          <td className="text-center">
+                          <td className="text-center text-black">
                             <p>{`${r.totalHours} hrs ${r.totalMinutes} mins`}</p>
                           </td>
-                          <td className="text-center">
+                          <td className="text-center text-black">
                             {r.tasks && r.tasks.length > 0 ? (
                               r.tasks.map((t) => (
                                 <div key={t.id}>
@@ -1115,7 +1076,7 @@ export default function Timesheet() {
                             )}
                           </td>
 
-                          <td className="text-center">
+                          <td className="text-center text-black">
                             {r.tasks && r.tasks.length > 0 ? (
                               r.tasks.map((t) => (
                                 <div key={t.id}>
@@ -1126,7 +1087,7 @@ export default function Timesheet() {
                               <span>N/A</span>
                             )}
                           </td>
-                          <td className="text-center">
+                          <td className="text-center text-black">
                             <p>{r.comment === "" ? "N/A" : r.comment}</p>
                           </td>
                         </tr>
@@ -1137,7 +1098,7 @@ export default function Timesheet() {
             </div>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline" className={`${isDarkMode ? "text-black" : "text-black"}`}>Cancel</Button>
               </DialogClose>{" "}
               <Button type="submit" onClick={handleSubmit}>
                 Submit
@@ -1151,10 +1112,11 @@ export default function Timesheet() {
         Your Timesheets
       </h2>
       <div className="timesheets-container w-[80%] mx-auto">
-        <div className="w-full bg-[#F5F5F5] p-4 rounded-xl border-2 border-primary">
+        <div className="w-full p-4 rounded-xl border-2 border-primary">
           <div className="flex items-center py-4">
             <Input
               placeholder="Filter by project name...."
+            
               value={
                 (table.getColumn("projectName")?.getFilterValue() as string) ??
                 ""
@@ -1164,7 +1126,7 @@ export default function Timesheet() {
                   .getColumn("projectName")
                   ?.setFilterValue(event.target.value)
               }
-              className="max-w-sm px-4 py-1 border border-black focus:outline-primary rounded-xl"
+              className="max-w-sm px-4 py-1 border border-primary bg-transparent focus:outline-primary rounded-xl"
             />
           </div>
 

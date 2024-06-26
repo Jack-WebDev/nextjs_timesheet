@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { Student, AP, type HelpDesk } from "@/types/helpDeskProps";
 import axios from "axios";
-import { useUser } from "@/app/store";
+import { useThemeStore, useUser } from "@/app/store";
 import useFetchTickets from "@/hooks/useFetchTickets";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
 export default function HelpDesk() {
   const user = useUser();
+  const { isDarkMode } = useThemeStore();
   const tickets = useFetchTickets();
   const [isFormVisible, setFormVisible] = useState(false);
   const [isDoneProcessing, setIsProcessing] = useState(false);
@@ -287,9 +288,9 @@ export default function HelpDesk() {
   };
 
   return (
-    <div className="grid rounded-xl p-4 bg-[#F5F5F5] mt-8 border-2 border-primary">
+    <div className="grid rounded-xl p-4 mt-8 border-2 border-primary">
       <div className="flex justify-around items-center mb-12">
-        <div className="grid rounded-xl border-2 border-secondary px-4 py-2 bg-white w-[15%] ">
+        <div className="grid rounded-xl border-2 border-[rgba(162,161,168,0.2)]  px-4 py-2  w-[15%] ">
           <h2>Total tickets</h2>
           <p className="font-semibold">{totalTickets}</p>
         </div>
@@ -297,7 +298,7 @@ export default function HelpDesk() {
         <button
           onClick={handleStartCall}
           className={`p-4 rounded-xl text-white ${
-            isDoneProcessing ? "bg-green-400" : "bg-green-600"
+            isDoneProcessing ? "bg-[rgba(1,90,74,0.5)]" : "bg-[rgba(1,90,74,0.8)]"
           }`}
           disabled={isDoneProcessing}
         >
@@ -308,28 +309,28 @@ export default function HelpDesk() {
       <div className="grid ">
         {isFormVisible && (
           <>
-            <div className="flex justify-evenly items-center  ">
+            <div className="flex justify-evenly items-center">
               <div className="grid mb-4 pointer-events-none">
-                <label htmlFor="date">Pick a date:</label>
+                <label htmlFor="date" className="mb-2">Date:</label>
                 <input
                   type="date"
                   id="date"
-                  className="border border-primary p-2 rounded-xl"
+                  className="border border-primary p-2 rounded-xl bg-transparent"
                   value={helpDeskData.date}
                   readOnly
                 />
               </div>
               <div className="grid mb-4">
-                <label htmlFor="option">Select an option:</label>
+                <label htmlFor="option" className="mb-2">Select an option:</label>
                 <select
                   id="option"
-                  className="border border-gray-300 p-2 rounded-xl"
+                  className={`border border-primary p-2 rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
                   value={helpDeskData.client}
                   onChange={(e) => handleHelpDeskData("client", e.target.value)}
                 >
-                  <option value="">Select...</option>
-                  <option value="AP">AP</option>
-                  <option value="Student">Student</option>
+                  <option className="bg-transparent" value="">Select...</option>
+                  <option className="bg-transparent" value="AP">AP</option>
+                  <option className="bg-transparent" value="Student">Student</option>
                 </select>
               </div>
             </div>
@@ -347,7 +348,7 @@ export default function HelpDesk() {
                             <input
                               type="text"
                               id="apField"
-                              className="border border-gray-300 p-2 rounded"
+                              className="border border-primary p-2 rounded-xl bg-transparent"
                               value={helpDeskData.query}
                               onChange={(e) =>
                                 handleHelpDeskData("query", e.target.value)
@@ -359,7 +360,7 @@ export default function HelpDesk() {
                             <label htmlFor="apField">Describe Query:</label>
                             <textarea
                               id="apField"
-                              className="border border-gray-300 p-2 rounded"
+                              className="border border-primary p-2 rounded-xl bg-transparent"
                               value={helpDeskData.problem}
                               onChange={(e) =>
                                 handleHelpDeskData("problem", e.target.value)
@@ -379,7 +380,7 @@ export default function HelpDesk() {
                               <input
                                 type="text"
                                 id="apField"
-                                className="border border-gray-300 p-2 rounded"
+                                className="border border-primary p-2 rounded-xl bg-transparent"
                                 value={apData.property}
                                 onChange={(e) =>
                                   handleAPData("property", e.target.value)
@@ -391,7 +392,7 @@ export default function HelpDesk() {
                               <input
                                 type="text"
                                 id="apField"
-                                className="border border-gray-300 p-2 rounded"
+                                className="border border-primary p-2 rounded-xl bg-transparent"
                                 value={apData.contactNo}
                                 onChange={(e) =>
                                   handleAPData("contactNo", e.target.value)
@@ -406,7 +407,7 @@ export default function HelpDesk() {
                               <input
                                 type="text"
                                 id="apField"
-                                className="border border-gray-300 p-2 rounded"
+                                className="border border-primary p-2 rounded-xl bg-transparent"
                                 value={apData.contactPerson}
                                 onChange={(e) =>
                                   handleAPData("contactPerson", e.target.value)
@@ -419,7 +420,7 @@ export default function HelpDesk() {
                               <input
                                 type="text"
                                 id="apField"
-                                className="border border-gray-300 p-2 rounded"
+                                className="border border-primary p-2 rounded-xl bg-transparent"
                                 value={helpDeskData.campus}
                                 onChange={(e) =>
                                   handleHelpDeskData("campus", e.target.value)
@@ -443,7 +444,7 @@ export default function HelpDesk() {
                             <input
                               type="text"
                               id="apField"
-                              className="border border-gray-300 p-2 rounded"
+                              className="border border-primary p-2 rounded-xl bg-transparent"
                               value={helpDeskData.query}
                               onChange={(e) =>
                                 handleHelpDeskData("query", e.target.value)
@@ -455,7 +456,7 @@ export default function HelpDesk() {
                             <label htmlFor="apField">Describe Query:</label>
                             <textarea
                               id="apField"
-                              className="border border-gray-300 p-2 rounded"
+                              className="border border-primary p-2 rounded-xl bg-transparent"
                               value={helpDeskData.problem}
                               onChange={(e) =>
                                 handleHelpDeskData("problem", e.target.value)
@@ -474,7 +475,7 @@ export default function HelpDesk() {
                             <input
                               type="text"
                               id="apField"
-                              className="border border-gray-300 p-2 rounded"
+                              className="border border-primary p-2 rounded-xl bg-transparent"
                               value={studentData.fullName}
                               onChange={(e) =>
                                 handleStudentData("fullName", e.target.value)
@@ -486,7 +487,7 @@ export default function HelpDesk() {
                             <input
                               type="text"
                               id="apField"
-                              className="border border-gray-300 p-2 rounded"
+                              className="border border-primary p-2 rounded-xl bg-transparent"
                               value={studentData.idNumber}
                               onChange={(e) =>
                                 handleStudentData("idNumber", e.target.value)
@@ -500,7 +501,7 @@ export default function HelpDesk() {
                             <input
                               type="text"
                               id="apField"
-                              className="border border-gray-300 p-2 rounded"
+                              className="border border-primary p-2 rounded-xl bg-transparent"
                               value={studentData.institution}
                               onChange={(e) =>
                                 handleStudentData("institution", e.target.value)
@@ -512,7 +513,7 @@ export default function HelpDesk() {
                             <input
                               type="text"
                               id="apField"
-                              className="border border-gray-300 p-2 rounded"
+                              className="border border-primary p-2 rounded-xl bg-transparent"
                               value={helpDeskData.campus}
                               onChange={(e) =>
                                 handleHelpDeskData("campus", e.target.value)
@@ -527,7 +528,7 @@ export default function HelpDesk() {
                             <input
                               type="text"
                               id="apField"
-                              className="border border-gray-300 p-2 rounded"
+                              className="border border-primary p-2 rounded-xl bg-transparent"
                               value={studentData.accommodation}
                               onChange={(e) =>
                                 handleStudentData(
@@ -543,7 +544,7 @@ export default function HelpDesk() {
                             <input
                               type="text"
                               id="apField"
-                              className="border border-gray-300 p-2 rounded"
+                              className="border border-primary p-2 rounded-xl bg-transparent"
                               value={studentData.studentNumber}
                               onChange={(e) =>
                                 handleStudentData(
@@ -560,7 +561,7 @@ export default function HelpDesk() {
                             <input
                               type="text"
                               id="apField"
-                              className="border border-gray-300 p-2 rounded"
+                              className="border border-primary p-2 rounded-xl bg-transparent"
                               value={studentData.contactNumber}
                               onChange={(e) =>
                                 handleStudentData(
@@ -576,7 +577,7 @@ export default function HelpDesk() {
                             <input
                               type="email"
                               id="apField"
-                              className="border border-gray-300 p-2 rounded"
+                              className="border border-primary p-2 rounded-xl bg-transparent"
                               value={studentData.email}
                               onChange={(e) =>
                                 handleStudentData("email", e.target.value)
@@ -604,10 +605,10 @@ export default function HelpDesk() {
           <>
             <div className="flex justify-evenly items-center">
               <div className="grid mb-4">
-                <label htmlFor="option">Select an option:</label>
+                <label htmlFor="option" className="mb-2">Select an option:</label>
                 <select
                   id="option"
-                  className="border border-gray-300 p-2 rounded-xl"
+                  className={`border border-primary p-2 rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
                   value={selectedResolution}
                   onChange={handleResolutionChange}
                 >
@@ -621,7 +622,7 @@ export default function HelpDesk() {
                 <label htmlFor="resolve">Comment for Resolution:</label>
                 <textarea
                   id="resolve"
-                  className="border border-gray-500 rounded-xl"
+                  className="border border-primary p-2 rounded-xl bg-transparent"
                   value={helpDeskData.resolve}
                   onChange={(e) =>
                     handleHelpDeskData("resolve", e.target.value)
