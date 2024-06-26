@@ -11,15 +11,17 @@ import {
   FaMoon,
   FaSun,
 } from "react-icons/fa";
-import { FaBookmark, FaGear } from "react-icons/fa6";
+import { FaBookmark, FaGear, FaS } from "react-icons/fa6";
 import Image from "next/image";
 import React from "react";
+import { useThemeStore } from "@/app/store";
 
 export default function EmployeeNav({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { isDarkMode, toggleTheme } = useThemeStore();
   const pathname = usePathname();
 
   return (
@@ -111,9 +113,19 @@ export default function EmployeeNav({
             </Link>
           </ul>
           <div className="flex items-center justify-center">
-            <button className="flex items-center gap-x-1 bg-primary text-white py-2 px-4 rounded-s-xl"><FaSun/>Light</button>
-            <button className="flex items-center gap-x-1 bg-gray-100 py-2 px-4 rounded-e-xl"><FaMoon/>Dark</button>
-          </div>
+      <button
+        className={`flex items-center gap-x-1  py-2 px-4 rounded-s-xl ${isDarkMode ? "bg-[rgba(162,161,168,0.1)] text-light" : "bg-primary text-white"}`}
+        onClick={toggleTheme}
+      >
+       <FaSun /> Light
+      </button>
+      <button
+        className={`flex items-center gap-x-1 py-2 px-4 rounded-e-xl ${isDarkMode ? "bg-primary text-white" : "bg-[rgba(162,161,168,0.1)] text-black"}`}
+        onClick={toggleTheme}
+      >
+        <FaMoon /> Dark
+      </button>
+    </div>
         </>
       </div>
       <div className="w-full">{children}</div>

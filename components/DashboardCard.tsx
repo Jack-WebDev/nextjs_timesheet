@@ -9,9 +9,9 @@ type DashboardCardProps = {
 
 export default function DashboardCard({ icon: Icon, total, title }: DashboardCardProps) {
   return (
-    <Card className="bg-white border border-primary">
+    <Card className=" border border-primary">
       <CardHeader>
-        <CardTitle className="flex items-center gap-x-4 text-secondary font-bold">
+        <CardTitle className="flex items-center gap-x-4 text-white font-bold">
           <Icon fill="#d69436" fontSize="2rem" />
           {title}
         </CardTitle>

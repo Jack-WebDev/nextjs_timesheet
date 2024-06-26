@@ -7,6 +7,18 @@
   --secondary-color: #015a4a;
 }
 
+
+.light-mode {
+  background-color: white;
+  color: black;
+}
+
+.dark-mode {
+  background-color: #16151C;
+  color: white;
+}
+
+
 .link:hover {
   color: var(--primary-color);
   font-weight: bold;
