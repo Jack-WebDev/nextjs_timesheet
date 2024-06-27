@@ -7,6 +7,16 @@
   --secondary-color: #015a4a;
 }
 
+.light-mode {
+  background-color: white;
+  color: black;
+}
+
+.dark-mode {
+  background-color: #16151c;
+  color: white;
+}
+
 .link:hover {
   color: var(--primary-color);
   font-weight: bold;
@@ -19,8 +29,8 @@
   border-left: 3px solid var(--primary-color);
   background-color: rgba(114, 82, 243, 0.05);
   padding: 10px 20px;
-  border-top-right-radius: .5rem;
-  border-bottom-right-radius: .5rem;
+  border-top-right-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
 }
 
 .side_menu {
