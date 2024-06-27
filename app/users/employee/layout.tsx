@@ -23,7 +23,7 @@ export default function DashboardLayout({
   return (
     <EmployeeNav>
 
-    <div className="flex flex-col h-screen">
+    <div className={`flex flex-col h-screen ${isDarkMode ? "dark-mode" : "light-mode"}`}>
       <header className="flex justify-end ml-[20rem] px-8 items-center py-8 pr-16">
       {/* <h3>{pathname}</h3> */}
         <div className="profile flex items-center gap-x-3">
