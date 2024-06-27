@@ -1,12 +1,16 @@
+"use client"
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoginForm } from "@/components/auth/Login";
 import { RegisterForm } from "@/components/auth/Register";
 import Image from "next/image";
+import { useThemeStore } from "./store";
 
 const Home = () => {
+	const {isDarkMode} = useThemeStore()
 	return (
 		<>
-			<div className="userAuth h-screen flex items-center justify-around">
+			<div className={`userAuth h-screen flex items-center justify-around ${isDarkMode ? "bg-white" : "bg-white"}`}>
 				<div className="left__column text-center">
 					<Image
 						src={"/6974855_4380.jpg"}

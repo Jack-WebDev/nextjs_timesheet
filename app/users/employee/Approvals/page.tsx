@@ -27,7 +27,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@/app/store";
+import { useThemeStore, useUser } from "@/app/store";
 import ApproveTimesheet from "@/components/dialogUI/ApproveTimesheet";
 import { TimesheetProps } from "@/types/timesheetProps";
 import useFetchTimesheets from "@/hooks/useFetchTimesheets";
@@ -35,6 +35,7 @@ import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-r
 
 export default function Timesheet() {
   const timesheetData = useFetchTimesheets();
+  const {isDarkMode} = useThemeStore();
   const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
 
 
@@ -169,7 +170,7 @@ export default function Timesheet() {
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      className="odd:bg-white even:bg-slate-100"
+                      className={`${isDarkMode ? "text-white" : "text-black odd:bg-white even:bg-slate-100 "}`}
 
                     >
                       {row.getVisibleCells().map((cell) => (
