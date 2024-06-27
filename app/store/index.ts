@@ -5,6 +5,11 @@ type Document = {
   url: string;
 };
 
+type ThemeState = {
+  isDarkMode: boolean;
+  toggleTheme: () => void;
+}
+
 
 type User = {
   NDTEmail: string;
@@ -46,6 +51,18 @@ type Employee = {
   OfficeLocation: string;
   documents: Document[];
 };
+
+export const useThemeStore = create<ThemeState>()(
+  persist(
+    (set) => ({
+      isDarkMode: false,
+      toggleTheme: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+    }),
+    {
+      name: 'theme-storage',
+    }
+  )
+);
 
 export const useUser = create(
   persist<User>(
