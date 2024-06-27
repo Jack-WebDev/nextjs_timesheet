@@ -229,7 +229,7 @@ export default function Timesheet() {
                     <DotsHorizontalIcon className="h-4 w-4" />
                   </span>
                 </DialogTrigger>
-                <DialogContent className="w-1/2">
+                <DialogContent className="w-1/2 text-black">
                   <DialogHeader className="flex flex-row items-baseline justify-around">
                     <DialogTitle>Timesheet Details</DialogTitle>
                     <div className="grid text-xl">
@@ -684,8 +684,8 @@ export default function Timesheet() {
           <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Month:</label>
             <select
-              className={`px-4 py-1 border border-primary bg-transparent rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
-              value={formDetails.month}
+                  className={`border border-primary p-2 rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
+                  value={formDetails.month}
               onChange={(e) => handleFormChange("month", e.target.value)}
             >
               <option value="" disabled>
@@ -706,8 +706,8 @@ export default function Timesheet() {
               Previous Year(If Applicable):
             </label>
             <select
-              className={`px-4 py-1 border border-primary bg-transparent focus:outline-primary rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
-              value={selectedYear}
+                  className={`border border-primary p-2 rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
+                  value={selectedYear}
               onChange={(e) => handleYearChange(e.target.value)}
             >
               <option value="">Select a previous year</option>
@@ -772,7 +772,7 @@ export default function Timesheet() {
                   selected={date}
                   onSelect={handleDateSelect}
                   numberOfMonths={1}
-                  className="border-2 border-primary rounded-xl"
+                  className={`px-4 py-1 border border-primary bg-transparent focus:outline-primary rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
                   weekStartsOn={1}
                   showOutsideDays={true}
                   disableNavigation={true}
@@ -787,7 +787,7 @@ export default function Timesheet() {
             </label>
             <select
               name="name"
-              className={`border border-primary bg-transparent rounded-xl h-[4vh] ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
+              className={`border border-primary p-2 rounded-xl h-[4vh] ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
               value={chosenProject}
               onChange={handleProjectChange}
             >
@@ -821,7 +821,7 @@ export default function Timesheet() {
                 {filteredUsers.map((user) => (
                   <li
                     key={user.id}
-                    className="cursor-pointer borderStyle hover:bg-[#F5F5F5]"
+                    className={`cursor-pointer borderStyle ${isDarkMode ? "hover:text-black" : "hover:bg-[#F5F5F5]"}`}
                     onClick={() => handleOptionClick(user)}
                   >
                     {user.Name} {user.Surname}
@@ -873,7 +873,7 @@ export default function Timesheet() {
                     <select
                       name=""
                       id=""
-                      className={`w-[10vw] border border-primary bg-transparent ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
+                      className={`w-[10vw] border border-primary p-2 rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
                       value={row.typeOfDay}
                       onChange={(e) =>
                         setTableData((prevData) => {
@@ -920,7 +920,7 @@ export default function Timesheet() {
                           }
                         />
                         <select
-                          className={`w-[8vw] h-[60%] border border-primary bg-transparent  ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
+                          className={`w-[8vw] h-[60%] border border-primary p-2 rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
                           value={task.taskStatus}
                           onChange={(e) =>
                             handleChange(
@@ -1159,7 +1159,7 @@ export default function Timesheet() {
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      className="odd:bg-white even:bg-slate-100"
+                     className={`${isDarkMode ? "text-white" : "text-black odd:bg-white even:bg-slate-100 "}`}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
