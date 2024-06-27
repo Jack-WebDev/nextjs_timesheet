@@ -1,5 +1,40 @@
 "use client";
 
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  flexRender,
+  VisibilityState,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { useEffect, useState } from "react";
 import { Student, AP, type HelpDesk } from "@/types/helpDeskProps";
 import axios from "axios";
@@ -8,11 +43,15 @@ import useFetchTickets from "@/hooks/useFetchTickets";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Loading from "../loading";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
 export default function HelpDesk() {
   const user = useUser();
   const tickets = useFetchTickets();
   const { isDarkMode } = useThemeStore();
+  const [data, setFilteredTickets] = useState<HelpDesk[]>([]);
+  const [ap, setAP] = useState<AP[]>([]);
+  const [student, setStudent] = useState<Student[]>([]);
   const [isFormVisible, setFormVisible] = useState(false);
   const [isDoneProcessing, setIsProcessing] = useState(false);
   const [isCallEnded, setCallEnded] = useState(false);
@@ -50,12 +89,208 @@ export default function HelpDesk() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+
+  // console.log(ap)
+
   useEffect(() => {
     const filteredTickets = tickets.filter(
       (ticket) => ticket.callAgent === user.NDTEmail
     );
+    setFilteredTickets(filteredTickets);
     setTotalTickets(filteredTickets.length);
+
+    const apIdData = filteredTickets.filter((ticket) => ticket.client === "AP");
+    const studentIdData = filteredTickets.filter(
+      (ticket) => ticket.client === "Student"
+    );
+    if (apIdData.length === 0) {
+      console.log("No AP tickets found");
+      return;
+    }
+
+    if (studentIdData.length === 0) {
+      return;
+    }
+
+    const fetchApTickets = async () => {
+      try {
+        // Ensure the endpoint and request format is correct
+        const res = await axios.get(`/api/helpdesk/ap`, {
+          params: { ids: apIdData.map((ticket) => ticket.id) },
+        });
+        console.log("Fetched data:", res.data);
+        // Assuming setAP is to update the state with fetched data
+        setAP(res.data);
+      } catch (error) {
+        console.error("Error fetching AP tickets:", error);
+      }
+    };
+    const fetchStudentTickets = async () => {
+      try {
+        // Ensure the endpoint and request format is correct
+        const res = await axios.get(`/api/helpdesk/student`, {
+          params: { ids: studentIdData.map((ticket) => ticket.id) },
+        });
+        console.log("Fetched data:", res.data);
+        // Assuming setAP is to update the state with fetched data
+        setStudent(res.data);
+      } catch (error) {
+        console.error("Error fetching AP tickets:", error);
+      }
+    };
+
+    fetchApTickets();
+    fetchStudentTickets();
   }, [tickets, user.NDTEmail]);
+
+  // useEffect(() => {
+
+  // }, [data]);
+
+  const columns: ColumnDef<HelpDesk>[] = [
+    {
+      accessorKey: "client",
+      header: "Client",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("client")}</div>
+      ),
+    },
+    {
+      accessorKey: "query",
+      header: "Query",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("query")}</div>
+      ),
+    },
+    {
+      accessorKey: "campus",
+      header: "Campus",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("campus")}</div>
+      ),
+    },
+    {
+      accessorKey: "problem",
+      header: "Problem",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("problem")}</div>
+      ),
+    },
+    {
+      accessorKey: "actions",
+      header: () => <div className="text-start">Actions</div>,
+      sortDescFirst: true,
+      enableSorting: true,
+      cell: ({ row }) => {
+        const ticket = row.original;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <span className="cursor-pointer">
+                    <DotsHorizontalIcon className="h-4 w-4" />
+                  </span>
+                </DialogTrigger>
+                <DialogContent className="w-[75%] text-black">
+                  <DialogHeader className="flex flex-row items-baseline justify-around">
+                    <DialogTitle>Ticket Details</DialogTitle>
+                    <h2>Ticket Status: {ticket.status}</h2>
+                  </DialogHeader>
+                  <div>
+                    {ticket.client === "AP" ? (
+                      <>
+                        <table className="w-full">
+                          <thead className="text-black">
+                            <tr className="border-b border-secondary">
+                              <th>Property Name</th>
+                              <th>Contact Number</th>
+                              <th>Contact Person</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {ap?.map((a) => (
+                              <tr key={a.id}>
+                                <td className="text-center">{a.property}</td>
+                                <td className="text-center">{a.contactNo}</td>
+                                <td className="text-center">
+                                  {a.contactPerson}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </>
+                    ) : (
+                      <>
+                        <table className="w-full">
+                          <thead className="text-black">
+                            <tr className="border-b border-secondary">
+                              <td className="text-center">Full Name</td>
+                              <td className="text-center">ID Number</td>
+                              <td className="text-center">Student Number</td>
+                              <td className="text-center">Contact Number</td>
+                              <td className="text-center">Email</td>
+                              <td className="text-center">Institution</td>
+                              <td className="text-center">Accomodation</td>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {student?.map((s) => (
+                              <tr key={s.id}>
+                                <td className="text-center">{s.fullName}</td>
+                                <td className="text-center">{s.idNumber}</td>
+                                <td className="text-center">{s.studentNumber}</td>
+                                <td className="text-center">{s.contactNumber}</td>
+                                <td className="text-center">{s.email}</td>
+                                <td className="text-center">{s.institution}</td>
+                                <td className="text-center">{s.accommodation}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </DropdownMenuTrigger>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 5,
+  });
+
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      pagination,
+    },
+  });
 
   const startCall = () => {
     setStartTime(new Date());
@@ -297,135 +532,242 @@ export default function HelpDesk() {
 
   return (
     <>
-          {loading && <Loading />}
+      {loading && <Loading />}
 
-    <div className="grid rounded-xl p-4 mt-8 border-2 border-primary">
-      <div className="flex justify-around items-center mb-12">
-      <div className="grid rounded-xl border-2 border-[rgba(162,161,168,0.2)]  px-4 py-2  w-[15%] ">
-      <h2>Total tickets</h2>
-          <p className="font-semibold">{totalTickets}</p>
+      <div className="grid rounded-xl p-4 mt-8 border-2 border-primary">
+        <div className="flex justify-around items-center mb-12">
+          <div className="grid rounded-xl border-2 border-[rgba(162,161,168,0.2)]  px-4 py-2  w-[15%] ">
+            <h2>Total tickets</h2>
+            <p className="font-semibold">{totalTickets}</p>
+          </div>
+
+          <button
+            onClick={handleStartCall}
+            className={`p-4 rounded-xl text-white ${
+              isDoneProcessing
+                ? "bg-[rgba(1,90,74,0.5)]"
+                : "bg-[rgba(1,90,74,0.8)]"
+            }`}
+            disabled={isDoneProcessing}
+          >
+            Start Call
+          </button>
         </div>
 
-        <button
-          onClick={handleStartCall}
-          className={`p-4 rounded-xl text-white ${
-            isDoneProcessing ? "bg-[rgba(1,90,74,0.5)]" : "bg-[rgba(1,90,74,0.8)]"
-          }`}
-          disabled={isDoneProcessing}
-        >
-          Start Call
-        </button>
-      </div>
-
-      <div className="grid ">
-        {isFormVisible && (
-          <>
-            <div className="flex justify-evenly items-center  ">
-              <div className="grid mb-4 pointer-events-none">
-                <label htmlFor="date">Date:</label>
-                <input
-                  type="date"
-                  id="date"
-                  className="border border-primary p-2 rounded-xl bg-transparent"
-                  value={helpDeskData.date}
-                  readOnly
-                />
+        <div className="grid ">
+          {isFormVisible && (
+            <>
+              <div className="flex justify-evenly items-center  ">
+                <div className="grid mb-4 pointer-events-none">
+                  <label htmlFor="date">Date:</label>
+                  <input
+                    type="date"
+                    id="date"
+                    className="border border-primary p-2 rounded-xl bg-transparent"
+                    value={helpDeskData.date}
+                    readOnly
+                  />
+                </div>
+                <div className="grid mb-4">
+                  <label htmlFor="option">Select an option:</label>
+                  <select
+                    id="option"
+                    className={`border border-primary p-2 rounded-xl ${
+                      isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"
+                    }`}
+                    value={helpDeskData.client}
+                    onChange={(e) =>
+                      handleHelpDeskData("client", e.target.value)
+                    }
+                  >
+                    <option value="">Select...</option>
+                    <option value="AP">AP</option>
+                    <option value="Student">Student</option>
+                  </select>
+                </div>
               </div>
-              <div className="grid mb-4">
-                <label htmlFor="option">Select an option:</label>
-                <select
-                  id="option"
-                  className={`border border-primary p-2 rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
-                  value={helpDeskData.client}
-                  onChange={(e) => handleHelpDeskData("client", e.target.value)}
-                >
-                  <option value="">Select...</option>
-                  <option value="AP">AP</option>
-                  <option value="Student">Student</option>
-                </select>
-              </div>
-            </div>
 
-            {helpDeskData.client && (
-              <div className="grid w-[75%] mx-auto">
-                {helpDeskData.client === "AP" && (
-                  <>
-                    <div>
-                      <h2 className="text-center text-2xl">AP Query:</h2>
+              {helpDeskData.client && (
+                <div className="grid w-[75%] mx-auto">
+                  {helpDeskData.client === "AP" && (
+                    <>
                       <div>
-                        <div className="flex justify-around items-center">
-                          <div className="grid">
-                            <label htmlFor="apField">Query:</label>
-                            <input
-                              type="text"
-                              id="apField"
-                              className="border border-primary p-2 rounded-xl bg-transparent"
-                              value={helpDeskData.query}
-                              onChange={(e) =>
-                                handleHelpDeskData("query", e.target.value)
-                              }
-                            />
-                          </div>
+                        <h2 className="text-center text-2xl">AP Query:</h2>
+                        <div>
+                          <div className="flex justify-around items-center">
+                            <div className="grid">
+                              <label htmlFor="apField">Query:</label>
+                              <input
+                                type="text"
+                                id="apField"
+                                className="border border-primary p-2 rounded-xl bg-transparent"
+                                value={helpDeskData.query}
+                                onChange={(e) =>
+                                  handleHelpDeskData("query", e.target.value)
+                                }
+                              />
+                            </div>
 
-                          <div className="grid">
-                            <label htmlFor="apField">Describe Query:</label>
-                            <textarea
-                              id="apField"
-                              className="border border-primary p-2 rounded-xl bg-transparent"
-                              value={helpDeskData.problem}
-                              onChange={(e) =>
-                                handleHelpDeskData("problem", e.target.value)
-                              }
-                            />
+                            <div className="grid">
+                              <label htmlFor="apField">Describe Query:</label>
+                              <textarea
+                                id="apField"
+                                className="border border-primary p-2 rounded-xl bg-transparent"
+                                value={helpDeskData.problem}
+                                onChange={(e) =>
+                                  handleHelpDeskData("problem", e.target.value)
+                                }
+                              />
+                            </div>
+                          </div>
+                        </div>{" "}
+                      </div>
+                      <div>
+                        <h2 className="text-center text-2xl">AP Details:</h2>
+                        <div>
+                          <div className="flex justify-around items-center">
+                            <div>
+                              <div className="grid">
+                                <label htmlFor="apField">Property Name:</label>
+                                <input
+                                  type="text"
+                                  id="apField"
+                                  className="border border-primary p-2 rounded-xl bg-transparent"
+                                  value={apData.property}
+                                  onChange={(e) =>
+                                    handleAPData("property", e.target.value)
+                                  }
+                                />
+                              </div>
+                              <div className="grid">
+                                <label htmlFor="apField">Contact Number:</label>
+                                <input
+                                  type="text"
+                                  id="apField"
+                                  className="border border-primary p-2 rounded-xl bg-transparent"
+                                  value={apData.contactNo}
+                                  onChange={(e) =>
+                                    handleAPData("contactNo", e.target.value)
+                                  }
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <div className="grid">
+                                <label htmlFor="apField">Full Name:</label>
+                                <input
+                                  type="text"
+                                  id="apField"
+                                  className="border border-primary p-2 rounded-xl bg-transparent"
+                                  value={apData.contactPerson}
+                                  onChange={(e) =>
+                                    handleAPData(
+                                      "contactPerson",
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                              </div>
+
+                              <div className="grid">
+                                <label htmlFor="apField">Campus:</label>
+                                <input
+                                  type="text"
+                                  id="apField"
+                                  className="border border-primary p-2 rounded-xl bg-transparent"
+                                  value={helpDeskData.campus}
+                                  onChange={(e) =>
+                                    handleHelpDeskData("campus", e.target.value)
+                                  }
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>{" "}
-                    </div>
-                    <div>
-                      <h2 className="text-center text-2xl">AP Details:</h2>
+                      </div>
+                    </>
+                  )}
+                  {helpDeskData.client === "Student" && (
+                    <>
                       <div>
-                        <div className="flex justify-around items-center">
-                          <div>
+                        <h2 className="text-center text-2xl">Student Query:</h2>
+                        <div>
+                          <div className="flex justify-around items-center">
                             <div className="grid">
-                              <label htmlFor="apField">Property Name:</label>
+                              <label htmlFor="apField">Query:</label>
                               <input
                                 type="text"
                                 id="apField"
                                 className="border border-primary p-2 rounded-xl bg-transparent"
-                                value={apData.property}
+                                value={helpDeskData.query}
                                 onChange={(e) =>
-                                  handleAPData("property", e.target.value)
+                                  handleHelpDeskData("query", e.target.value)
                                 }
                               />
                             </div>
+
                             <div className="grid">
-                              <label htmlFor="apField">Contact Number:</label>
-                              <input
-                                type="text"
+                              <label htmlFor="apField">Describe Query:</label>
+                              <textarea
                                 id="apField"
                                 className="border border-primary p-2 rounded-xl bg-transparent"
-                                value={apData.contactNo}
+                                value={helpDeskData.problem}
                                 onChange={(e) =>
-                                  handleAPData("contactNo", e.target.value)
+                                  handleHelpDeskData("problem", e.target.value)
                                 }
                               />
                             </div>
                           </div>
-
-                          <div>
+                        </div>{" "}
+                      </div>
+                      <div>
+                        <h2 className="text-center text-2xl">
+                          Student Details:
+                        </h2>
+                        <div className="grid">
+                          <div className="flex justify-around items-center">
                             <div className="grid">
                               <label htmlFor="apField">Full Name:</label>
                               <input
                                 type="text"
                                 id="apField"
                                 className="border border-primary p-2 rounded-xl bg-transparent"
-                                value={apData.contactPerson}
+                                value={studentData.fullName}
                                 onChange={(e) =>
-                                  handleAPData("contactPerson", e.target.value)
+                                  handleStudentData("fullName", e.target.value)
                                 }
                               />
                             </div>
-
+                            <div className="grid">
+                              <label htmlFor="apField">ID Number:</label>
+                              <input
+                                type="text"
+                                id="apField"
+                                className="border border-primary p-2 rounded-xl bg-transparent"
+                                value={studentData.idNumber}
+                                onChange={(e) =>
+                                  handleStudentData("idNumber", e.target.value)
+                                }
+                              />
+                            </div>
+                          </div>
+                          <div className="flex justify-around items-center">
+                            <div className="grid">
+                              <label htmlFor="apField">Institution:</label>
+                              <input
+                                type="text"
+                                id="apField"
+                                className="border border-primary p-2 rounded-xl bg-transparent"
+                                value={studentData.institution}
+                                onChange={(e) =>
+                                  handleStudentData(
+                                    "institution",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
                             <div className="grid">
                               <label htmlFor="apField">Campus:</label>
                               <input
@@ -439,308 +781,276 @@ export default function HelpDesk() {
                               />
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-                {helpDeskData.client === "Student" && (
-                  <>
-                    <div>
-                      <h2 className="text-center text-2xl">Student Query:</h2>
-                      <div>
-                        <div className="flex justify-around items-center">
-                          <div className="grid">
-                            <label htmlFor="apField">Query:</label>
-                            <input
-                              type="text"
-                              id="apField"
-                              className="border border-primary p-2 rounded-xl bg-transparent"
-                              value={helpDeskData.query}
-                              onChange={(e) =>
-                                handleHelpDeskData("query", e.target.value)
-                              }
-                            />
-                          </div>
+                          <div className="flex justify-around items-center">
+                            <div className="grid">
+                              <label htmlFor="apField">Accomodation:</label>
+                              <input
+                                type="text"
+                                id="apField"
+                                className="border border-primary p-2 rounded-xl bg-transparent"
+                                value={studentData.accommodation}
+                                onChange={(e) =>
+                                  handleStudentData(
+                                    "accommodation",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
 
-                          <div className="grid">
-                            <label htmlFor="apField">Describe Query:</label>
-                            <textarea
-                              id="apField"
-                              className="border border-primary p-2 rounded-xl bg-transparent"
-                              value={helpDeskData.problem}
-                              onChange={(e) =>
-                                handleHelpDeskData("problem", e.target.value)
-                              }
-                            />
+                            <div className="grid">
+                              <label htmlFor="apField">Student Number:</label>
+                              <input
+                                type="text"
+                                id="apField"
+                                className="border border-primary p-2 rounded-xl bg-transparent"
+                                value={studentData.studentNumber}
+                                onChange={(e) =>
+                                  handleStudentData(
+                                    "studentNumber",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
                           </div>
-                        </div>
-                      </div>{" "}
-                    </div>
-                    <div>
-                      <h2 className="text-center text-2xl">Student Details:</h2>
-                      <div className="grid">
-                        <div className="flex justify-around items-center">
-                          <div className="grid">
-                            <label htmlFor="apField">Full Name:</label>
-                            <input
-                              type="text"
-                              id="apField"
-                              className="border border-primary p-2 rounded-xl bg-transparent"
-                              value={studentData.fullName}
-                              onChange={(e) =>
-                                handleStudentData("fullName", e.target.value)
-                              }
-                            />
-                          </div>
-                          <div className="grid">
-                            <label htmlFor="apField">ID Number:</label>
-                            <input
-                              type="text"
-                              id="apField"
-                              className="border border-primary p-2 rounded-xl bg-transparent"
-                              value={studentData.idNumber}
-                              onChange={(e) =>
-                                handleStudentData("idNumber", e.target.value)
-                              }
-                            />
-                          </div>
-                        </div>
-                        <div className="flex justify-around items-center">
-                        <div className="grid">
-                            <label htmlFor="apField">Institution:</label>
-                            <input
-                              type="text"
-                              id="apField"
-                              className="border border-primary p-2 rounded-xl bg-transparent"
-                              value={studentData.institution}
-                              onChange={(e) =>
-                                handleStudentData("institution", e.target.value)
-                              }
-                            />
-                          </div>
-                          <div className="grid">
-                            <label htmlFor="apField">Campus:</label>
-                            <input
-                              type="text"
-                              id="apField"
-                              className="border border-primary p-2 rounded-xl bg-transparent"
-                              value={helpDeskData.campus}
-                              onChange={(e) =>
-                                handleHelpDeskData("campus", e.target.value)
-                              }
-                            />
-                          </div>
+                          <div className="flex justify-around items-center">
+                            <div className="grid">
+                              <label htmlFor="apField">Contact Number:</label>
+                              <input
+                                type="text"
+                                id="apField"
+                                className="border border-primary p-2 rounded-xl bg-transparent"
+                                value={studentData.contactNumber}
+                                onChange={(e) =>
+                                  handleStudentData(
+                                    "contactNumber",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
 
-                        </div>
-                        <div className="flex justify-around items-center">
-                          <div className="grid">
-                            <label htmlFor="apField">Accomodation:</label>
-                            <input
-                              type="text"
-                              id="apField"
-                              className="border border-primary p-2 rounded-xl bg-transparent"
-                              value={studentData.accommodation}
-                              onChange={(e) =>
-                                handleStudentData(
-                                  "accommodation",
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </div>
-
-                          <div className="grid">
-                            <label htmlFor="apField">Student Number:</label>
-                            <input
-                              type="text"
-                              id="apField"
-                              className="border border-primary p-2 rounded-xl bg-transparent"
-                              value={studentData.studentNumber}
-                              onChange={(e) =>
-                                handleStudentData(
-                                  "studentNumber",
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </div>
-                        </div>
-                        <div className="flex justify-around items-center">
-                          <div className="grid">
-                            <label htmlFor="apField">Contact Number:</label>
-                            <input
-                              type="text"
-                              id="apField"
-                              className="border border-primary p-2 rounded-xl bg-transparent"
-                              value={studentData.contactNumber}
-                              onChange={(e) =>
-                                handleStudentData(
-                                  "contactNumber",
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </div>
-
-                          <div className="grid">
-                            <label htmlFor="apField">Email:</label>
-                            <input
-                              type="email"
-                              id="apField"
-                              className="border border-primary p-2 rounded-xl bg-transparent"
-                              value={studentData.email}
-                              onChange={(e) =>
-                                handleStudentData("email", e.target.value)
-                              }
-                            />
+                            <div className="grid">
+                              <label htmlFor="apField">Email:</label>
+                              <input
+                                type="email"
+                                id="apField"
+                                className="border border-primary p-2 rounded-xl bg-transparent"
+                                value={studentData.email}
+                                onChange={(e) =>
+                                  handleStudentData("email", e.target.value)
+                                }
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </>
-                )}
+                    </>
+                  )}
 
-                <button
-                  onClick={handleEndCall}
-                  className="bg-red-600 text-white rounded-xl p-4 grid justify-self-end mr-[7rem] mt-[3rem] mb-8"
-                >
-                  End Call
-                </button>
-              </div>
-            )}
-          </>
-        )}
-
-        {isCallEnded && (
-          <>
-            <div className="flex justify-evenly items-center">
-              <div className="grid mb-4">
-                <label htmlFor="option">Select an option:</label>
-                <select
-                  id="option"
-                  className={`border border-primary p-2 rounded-xl ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
-                  value={selectedResolution}
-                  onChange={handleResolutionChange}
-                >
-                  <option value="">Select...</option>
-                  <option value="FreshDesk">Sent to FreshDesk</option>
-                  <option value="Resolved">Resolved</option>
-                </select>
-              </div>
-
-              <div className="grid">
-                <label htmlFor="resolve">Comment for Resolution:</label>
-                <textarea
-                  id="resolve"
-                  className={`border border-primary rounded-xl py-2 px-4 ${isDarkMode ? "text-black" : "text-black"}`}
-                  value={helpDeskData.resolve}
-                  onChange={(e) =>
-                    handleHelpDeskData("resolve", e.target.value)
-                  }
-                ></textarea>
-              </div>
-            </div>
-
-            {helpDeskData.client === "AP" ? (
-              <>
-                {selectedResolution === "FreshDesk" ? (
                   <button
-                    className="rounded-xl text-white bg-primary grid justify-self-center p-4 mt-12 mb-8"
-                    onClick={async () => {
-                      if (postEndCallValidation()) {
-                        try {
-                          await axios.post("/api/emails", {
-                            property: apData.property,
-                            contactPerson: apData.contactPerson,
-                            contactNo: apData.contactNo,
-                            date: helpDeskData.date,
-                            campus: helpDeskData.campus,
-                            query: helpDeskData.query,
-                            problem: helpDeskData.problem,
-                            resolve: helpDeskData.resolve,
-                            client: helpDeskData.client,
-                            duration: duration,
-                            status: selectedResolution,
-                            callAgent: helpDeskData.callAgent,
-                          });
+                    onClick={handleEndCall}
+                    className="bg-red-600 text-white rounded-xl p-4 grid justify-self-end mr-[7rem] mt-[3rem] mb-8"
+                  >
+                    End Call
+                  </button>
+                </div>
+              )}
+            </>
+          )}
 
-                          await handleCreateAPTicket();
-                          setIsProcessing(false);
-                          toast.success("Ticket sent to FreshDesk");
-                          window.location.reload();
-                        } catch (error) {
-                          console.error(
-                            "There was an error sending the email:",
-                            error
-                          );
+          {isCallEnded && (
+            <>
+              <div className="flex justify-evenly items-center">
+                <div className="grid mb-4">
+                  <label htmlFor="option">Select an option:</label>
+                  <select
+                    id="option"
+                    className={`border border-primary p-2 rounded-xl ${
+                      isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"
+                    }`}
+                    value={selectedResolution}
+                    onChange={handleResolutionChange}
+                  >
+                    <option value="">Select...</option>
+                    <option value="FreshDesk">Sent to FreshDesk</option>
+                    <option value="Resolved">Resolved</option>
+                  </select>
+                </div>
+
+                <div className="grid">
+                  <label htmlFor="resolve">Comment for Resolution:</label>
+                  <textarea
+                    id="resolve"
+                    className={`border border-primary rounded-xl py-2 px-4 ${
+                      isDarkMode ? "text-black" : "text-black"
+                    }`}
+                    value={helpDeskData.resolve}
+                    onChange={(e) =>
+                      handleHelpDeskData("resolve", e.target.value)
+                    }
+                  ></textarea>
+                </div>
+              </div>
+
+              {helpDeskData.client === "AP" ? (
+                <>
+                  {selectedResolution === "FreshDesk" ? (
+                    <button
+                      className="rounded-xl text-white bg-primary grid justify-self-center p-4 mt-12 mb-8"
+                      onClick={async () => {
+                        if (postEndCallValidation()) {
+                          try {
+                            await axios.post("/api/emails", {
+                              property: apData.property,
+                              contactPerson: apData.contactPerson,
+                              contactNo: apData.contactNo,
+                              date: helpDeskData.date,
+                              campus: helpDeskData.campus,
+                              query: helpDeskData.query,
+                              problem: helpDeskData.problem,
+                              resolve: helpDeskData.resolve,
+                              client: helpDeskData.client,
+                              duration: duration,
+                              status: selectedResolution,
+                              callAgent: helpDeskData.callAgent,
+                            });
+
+                            await handleCreateAPTicket();
+                            setIsProcessing(false);
+                            toast.success("Ticket sent to FreshDesk");
+                            window.location.reload();
+                          } catch (error) {
+                            console.error(
+                              "There was an error sending the email:",
+                              error
+                            );
+                          }
                         }
-                      }
-                    }}
-                  >
-                    Send to FreshDesk
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleCreateAPTicket}
-                    className="rounded-xl text-white bg-primary grid justify-self-center p-4 mt-12 mb-8"
-                  >
-                    Create ticket
-                  </button>
-                )}
-              </>
-            ) : (
-              <>
-                {selectedResolution === "FreshDesk" ? (
-                  <button
-                    className="rounded-xl text-white bg-primary grid justify-self-center p-4 mt-12 mb-8"
-                    onClick={async () => {
-                      if (postEndCallValidation()) {
-                        try {
-                          await axios.post("/api/emails", {
-                            fullName: studentData.fullName,
-                            idNumber: studentData.idNumber,
-                            studentNumber: studentData.studentNumber,
-                            contactNumber: studentData.contactNumber,
-                            email: studentData.email,
-                            institution: studentData.institution,
-                            accommodation: studentData.accommodation,
-                            date: helpDeskData.date,
-                            campus: helpDeskData.campus,
-                            query: helpDeskData.query,
-                            problem: helpDeskData.problem,
-                            resolve: helpDeskData.resolve,
-                            client: helpDeskData.client,
-                          });
-                          await handleCreateStudentTicket();
-                          setIsProcessing(true);
-                          toast.success("Ticket sent to FreshDesk");
-                          window.location.reload();
-                        } catch (error) {
-                          console.error(
-                            "There was an error sending the email:",
-                            error
-                          );
+                      }}
+                    >
+                      Send to FreshDesk
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleCreateAPTicket}
+                      className="rounded-xl text-white bg-primary grid justify-self-center p-4 mt-12 mb-8"
+                    >
+                      Create ticket
+                    </button>
+                  )}
+                </>
+              ) : (
+                <>
+                  {selectedResolution === "FreshDesk" ? (
+                    <button
+                      className="rounded-xl text-white bg-primary grid justify-self-center p-4 mt-12 mb-8"
+                      onClick={async () => {
+                        if (postEndCallValidation()) {
+                          try {
+                            await axios.post("/api/emails", {
+                              fullName: studentData.fullName,
+                              idNumber: studentData.idNumber,
+                              studentNumber: studentData.studentNumber,
+                              contactNumber: studentData.contactNumber,
+                              email: studentData.email,
+                              institution: studentData.institution,
+                              accommodation: studentData.accommodation,
+                              date: helpDeskData.date,
+                              campus: helpDeskData.campus,
+                              query: helpDeskData.query,
+                              problem: helpDeskData.problem,
+                              resolve: helpDeskData.resolve,
+                              client: helpDeskData.client,
+                            });
+                            await handleCreateStudentTicket();
+                            setIsProcessing(true);
+                            toast.success("Ticket sent to FreshDesk");
+                            window.location.reload();
+                          } catch (error) {
+                            console.error(
+                              "There was an error sending the email:",
+                              error
+                            );
+                          }
                         }
-                      }
-                    }}
-                  >
-                    Send to FreshDesk
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleCreateStudentTicket}
-                    className="rounded-xl text-white bg-primary grid justify-self-center p-4 mt-12 mb-8"
-                  >
-                    Create ticket
-                  </button>
-                )}
-              </>
-            )}
-          </>
-        )}
+                      }}
+                    >
+                      Send to FreshDesk
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleCreateStudentTicket}
+                      className="rounded-xl text-white bg-primary grid justify-self-center p-4 mt-12 mb-8"
+                    >
+                      Create ticket
+                    </button>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+      <div className="mt-[10rem]">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className="text-[1rem] font-medium"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className={`${
+                    isDarkMode
+                      ? "text-white"
+                      : "text-black odd:bg-white even:bg-slate-100 "
+                  }`}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center font-bold text-xl text-secondary"
+                >
+                  No tickets for now.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </>
   );
 }

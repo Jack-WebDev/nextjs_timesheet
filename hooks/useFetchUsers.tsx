@@ -1,15 +1,15 @@
+"use client"
+
 import { useEffect, useState } from "react";
-// import axios from "axios";
 import { UserProps } from "../types/userProps";
 
 export default function useFetchUsers() {
   const [users, setUsers] = useState<UserProps[]>([]);
 
-
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch("/api/users/", {next: {revalidate: 0}});
+        const res = await fetch("/api/users/", { next: { revalidate: 0 } });
         if (!res.ok) {
           throw new Error("Network response was not ok" + res.statusText);
         }
