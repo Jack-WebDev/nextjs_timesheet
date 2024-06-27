@@ -663,7 +663,7 @@ export default function Timesheet() {
   return (
     <>
       {loading && <Loading />}
-      <div className="grid bg-[#F5F5F5] border-2 border-primary p-8 rounded-xl">
+      <div className="grid border-2 border-primary p-8 rounded-xl">
         <form className="grid grid-cols-4 border-b-2 border-secondary pb-8 gap-y-4 items-end">
           <div>
             <label className="grid w-[60%] mb-1 text-[1.2rem]">Name:</label>
@@ -787,7 +787,7 @@ export default function Timesheet() {
             </label>
             <select
               name="name"
-              className={`border border-primary bg-transparentrounded-xl h-[4vh] ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
+              className={`border border-primary bg-transparent rounded-xl h-[4vh] ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
               value={chosenProject}
               onChange={handleProjectChange}
             >
@@ -856,7 +856,7 @@ export default function Timesheet() {
                 <tr key={rowIndex} className="border-b border-secondary py-2">
                   <td className="text-center">
                     <input
-                      className="py-1 px-2 border-primary bg-transparent rounded-xl pointer-events-none"
+                      className="py-1 px-2 border border-primary bg-transparent rounded-xl pointer-events-none"
                       type="date"
                       value={row.weekday}
                       onChange={(e) =>
