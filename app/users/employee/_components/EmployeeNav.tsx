@@ -26,7 +26,7 @@ export default function EmployeeNav({
   const pathname = usePathname();
 
   return (
-    <div className="flex h-screen w-full">
+    <div className={`flex h-screen w-full ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
       <div className="grid grid-rows-[.4fr 1fr] w-[15%] h-full bg-[rgba(162,161,168,0.05)] fixed">
         <>
           <Link href={"/users/employee"}>
