@@ -47,7 +47,7 @@ export default function EmployeeNav({
               href={"/users/employee"}
               className={`link flex items-center gap-x-2 ${
                 pathname === "/users/employee" ? "active" : ""
-              }`}
+              } ${isDarkMode ? "text-white" : "text-black"}`}
             >
               <FaAlignCenter />
               Dashboard
@@ -57,7 +57,7 @@ export default function EmployeeNav({
               href={"/users/employee/Tasks"}
               className={`link flex items-center gap-x-2 ${
                 pathname === "/users/employee/Tasks" ? "active" : ""
-              }`}
+              } ${isDarkMode ? "text-white" : "text-black"}`}
             >
               <FaTasks />
               Tasks
@@ -67,7 +67,7 @@ export default function EmployeeNav({
               href={"/users/employee/help"}
               className={`link flex items-center gap-x-2 ${
                 pathname === "/users/employee/help" ? "active" : ""
-              }`}
+              } ${isDarkMode ? "text-white" : "text-black"}`}
             >
               <FaInfoCircle />
               Help Desk
@@ -77,7 +77,7 @@ export default function EmployeeNav({
               href={"/users/employee/Bookings"}
               className={`link flex items-center gap-x-2 ${
                 pathname === "/users/employee/Bookings" ? "active" : ""
-              }`}
+              } ${isDarkMode ? "text-white" : "text-black"}`}
             >
               <FaBookmark />
               Bookings
@@ -87,7 +87,7 @@ export default function EmployeeNav({
               href={"/users/employee/Approvals"}
               className={`link flex items-center gap-x-2 ${
                 pathname === "/users/employee/Approvals" ? "active" : ""
-              }`}
+              } ${isDarkMode ? "text-white" : "text-black"}`}
             >
               <FaCheck />
               Approvals
@@ -97,7 +97,7 @@ export default function EmployeeNav({
               href={"/users/employee/timesheet"}
               className={`link flex items-center gap-x-2 ${
                 pathname === "/users/employee/timesheet" ? "active" : ""
-              }`}
+              } ${isDarkMode ? "text-white" : "text-black"}`}
             >
               <FaClock />
               Timesheets
@@ -107,7 +107,7 @@ export default function EmployeeNav({
               href={"/users/employee/settings"}
               className={`link flex items-center gap-x-2 ${
                 pathname === "/users/employee/settings" ? "active" : ""
-              }`}
+              } ${isDarkMode ? "text-white" : "text-black"}`}
             >
               <FaGear />
               Settings
@@ -115,7 +115,7 @@ export default function EmployeeNav({
           </ul>
           <div className="flex items-center justify-center">
           <button
-        className={`flex items-center gap-x-1  py-2 px-4 rounded-s-xl ${isDarkMode ? "bg-[rgba(162,161,168,0.1)] text-light" : "bg-primary text-white"}`}
+        className={`flex items-center gap-x-1  py-2 px-4 rounded-s-xl ${isDarkMode ? "bg-[rgba(162,161,168,0.1)] text-white" : "bg-primary text-white"}`}
         onClick={toggleTheme}
       >
        <FaSun /> Light
