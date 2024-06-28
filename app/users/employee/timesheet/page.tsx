@@ -168,7 +168,7 @@ export default function Timesheet() {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  // const [selectedMonthIndex, setSelectedMonthIndex] = useState(-1);
+
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",

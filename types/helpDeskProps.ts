@@ -1,20 +1,5 @@
-export type AP = {
-  id?: string;
-  property: string;
-  contactPerson: string;
-  contactNo: string;
-};
-
-export type Student = {
-  id?: string;
-  fullName?: string;
-  idNumber?: string;
-  studentNumber?: string;
-  contactNumber?: string;
-  email?: string;
-  institution?: string;
-  accommodation?: string;
-};
+import { AP } from "./apProps";
+import { Student } from "./studentProps";
 
 export type HelpDesk = {
   id?: string;
@@ -28,7 +13,7 @@ export type HelpDesk = {
   query?: string;
   problem?: string;
   status?: string;
-  client?:string;
+  client?: string;
   ap?: AP;
   student?: Student;
 };

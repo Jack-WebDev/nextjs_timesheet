@@ -36,7 +36,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { useEffect, useState } from "react";
-import { Student, AP, type HelpDesk } from "@/types/helpDeskProps";
+import { type HelpDesk } from "@/types/helpDeskProps";
+import { AP } from "@/types/apProps";
+import { Student } from "@/types/studentProps";
 import axios from "axios";
 import { useThemeStore, useUser } from "@/app/store";
 import useFetchTickets from "@/hooks/useFetchTickets";
@@ -44,6 +46,13 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Loading from "../loading";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { Button } from "@/components/ui/button";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 
 export default function HelpDesk() {
   const user = useUser();
@@ -94,62 +103,13 @@ export default function HelpDesk() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
-  // console.log(ap)
-
   useEffect(() => {
     const filteredTickets = tickets.filter(
       (ticket) => ticket.callAgent === user.NDTEmail
     );
     setFilteredTickets(filteredTickets);
     setTotalTickets(filteredTickets.length);
-
-    const apIdData = filteredTickets.filter((ticket) => ticket.client === "AP");
-    const studentIdData = filteredTickets.filter(
-      (ticket) => ticket.client === "Student"
-    );
-    if (apIdData.length === 0) {
-      console.log("No AP tickets found");
-      return;
-    }
-
-    if (studentIdData.length === 0) {
-      return;
-    }
-
-    const fetchApTickets = async () => {
-      try {
-        // Ensure the endpoint and request format is correct
-        const res = await axios.get(`/api/helpdesk/ap`, {
-          params: { ids: apIdData.map((ticket) => ticket.id) },
-        });
-        console.log("Fetched data:", res.data);
-        // Assuming setAP is to update the state with fetched data
-        setAP(res.data);
-      } catch (error) {
-        console.error("Error fetching AP tickets:", error);
-      }
-    };
-    const fetchStudentTickets = async () => {
-      try {
-        // Ensure the endpoint and request format is correct
-        const res = await axios.get(`/api/helpdesk/student`, {
-          params: { ids: studentIdData.map((ticket) => ticket.id) },
-        });
-        console.log("Fetched data:", res.data);
-        // Assuming setAP is to update the state with fetched data
-        setStudent(res.data);
-      } catch (error) {
-        console.error("Error fetching AP tickets:", error);
-      }
-    };
-
-    fetchApTickets();
-    fetchStudentTickets();
   }, [tickets, user.NDTEmail]);
-
-  // useEffect(() => {
-
-  // }, [data]);
 
   const columns: ColumnDef<HelpDesk>[] = [
     {
@@ -188,6 +148,9 @@ export default function HelpDesk() {
       cell: ({ row }) => {
         const ticket = row.original;
 
+        if (!ticket) return null;
+
+
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -214,15 +177,22 @@ export default function HelpDesk() {
                             </tr>
                           </thead>
                           <tbody>
-                            {ap?.map((a) => (
-                              <tr key={a.id}>
-                                <td className="text-center">{a.property}</td>
-                                <td className="text-center">{a.contactNo}</td>
+                            {ticket && (
+                              <tr
+                                key={ticket.id}
+                                className="border-b border-secondary"
+                              >
                                 <td className="text-center">
-                                  {a.contactPerson}
+                                  {ticket.ap ? ticket.ap.property : ""}
+                                </td>
+                                <td className="text-center">
+                                  {ticket.ap ? ticket.ap.contactNo : ""}
+                                </td>
+                                <td className="text-center">
+                                  {ticket.ap ? ticket.ap.contactPerson : ""}
                                 </td>
                               </tr>
-                            ))}
+                            )}
                           </tbody>
                         </table>
                       </>
@@ -241,17 +211,46 @@ export default function HelpDesk() {
                             </tr>
                           </thead>
                           <tbody>
-                            {student?.map((s) => (
-                              <tr key={s.id}>
-                                <td className="text-center">{s.fullName}</td>
-                                <td className="text-center">{s.idNumber}</td>
-                                <td className="text-center">{s.studentNumber}</td>
-                                <td className="text-center">{s.contactNumber}</td>
-                                <td className="text-center">{s.email}</td>
-                                <td className="text-center">{s.institution}</td>
-                                <td className="text-center">{s.accommodation}</td>
+                            {ticket && (
+                              <tr
+                                key={ticket.id}
+                                className="border-b border-secondary"
+                              >
+                                <td className="text-center">
+                                  {ticket.student
+                                    ? ticket.student.fullName
+                                    : ""}
+                                </td>
+                                <td className="text-center">
+                                  {ticket.student
+                                    ? ticket.student.idNumber
+                                    : ""}
+                                </td>
+                                <td className="text-center">
+                                  {ticket.student
+                                    ? ticket.student.studentNumber
+                                    : ""}
+                                </td>
+                                <td className="text-center">
+                                  {ticket.student
+                                    ? ticket.student.contactNumber
+                                    : ""}
+                                </td>
+                                <td className="text-center">
+                                  {ticket.student ? ticket.student.email : ""}
+                                </td>
+                                <td className="text-center">
+                                  {ticket.student
+                                    ? ticket.student.institution
+                                    : ""}
+                                </td>
+                                <td className="text-center">
+                                  {ticket.student
+                                    ? ticket.student.accommodation
+                                    : ""}
+                                </td>
                               </tr>
-                            ))}
+                            )}
                           </tbody>
                         </table>
                       </>
@@ -268,7 +267,7 @@ export default function HelpDesk() {
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 5,
+    pageSize: 10,
   });
 
   const table = useReactTable({
@@ -901,6 +900,7 @@ export default function HelpDesk() {
                       className="rounded-xl text-white bg-primary grid justify-self-center p-4 mt-12 mb-8"
                       onClick={async () => {
                         if (postEndCallValidation()) {
+                          setLoading(true);
                           try {
                             await axios.post("/api/emails", {
                               property: apData.property,
@@ -920,6 +920,7 @@ export default function HelpDesk() {
                             await handleCreateAPTicket();
                             setIsProcessing(false);
                             toast.success("Ticket sent to FreshDesk");
+                            setLoading(false);
                             window.location.reload();
                           } catch (error) {
                             console.error(
@@ -948,6 +949,7 @@ export default function HelpDesk() {
                       className="rounded-xl text-white bg-primary grid justify-self-center p-4 mt-12 mb-8"
                       onClick={async () => {
                         if (postEndCallValidation()) {
+                          setLoading(true);
                           try {
                             await axios.post("/api/emails", {
                               fullName: studentData.fullName,
@@ -967,6 +969,7 @@ export default function HelpDesk() {
                             await handleCreateStudentTicket();
                             setIsProcessing(true);
                             toast.success("Ticket sent to FreshDesk");
+                            setLoading(false);
                             window.location.reload();
                           } catch (error) {
                             console.error(
@@ -1050,6 +1053,49 @@ export default function HelpDesk() {
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex justify-center flex-col items-center gap-2 mt-12">
+        <div className="flex items-center gap-4">
+          <Button
+            variant={"default"}
+            className="border rounded p-1"
+            onClick={() => table.firstPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <ChevronsLeft />
+          </Button>
+          <Button
+            variant={"default"}
+            className="border rounded p-1"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <ChevronLeft />
+          </Button>
+          <Button
+            variant={"default"}
+            className="border rounded p-1"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            <ChevronRight />
+          </Button>
+          <Button
+            variant={"default"}
+            className="border rounded p-1"
+            onClick={() => table.lastPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            <ChevronsRight />
+          </Button>
+        </div>
+        <span className="flex items-center gap-1">
+          <div>Page</div>
+          <strong>
+            {table.getState().pagination.pageIndex + 1} of{" "}
+            {table.getPageCount().toLocaleString()}
+          </strong>
+        </span>
       </div>
     </>
   );
