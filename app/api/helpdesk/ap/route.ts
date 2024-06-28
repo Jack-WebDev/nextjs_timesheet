@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
         property: data.property,
         contactPerson: data.contactPerson,
         contactNo: data.contactNo,
+        email: data.email,
       },
     });
 

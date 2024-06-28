@@ -3,4 +3,5 @@ export type AP = {
   property: string;
   contactPerson: string;
   contactNo: string;
+  email: string;
 };

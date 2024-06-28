@@ -69,6 +69,7 @@ export default function HelpDesk() {
     property: "",
     contactPerson: "",
     contactNo: "",
+    email: ""
   });
   const [studentData, setStudentData] = useState<Student>({
     idNumber: "",
@@ -174,6 +175,7 @@ export default function HelpDesk() {
                               <th>Property Name</th>
                               <th>Contact Number</th>
                               <th>Contact Person</th>
+                              <th>Email</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -183,13 +185,16 @@ export default function HelpDesk() {
                                 className="border-b border-secondary"
                               >
                                 <td className="text-center">
-                                  {ticket.ap ? ticket.ap.property : ""}
+                                  {ticket.ap ? ticket.ap.property : "N/A"}
                                 </td>
                                 <td className="text-center">
-                                  {ticket.ap ? ticket.ap.contactNo : ""}
+                                  {ticket.ap ? ticket.ap.contactNo : "N/A"}
                                 </td>
                                 <td className="text-center">
-                                  {ticket.ap ? ticket.ap.contactPerson : ""}
+                                  {ticket.ap ? ticket.ap.contactPerson : "N/A"}
+                                </td>
+                                <td className="text-center">
+                                  {ticket.ap ? ticket.ap.email : "N/A"}
                                 </td>
                               </tr>
                             )}
@@ -219,35 +224,35 @@ export default function HelpDesk() {
                                 <td className="text-center">
                                   {ticket.student
                                     ? ticket.student.fullName
-                                    : ""}
+                                    : "N/A"}
                                 </td>
                                 <td className="text-center">
                                   {ticket.student
                                     ? ticket.student.idNumber
-                                    : ""}
+                                    : "N/A"}
                                 </td>
                                 <td className="text-center">
                                   {ticket.student
                                     ? ticket.student.studentNumber
-                                    : ""}
+                                    : "N/A"}
                                 </td>
                                 <td className="text-center">
                                   {ticket.student
                                     ? ticket.student.contactNumber
-                                    : ""}
+                                    : "N/A"}
                                 </td>
                                 <td className="text-center">
-                                  {ticket.student ? ticket.student.email : ""}
+                                  {ticket.student ? ticket.student.email : "N/A"}
                                 </td>
                                 <td className="text-center">
                                   {ticket.student
                                     ? ticket.student.institution
-                                    : ""}
+                                    : "N/A"}
                                 </td>
                                 <td className="text-center">
                                   {ticket.student
                                     ? ticket.student.accommodation
-                                    : ""}
+                                    : "N/A"}
                                 </td>
                               </tr>
                             )}
@@ -394,6 +399,11 @@ export default function HelpDesk() {
       isValid = false;
     }
 
+    if (!apData.email || !apData.email.includes("@")) {
+      toast.error("Please enter a valid email");
+      isValid = false;
+    }
+
     return isValid;
   };
 
@@ -472,6 +482,7 @@ export default function HelpDesk() {
         client: helpDeskData.client,
         duration: duration,
         status: selectedResolution,
+        email: apData.email
       };
       console.log(formData);
       try {
@@ -681,7 +692,20 @@ export default function HelpDesk() {
                                   }
                                 />
                               </div>
+                            <div className="grid">
+                                <label htmlFor="apField">Email:</label>
+                                <input
+                                  type="email"
+                                  id="apField"
+                                  className="border border-primary p-2 rounded-xl bg-transparent"
+                                  value={apData.email}
+                                  onChange={(e) =>
+                                    handleAPData("email", e.target.value)
+                                  }
+                                />
+                              </div>
                             </div>
+
                           </div>
                         </div>
                       </div>

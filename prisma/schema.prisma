@@ -107,6 +107,7 @@ model AP {
   property      String
   contactPerson String
   contactNo     String
+  email         String?
   helpDesks     HelpDesk[] @relation("APHelpDesks")
 }
 
@@ -135,6 +136,7 @@ model HelpDesk {
   client       String
   problem      String
   status       String
-  ap           AP?      @relation("APHelpDesks", fields: [apId], references: [id])
-  student      Student? @relation("StudentHelpDesks", fields: [studentId], references: [id])
+  ap           AP?      @relation("APHelpDesks", fields: [apId], references: [id], onDelete: Cascade)
+  student      Student? @relation("StudentHelpDesks", fields: [studentId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
 }
