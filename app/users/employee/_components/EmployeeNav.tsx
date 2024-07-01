@@ -53,15 +53,6 @@ export default function EmployeeNav({
               Dashboard
             </Link>
 
-            <Link
-              href={"/users/employee/Tasks"}
-              className={`link flex items-center gap-x-2 ${
-                pathname === "/users/employee/Tasks" ? "active" : ""
-              } ${isDarkMode ? "text-white" : "text-black"}`}
-            >
-              <FaTasks />
-              Tasks
-            </Link>
 
             <Link
               href={"/users/employee/help"}

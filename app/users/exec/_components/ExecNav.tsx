@@ -57,15 +57,6 @@ function NavMenu({
 						Projects
 					</Link>
 					<Link
-						href={"/users/exec/tasks"}
-						className={`link flex items-center gap-x-2 ${
-							pathname === "/users/exec/tasks" ? "active" : ""
-						}`}
-					>
-						<FaTasks />
-						Tasks
-					</Link>
-					<Link
 						href={"/users/exec/bookings"}
 						className={`link flex items-center gap-x-2 ${
 							pathname === "/users/exec/bookings" ? "active" : ""
