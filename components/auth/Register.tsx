@@ -29,7 +29,7 @@ const formSchema = z.object({
   password: z
     .string()
     .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/,
       {
         message:
           "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
@@ -56,6 +56,12 @@ export function RegisterForm() {
       toast.error(error?.response?.data?.message);
     }
   }
+
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const password = "PHAFOgang476#";
+
+  console.log(passwordRegex.test(password));
 
   return (
     <Form {...form}>
