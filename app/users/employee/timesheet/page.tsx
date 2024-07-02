@@ -187,7 +187,7 @@ export default function Timesheet() {
     },
     {
       accessorKey: "projectName",
-      header: "Project Name",
+      header: "Project(s)",
       cell: ({ row }) => (
         <div className="capitalize">{row.getValue("projectName")}</div>
       ),

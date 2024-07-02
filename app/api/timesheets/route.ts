@@ -27,6 +27,18 @@ export async function POST(req: NextRequest) {
       };
     });
 
+    const allProjectNames = mapped.flatMap((i: any) => 
+      i.tasks.create.map((task: any) => task.projectName)
+    );
+
+    
+    const getUniqueProjectNames = Array.from(new Set(allProjectNames));
+
+
+    const projectNames = getUniqueProjectNames.join(', ');
+
+
+
     try {
       const detailsID = await db.tableDetails.create({
         data: {
@@ -34,7 +46,7 @@ export async function POST(req: NextRequest) {
           weeklyPeriod: combinedData.weeklyPeriod,
           name: fullName,
           projectManager: combinedData.projectManager,
-          projectName: combinedData.projectName, // Doesn't work. NVM
+          projectName: projectNames,
           role: combinedData.role,
           Approval_Status: combinedData.Approval_Status,
           userId: combinedData.userID,
