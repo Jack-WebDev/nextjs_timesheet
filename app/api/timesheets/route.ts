@@ -13,19 +13,31 @@ export async function POST(req: NextRequest) {
     const mapped = combinedData.timesheet.map((i: any) => {
       return {
         weekday: i.weekday.toString(),
-        typeOfDay:i.typeOfDay,
+        typeOfDay: i.typeOfDay,
         totalHours: i.totalHours,
         totalMinutes: i.totalMinutes,
         tasks: {
           create: i.tasks.map((task: any) => ({
+            projectName: task.projectName,
             taskPerformed: task.taskPerformed,
             taskStatus: task.taskStatus,
           })),
         },
         comment: i.comment,
-        
       };
     });
+
+    const allProjectNames = mapped.flatMap((i: any) => 
+      i.tasks.create.map((task: any) => task.projectName)
+    );
+
+    
+    const getUniqueProjectNames = Array.from(new Set(allProjectNames));
+
+
+    const projectNames = getUniqueProjectNames.join(', ');
+
+
 
     try {
       const detailsID = await db.tableDetails.create({
@@ -34,10 +46,10 @@ export async function POST(req: NextRequest) {
           weeklyPeriod: combinedData.weeklyPeriod,
           name: fullName,
           projectManager: combinedData.projectManager,
-          projectName: combinedData.projectName,
+          projectName: projectNames,
           role: combinedData.role,
           Approval_Status: combinedData.Approval_Status,
-          userId: combinedData.userID
+          userId: combinedData.userID,
         },
       });
 
@@ -49,12 +61,11 @@ export async function POST(req: NextRequest) {
             totalMinutes: entry.totalMinutes,
             weekday: entry.weekday,
             tasks: entry.tasks,
-            typeOfDay:entry.typeOfDay,
+            typeOfDay: entry.typeOfDay,
             userId: combinedData.userID,
             tableDetailsId: detailsID.id,
           },
         });
-
       }
     } catch (error) {
       console.error("Error inserting data:", error);
@@ -70,7 +81,7 @@ export async function GET() {
   try {
     const res = await db.tableDetails.findMany({
       select: {
-        id:true,
+        id: true,
         month: true,
         name: true,
         projectManager: true,
@@ -82,10 +93,9 @@ export async function GET() {
           },
         },
         weeklyPeriod: true,
-        Approval_Status:true,
-        comments:true,
-        userId:true
-      
+        Approval_Status: true,
+        comments: true,
+        userId: true,
       },
     });
 

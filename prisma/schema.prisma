@@ -67,6 +67,7 @@ model Department {
 
 model Task {
   id            String   @id @default(uuid())
+  projectName   String?
   taskPerformed String
   taskStatus    String
   tableRowId    String
