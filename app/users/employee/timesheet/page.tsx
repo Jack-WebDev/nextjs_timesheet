@@ -223,7 +223,7 @@ export default function Timesheet() {
                     <DotsHorizontalIcon className="h-4 w-4" />
                   </span>
                 </DialogTrigger>
-                <DialogContent className="w-1/2 text-black">
+                <DialogContent className="w-[70%] text-black">
                   <DialogHeader className="flex flex-row items-baseline justify-around">
                     <DialogTitle>Timesheet Details</DialogTitle>
                     <div className="grid text-xl">

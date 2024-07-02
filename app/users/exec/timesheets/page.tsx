@@ -134,7 +134,7 @@ export default function Timesheet() {
                     <DotsHorizontalIcon className="h-4 w-4" />
                   </span>
                 </DialogTrigger>
-                <DialogContent className="w-[50%]">
+                <DialogContent className="w-[70%]">
                   <DialogHeader>
                     <DialogTitle className="flex justify-around items-center text-2xl">
                       Timesheet Details
