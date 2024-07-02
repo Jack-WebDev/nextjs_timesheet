@@ -1,11 +1,9 @@
-import { TaskProps } from './taskProps';
+import { TaskProps } from "./taskProps";
 
-
-  
 export type TableRowsProps = {
   id?: string;
   totalHours: number;
-  totalMinutes: number; // Add this field
+  totalMinutes: number;
   comment: string;
   tasks: TaskProps[];
   weekday: string;
