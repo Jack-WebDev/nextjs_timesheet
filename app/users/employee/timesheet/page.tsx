@@ -73,6 +73,9 @@ import { UserProps } from "@/types/userProps";
 import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Loading from "../loading";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+
 
 type FormDetails = {
   month: string;
@@ -163,6 +166,8 @@ export default function Timesheet() {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isAddingTask, setIsAddingTask] = useState(false);
+  const modalRef = useRef(null);
+
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -176,6 +181,35 @@ export default function Timesheet() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+
+  const generatePDF = async () => {
+    if (modalRef.current) {
+      const canvas = await html2canvas(modalRef.current);
+      const imgData = canvas.toDataURL("image/png");
+
+      // Define desired PDF width
+      const pdfWidth = 200; // A4 paper width in mm (change as needed)
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+
+      // Calculate the scale factor
+      const scaleFactor = pdfWidth / canvasWidth;
+
+      // Calculate the height to maintain aspect ratio
+      const pdfHeight = canvasHeight * scaleFactor;
+
+      const pdf = new jsPDF({
+        orientation: "l",
+        unit: "mm",
+        format: [pdfWidth, pdfHeight]
+      });
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("timesheet.pdf");
+    }
+    
+  };
+
 
   const columns: ColumnDef<TimesheetProps>[] = [
     {
@@ -215,7 +249,7 @@ export default function Timesheet() {
             ? "text-green-700 font-semibold"
             : "";
         return (
-          <DropdownMenu>
+          <DropdownMenu >
             <DropdownMenuTrigger asChild>
               <Dialog>
                 <DialogTrigger asChild>
@@ -223,7 +257,7 @@ export default function Timesheet() {
                     <DotsHorizontalIcon className="h-4 w-4" />
                   </span>
                 </DialogTrigger>
-                <DialogContent className="w-[70%] text-black">
+                <DialogContent ref={modalRef}   className="w-[70%] text-black">
                   <DialogHeader className="flex flex-row items-baseline justify-around">
                     <DialogTitle>Timesheet Details</DialogTitle>
                     <div className="grid text-xl">
@@ -235,8 +269,8 @@ export default function Timesheet() {
                       </div>
                     </div>
                   </DialogHeader>
-                  <div>
-                    <table className="w-full">
+                  <div >
+                    <table  className="generate w-full">
                       <thead className="text-black">
                         <tr>
                           <th>Weekday</th>
@@ -329,12 +363,15 @@ export default function Timesheet() {
                       </p>
                     </div>
                   </div>
+                    <button onClick={generatePDF} className="grid justify-self-end items-center rounded-xl bg-secondary text-white py-2 px-4 font-medium">Generate PDF</button>
                 </DialogContent>
               </Dialog>
             </DropdownMenuTrigger>
           </DropdownMenu>
         );
       },
+
+  
     },
   ];
 
