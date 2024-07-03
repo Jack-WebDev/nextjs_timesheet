@@ -11,7 +11,8 @@ import {
 	FaSun,
 	FaTasks,
 } from "react-icons/fa";
-import {FaBookmark, FaGear} from "react-icons/fa6"
+import { Bookmark, CalendarClock, Check, Clock, Info, LayoutDashboard, LineChart, NotebookPen, Settings } from "lucide-react";
+
 
 function NavMenu({
 	children,
@@ -43,7 +44,7 @@ function NavMenu({
 							pathname === "/users/exec" ? "active" : ""
 						}`}
 					>
-						<FaAlignCenter />
+						<LayoutDashboard />
 						Dashboard
 					</Link>
 
@@ -53,7 +54,7 @@ function NavMenu({
 							pathname === "/users/exec/projects" ? "active" : ""
 						}`}
 					>
-						<FaCalendarCheck />
+						<NotebookPen />
 						Projects
 					</Link>
 					<Link
@@ -62,8 +63,17 @@ function NavMenu({
 							pathname === "/users/exec/bookings" ? "active" : ""
 						}`}
 					>
-						<FaBookmark />
+						<Bookmark />
 						Bookings
+					</Link>
+					<Link
+						href={"/users/exec/leave"}
+						className={`link flex items-center gap-x-2 ${
+							pathname === "/users/exec/leave" ? "active" : ""
+						}`}
+					>
+						<CalendarClock />
+						Leave
 					</Link>
 					<Link
 						href={"/users/exec/timesheets"}
@@ -71,7 +81,7 @@ function NavMenu({
 							pathname === "/users/exec/timesheets" ? "active" : ""
 						}`}
 					>
-						<FaClock />
+						<Clock />
 						Timesheets
 					</Link>
                     <Link
@@ -80,7 +90,7 @@ function NavMenu({
 							pathname === "/users/exec/reports" ? "active" : ""
 						}`}
 					>
-						<FaCalendarCheck />
+						<LineChart />
 						Reports
 					</Link>
 					<Link
@@ -89,7 +99,7 @@ function NavMenu({
 							pathname === "/users/exec/settings" ? "active" : ""
 						}`}
 					>
-						<FaGear />
+						<Settings />
 						Settings
 					</Link>
 			</ul>

@@ -4,17 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   FaAlignCenter,
-  FaTasks,
-  FaClock,
-  FaCheck,
-  FaInfoCircle,
   FaMoon,
   FaSun,
 } from "react-icons/fa";
-import { FaBookmark, FaGear } from "react-icons/fa6";
 import Image from "next/image";
 import React from "react";
 import { useThemeStore } from "@/app/store";
+import { Bookmark, CalendarClock, Check, Clock, Info, LayoutDashboard, Settings } from "lucide-react";
 
 
 export default function EmployeeNav({
@@ -49,7 +45,7 @@ export default function EmployeeNav({
                 pathname === "/users/employee" ? "active" : ""
               } ${isDarkMode ? "text-white" : "text-black"}`}
             >
-              <FaAlignCenter />
+              <LayoutDashboard />
               Dashboard
             </Link>
 
@@ -60,7 +56,7 @@ export default function EmployeeNav({
                 pathname === "/users/employee/help" ? "active" : ""
               } ${isDarkMode ? "text-white" : "text-black"}`}
             >
-              <FaInfoCircle />
+              <Info />
               Help Desk
             </Link>
 
@@ -70,7 +66,7 @@ export default function EmployeeNav({
                 pathname === "/users/employee/Bookings" ? "active" : ""
               } ${isDarkMode ? "text-white" : "text-black"}`}
             >
-              <FaBookmark />
+              <Bookmark />
               Bookings
             </Link>
 
@@ -80,8 +76,17 @@ export default function EmployeeNav({
                 pathname === "/users/employee/Approvals" ? "active" : ""
               } ${isDarkMode ? "text-white" : "text-black"}`}
             >
-              <FaCheck />
+              <Check />
               Approvals
+            </Link>
+            <Link
+              href={"/users/employee/leave"}
+              className={`link flex items-center gap-x-2 ${
+                pathname === "/users/employee/leave" ? "active" : ""
+              } ${isDarkMode ? "text-white" : "text-black"}`}
+            >
+              <CalendarClock />
+              Leaves
             </Link>
 
             <Link
@@ -90,7 +95,7 @@ export default function EmployeeNav({
                 pathname === "/users/employee/timesheet" ? "active" : ""
               } ${isDarkMode ? "text-white" : "text-black"}`}
             >
-              <FaClock />
+              <Clock />
               Timesheets
             </Link>
 
@@ -100,7 +105,7 @@ export default function EmployeeNav({
                 pathname === "/users/employee/settings" ? "active" : ""
               } ${isDarkMode ? "text-white" : "text-black"}`}
             >
-              <FaGear />
+              <Settings />
               Settings
             </Link>
           </ul>

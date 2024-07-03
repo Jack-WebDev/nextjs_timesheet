@@ -3,14 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-	FaAlignCenter,
-	FaBuilding,
-	FaCalendarCheck,
-	FaTasks,
-	FaUsers,
-} from "react-icons/fa";
-import {FaBookmark, FaGear} from "react-icons/fa6"
+import { Bookmark, Building,LayoutDashboard, NotebookPen, Settings, Users } from "lucide-react";
+
 
 function NavMenu() {
 	const pathname = usePathname();
@@ -33,7 +27,7 @@ function NavMenu() {
 							pathname === "/users/admin" ? "active" : ""
 						}`}
 					>
-						<FaAlignCenter />
+						<LayoutDashboard />
 						Dashboard
 					</Link>
 					<Link
@@ -42,7 +36,7 @@ function NavMenu() {
 							pathname === "/users/admin/employees" ? "active" : ""
 						}`}
 					>
-						<FaUsers />
+						<Users />
 						Employees
 					</Link>
 					<Link
@@ -51,7 +45,7 @@ function NavMenu() {
 							pathname === "/users/admin/departments" ? "active" : ""
 						}`}
 					>
-						<FaBuilding />
+						<Building />
 						Departments
 					</Link>
 					<Link
@@ -60,7 +54,7 @@ function NavMenu() {
 							pathname === "/users/admin/projects" ? "active" : ""
 						}`}
 					>
-						<FaCalendarCheck />
+						<NotebookPen />
 						Projects
 					</Link>
 					<Link
@@ -69,7 +63,7 @@ function NavMenu() {
 							pathname === "/users/admin/bookings" ? "active" : ""
 						}`}
 					>
-						<FaBookmark />
+						<Bookmark />
 						Bookings
 					</Link>
 					<Link
@@ -78,7 +72,7 @@ function NavMenu() {
 							pathname === "/users/settings" ? "active" : ""
 						}`}
 					>
-						<FaGear />
+						<Settings />
 						Settings
 					</Link>
 				</ul>
