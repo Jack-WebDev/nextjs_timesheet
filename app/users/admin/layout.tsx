@@ -1,3 +1,5 @@
+"use client";
+
 import { logOut, getSession } from "@/actions/auth/actions";
 import {
   Popover,
@@ -7,21 +9,25 @@ import {
 import { FaChevronDown } from "react-icons/fa";
 import NavMenu from "@/app/users/admin/_components/NavMenu";
 import Image from "next/image";
+import { useThemeStore, useUser } from "@/app/store";
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSession();
-  const name = session.Name;
+  const user = useUser();
+  const { isDarkMode } = useThemeStore();
+
+  const fullName = `${user.Name} ${user.Surname}`;
   return (
-    <div className="flex flex-col h-screen">
-      <header className="flex justify-end px-8 items-center py-8 pr-16 bg-[#a2a1a81a]">
-        <div className="profile flex items-center gap-x-3">
+    <NavMenu>
+    <div className={`flex flex-col h-screen ${isDarkMode ? "dark-mode" : "light-mode"}`}>
+    <header className="flex justify-end ml-[20rem] px-8 items-center py-8 pr-16">
+    <div className="profile flex items-center gap-x-3">
           <Popover>
             <PopoverTrigger className="flex items-center gap-4 text-[#d69436]">
-              <b>{name}</b>
+              <b>{fullName}</b>
               <FaChevronDown />
             </PopoverTrigger>
             <PopoverContent className="flex items-center gap-4 w-fit border-2 border-primary rounded-xl">
@@ -33,14 +39,14 @@ export default async function DashboardLayout({
         </div>
       </header>
 
-      <div className="content flex flex-1">
-        <NavMenu />
+      <div className={`content flex flex-1 ${isDarkMode ? "dark-mode" : "light-mode"}`}>
 
-        <div className="main__content flex-1 m-12">
+        <div className="main__content ml-[20rem] flex-1 m-12">
 
           {children}
         </div>
       </div>
     </div>
+    </NavMenu>
   );
 }

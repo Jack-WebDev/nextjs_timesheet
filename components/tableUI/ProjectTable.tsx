@@ -10,12 +10,14 @@ import { ViewProject } from "../dialogUI/ViewProject";
 import { Project } from "../../types/projectProps";
 import useFetchProjects from "@/hooks/useFetchProjects";
 import { useRouter } from "next/navigation";
+import { useThemeStore } from "@/app/store";
 
 const ProjectTable = () => {
   const projectsData = useFetchProjects();
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [filter, setFilter] = useState<string>("");
+  const { isDarkMode } = useThemeStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -65,7 +67,7 @@ const ProjectTable = () => {
   };
 
   return (
-    <div className="w-[60%] mx-auto mt-12 bg-white border-2 border-primary p-8 rounded-2xl ">
+    <div className="w-[60%] mx-auto mt-12 border-2 border-primary p-8 rounded-2xl ">
       <div className="flex items-center justify-between mb-12">
         <input
           type="text"
@@ -87,7 +89,13 @@ const ProjectTable = () => {
             <th className=" font-normal">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody
+          className={`${
+            isDarkMode
+              ? "text-white"
+              : "text-black odd:bg-white even:bg-slate-100 "
+          }`}
+        >
           {filteredProjects.map((project) => (
             <tr key={project.id}>
               <td>{truncateText(project.Project_Name, 5)}</td>
