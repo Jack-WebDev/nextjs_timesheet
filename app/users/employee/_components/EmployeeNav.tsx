@@ -2,16 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  FaAlignCenter,
-  FaMoon,
-  FaSun,
-} from "react-icons/fa";
+import { FaMoon, FaSun } from "react-icons/fa";
 import Image from "next/image";
 import React from "react";
 import { useThemeStore } from "@/app/store";
-import { Bookmark, CalendarClock, Check, Clock, Info, LayoutDashboard, Settings } from "lucide-react";
-
+import {
+  Bookmark,
+  CalendarClock,
+  Check,
+  Clock,
+  Info,
+  LayoutDashboard,
+  Settings,
+} from "lucide-react";
 
 export default function EmployeeNav({
   children,
@@ -48,7 +51,6 @@ export default function EmployeeNav({
               <LayoutDashboard />
               Dashboard
             </Link>
-
 
             <Link
               href={"/users/employee/help"}
@@ -110,18 +112,26 @@ export default function EmployeeNav({
             </Link>
           </ul>
           <div className="flex items-center justify-center">
-          <button
-        className={`flex items-center gap-x-1  py-2 px-4 rounded-s-xl ${isDarkMode ? "bg-[rgba(162,161,168,0.1)] text-white" : "bg-primary text-white"}`}
-        onClick={toggleTheme}
-      >
-       <FaSun /> Light
-      </button>
-      <button
-        className={`flex items-center gap-x-1 py-2 px-4 rounded-e-xl ${isDarkMode ? "bg-primary text-white" : "bg-[rgba(162,161,168,0.1)] text-black"}`}
-        onClick={toggleTheme}
-      >
-        <FaMoon /> Dark
-      </button>
+            <button
+              className={`flex items-center gap-x-1  py-2 px-4 rounded-s-xl ${
+                isDarkMode
+                  ? "bg-[rgba(162,161,168,0.1)] text-white"
+                  : "bg-primary text-white"
+              }`}
+              onClick={toggleTheme}
+            >
+              <FaSun /> Light
+            </button>
+            <button
+              className={`flex items-center gap-x-1 py-2 px-4 rounded-e-xl ${
+                isDarkMode
+                  ? "bg-primary text-white"
+                  : "bg-[rgba(162,161,168,0.1)] text-black"
+              }`}
+              onClick={toggleTheme}
+            >
+              <FaMoon /> Dark
+            </button>
           </div>
         </>
       </div>

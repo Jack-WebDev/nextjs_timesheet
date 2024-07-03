@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {FaEye, FaTrash } from "react-icons/fa";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { useThemeStore } from "@/app/store";
 
 
 
@@ -53,6 +54,7 @@ const UserTable = () => {
   const [data, setFilteredUsers] = useState<UserProps[]>([]);
   const [filter, setFilter] = useState<string>("");
   const userData = useFetchUsers();
+  const { isDarkMode } = useThemeStore();
   const router = useRouter();
 
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -187,7 +189,7 @@ const UserTable = () => {
 
   return (
     <>
-    <div className="w-full bg-[#F5F5F5] p-4 rounded-xl border-2 border-primary">
+    <div className="w-full p-4 rounded-xl border-2 border-primary">
     <div className="flex justify-between items-center py-4">
       <Input
         placeholder="Filter by name, department or employee type...."
@@ -234,6 +236,8 @@ const UserTable = () => {
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                className={`${isDarkMode ? "text-white" : "text-black odd:bg-white even:bg-slate-100 "}`}
+
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
