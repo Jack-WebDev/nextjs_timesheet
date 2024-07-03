@@ -46,7 +46,7 @@ import axios from "axios";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { TimesheetProps } from "@/types/timesheetProps";
 import useFetchTimesheets from "@/hooks/useFetchTimesheets";
-import { useUser } from "@/app/store";
+import { useThemeStore, useUser } from "@/app/store";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 export default function Timesheet() {
@@ -58,6 +58,7 @@ export default function Timesheet() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const { isDarkMode } = useThemeStore();
 
   useEffect(() => {
     if (timesheetsData) {
@@ -343,8 +344,11 @@ export default function Timesheet() {
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      className="odd:bg-white even:bg-slate-100"
-
+                      className={`${
+                        isDarkMode
+                          ? "text-white"
+                          : "text-black odd:bg-white even:bg-slate-100 "
+                      }`}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
