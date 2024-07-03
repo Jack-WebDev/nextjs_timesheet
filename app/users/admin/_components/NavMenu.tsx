@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bookmark, Building,LayoutDashboard, NotebookPen, Settings, Users } from "lucide-react";
+import { Bookmark, Building,CalendarClock,LayoutDashboard, NotebookPen, Settings, Users } from "lucide-react";
 
 
 function NavMenu() {
@@ -65,6 +65,15 @@ function NavMenu() {
 					>
 						<Bookmark />
 						Bookings
+					</Link>
+					<Link
+						href={"/users/admin/leave"}
+						className={`link flex items-center gap-x-2 ${
+							pathname === "/users/admin/leave" ? "active" : ""
+						}`}
+					>
+						<CalendarClock />
+						Leave
 					</Link>
 					<Link
 						href={"/users/settings"}

@@ -45,6 +45,7 @@ import { Input } from "@/components/ui/input";
 import { Project } from "@/types/projectProps";
 import useFetchProjects from "@/hooks/useFetchProjects";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { useThemeStore } from "@/app/store";
 
 const ProjectTable = () => {
   const projectsData = useFetchProjects();
@@ -56,6 +57,8 @@ const ProjectTable = () => {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const { isDarkMode } = useThemeStore();
+
 
   useEffect(() => {
     if (projectsData) {
@@ -218,13 +221,12 @@ const ProjectTable = () => {
           className="max-w-sm rounded-xl"
         />
       </div>
-      <div className=" bg-white">
+      <div>
         <Table className="p-4 rounded-xl">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.id}
-                className="border-b border-secondary"
               >
                 {headerGroup.headers.map((header) => {
                   return (
@@ -247,8 +249,11 @@ const ProjectTable = () => {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className=" even:bg-slate-100 rounded-br-xl"
-
+                  className={`${
+                    isDarkMode
+                      ? "text-white"
+                      : "text-black odd:bg-white even:bg-slate-100 "
+                  }`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
