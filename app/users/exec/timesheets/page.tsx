@@ -107,6 +107,13 @@ export default function Timesheet() {
       ),
     },
     {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("name")}</div>
+      ),
+    },
+    {
       accessorKey: "projectName",
       header: "Project Name",
       cell: ({ row }) => (
@@ -137,7 +144,7 @@ export default function Timesheet() {
                 <DialogContent className="w-[70%]">
                   <DialogHeader>
                     <DialogTitle className="flex justify-around items-center text-2xl">
-                      Timesheet Details
+                      Timesheet Details for : {timesheet.name}
                       <span className="text-xl">
                         Weekly Period:{" "}
                         <b className="text-primary">{timesheet.weeklyPeriod}</b>
@@ -151,6 +158,7 @@ export default function Timesheet() {
                           <th>Weekday</th>
                           <th>Type Of Day</th>
                           <th>Total Time</th>
+                          <th>Project Name</th>
                           <th>Tasks Performed</th>
                           <th>Task Status</th>
                           <th>Comment</th>
@@ -176,6 +184,21 @@ export default function Timesheet() {
 
                               <td>
                                 <p>{`${r.totalHours} hrs ${r.totalMinutes} mins`}</p>
+                              </td>
+                              <td className="text-center">
+                                {r.tasks && r.tasks.length > 0 ? (
+                                  r.tasks.map((t) => (
+                                    <div key={t.id}>
+                                      <p>
+                                        {t.projectName === ""
+                                          ? "N/A"
+                                          : t.projectName}
+                                      </p>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <p>N/A</p>
+                                )}
                               </td>
                               <td className="text-center">
                                 {r.tasks && r.tasks.length > 0 ? (
