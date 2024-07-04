@@ -9,6 +9,8 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronLeft,
+  MoreHorizontal,
+  Eye,
 } from "lucide-react";
 
 import {
@@ -47,6 +49,9 @@ import {
 
 import {
   DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -70,12 +75,29 @@ import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 import useFetchProjects from "@/hooks/useFetchProjects";
 import useFetchUsers from "@/hooks/useFetchUsers";
 import { UserProps } from "@/types/userProps";
-import { FaTrash } from "react-icons/fa";
+import { FaEye, FaFilePdf, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Loading from "../loading";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import { useRouter } from "next/navigation";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import dynamic from "next/dynamic";
+const PDFViewer = dynamic(
+  () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
+  { ssr: false }
+);
 
+// Create styles
+const styles = StyleSheet.create({
+  viewer: { width: "100%", height: "50vh" },
+  page: { padding: 30 },
+  section: { marginBottom: 10 },
+  heading: { fontSize: 20, marginBottom: 10 },
+  text: { fontSize: 12, marginBottom: 5 },
+  table: { width: "auto", marginBottom: 20 },
+  tableRow: { flexDirection: "row" },
+  tableCol: { flex: 1 },
+  tableCell: { margin: 5, fontSize: 10 },
+});
 
 type FormDetails = {
   month: string;
@@ -152,7 +174,6 @@ export default function Timesheet() {
   const [tableData, setTableData] = useState<TableRowsProps[]>(initialData);
   const [data, setFilteredTimesheets] = useState<TimesheetProps[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [chosenProject, setChosenProject] = useState("");
   const userZ = useUser();
   const fullName = `${userZ.Name} ${userZ.Surname}`;
   const [query, setQuery] = useState<string>("");
@@ -167,7 +188,8 @@ export default function Timesheet() {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isAddingTask, setIsAddingTask] = useState(false);
   const modalRef = useRef(null);
-
+  const [showPDF, setShowPDF] = useState(false);
+  const router = useRouter()
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -181,35 +203,255 @@ export default function Timesheet() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [selectedTimesheet, setSelectedTimesheet] =
+    useState<TimesheetProps | null>(null);
 
-  const generatePDF = async () => {
-    if (modalRef.current) {
-      const canvas = await html2canvas(modalRef.current);
-      const imgData = canvas.toDataURL("image/png");
+  const handleViewTimesheet = (timesheet: TimesheetProps) => {
+    setSelectedTimesheet(timesheet);
+    setDialogOpen(true);
+  };
 
-      // Define desired PDF width
-      const pdfWidth = 200; // A4 paper width in mm (change as needed)
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
+  const handleClosePDF = () => {
+    setShowPDF(false);
+  };
 
-      // Calculate the scale factor
-      const scaleFactor = pdfWidth / canvasWidth;
-
-      // Calculate the height to maintain aspect ratio
-      const pdfHeight = canvasHeight * scaleFactor;
-
-      const pdf = new jsPDF({
-        orientation: "l",
-        unit: "mm",
-        format: [pdfWidth, pdfHeight]
-      });
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("timesheet.pdf");
-    }
+  const handleGeneratePDF = (timesheet: TimesheetProps) => {
+    setSelectedTimesheet(timesheet);
+    setShowPDF(true);
     
   };
 
+  const TimesheetDialog = ({ timesheet, closeDialog }: any) => {
+    const statusClass =
+      timesheet.Approval_Status === "Pending"
+        ? "text-yellow-500 font-semibold"
+        : timesheet.Approval_Status.includes("Rejected")
+        ? "text-red-500 font-semibold font-semibold"
+        : timesheet.Approval_Status.includes("Approved")
+        ? "text-green-700 font-semibold"
+        : "";
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Dialog open={true} onOpenChange={closeDialog}>
+            <DialogTrigger asChild>
+              <span className="cursor-pointer">
+                <DotsHorizontalIcon className="h-4 w-4" />
+              </span>
+            </DialogTrigger>
+            <DialogContent ref={modalRef} className="w-[70%] text-black">
+              <DialogHeader className="flex flex-row items-baseline justify-around">
+                <DialogTitle>Timesheet Details</DialogTitle>
+                <div className="grid text-xl">
+                  <div className="flex">
+                    Approval Status:
+                    <span className={statusClass}>
+                      {timesheet.Approval_Status}
+                    </span>
+                  </div>
+                </div>
+              </DialogHeader>
+              <div>
+                <table className="generate w-full">
+                  <thead className="text-black">
+                    <tr>
+                      <th>Weekday</th>
+                      <th>Type Of Day</th>
+                      <th>Total Time</th>
+                      <th>Project Name</th>
+                      <th>Tasks Performed</th>
+                      <th>Task Status</th>
+                      <th>Comment</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {timesheet &&
+                      timesheet.tableRows &&
+                      timesheet.tableRows?.map((r: any) => (
+                        <tr key={r.id} className="border-b border-secondary">
+                          <td className="text-black text-center">
+                            <p>{r.weekday}</p>
+                          </td>
+                          <td className="text-black text-center">
+                            <p>{r.typeOfDay === "" ? "N/A" : r.typeOfDay}</p>
+                          </td>
+                          <td className="text-black text-center">
+                            <p>{`${r.totalHours} hrs ${r.totalMinutes} mins`}</p>
+                          </td>
+                          <td className="text-black text-center">
+                            {r.tasks && r.tasks.length > 0 ? (
+                              r.tasks.map((t: any) => (
+                                <div key={t.id}>
+                                  <p>
+                                    {t.projectName === ""
+                                      ? "N/A"
+                                      : t.projectName}
+                                  </p>
+                                </div>
+                              ))
+                            ) : (
+                              <p>N/A</p>
+                            )}
+                          </td>
+
+                          <td className="text-black text-center">
+                            {r.tasks && r.tasks.length > 0 ? (
+                              r.tasks.map((t: any) => (
+                                <div key={t.id}>
+                                  <p>
+                                    {t.taskPerformed === ""
+                                      ? "N/A"
+                                      : t.taskPerformed}
+                                  </p>
+                                </div>
+                              ))
+                            ) : (
+                              <p>N/A</p>
+                            )}
+                          </td>
+
+                          <td className="text-black text-center">
+                            {r.tasks && r.tasks.length > 0 ? (
+                              r.tasks.map((t: any) => (
+                                <div key={t.id}>
+                                  <p>{t.taskStatus}</p>
+                                </div>
+                              ))
+                            ) : (
+                              <span>N/A</span>
+                            )}
+                          </td>
+                          <td className="text-black text-center">
+                            <p>{r.comment === "" ? "N/A" : r.comment}</p>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+
+                <div className="mt-4">
+                  <h2 className="font-semibold text-black">
+                    Supervisor&apos;s comments:
+                  </h2>
+                  <p className="text-black">
+                    {timesheet.comments === ""
+                      ? "No comment."
+                      : timesheet.comments}
+                  </p>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </DropdownMenuTrigger>
+      </DropdownMenu>
+    );
+  };
+
+  const GeneratePDF = ({ timesheet, onClose }: any) => {
+    return (
+      <div className="absolute z-10 top-[100%] left-[20%] right-[20%] bottom-0">
+        <div className="w-full bg-gray-400 rounded-t-xl py-4 pl-4">
+
+        <Button variant={"default"} onClick={onClose} className="text-[1.5rem] font-semibold w-[20%] h-[5vh]">
+          Close PDF
+        </Button>
+        </div>
+        <PDFViewer style={styles.viewer}>
+          <Document>
+            <Page size="A4" style={styles.page}>
+              <View style={styles.section}>
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-evenly",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={styles.heading}>Timesheet Details</Text>
+                  <View style={{ display: "flex", flexDirection: "row" }}>
+                    <Text style={styles.text}>Approval Status:</Text>
+                    <Text style={styles.text}>{timesheet.Approval_Status}</Text>
+                  </View>
+                </View>
+                <View style={styles.table}>
+                  <View
+                    style={[styles.tableRow, { backgroundColor: "#f0f0f0" }]}
+                  >
+                    <Text style={[styles.tableCol, styles.tableCell]}>
+                      Weekday
+                    </Text>
+                    <Text style={[styles.tableCol, styles.tableCell]}>
+                      Type Of Day
+                    </Text>
+                    <Text style={[styles.tableCol, styles.tableCell]}>
+                      Total Time
+                    </Text>
+                    <Text style={[styles.tableCol, styles.tableCell]}>
+                      Project Name
+                    </Text>
+                    <Text style={[styles.tableCol, styles.tableCell]}>
+                      Tasks Performed
+                    </Text>
+                    <Text style={[styles.tableCol, styles.tableCell]}>
+                      Task Status
+                    </Text>
+                    <Text style={[styles.tableCol, styles.tableCell]}>
+                      Comment
+                    </Text>
+                  </View>
+                  {timesheet?.tableRows?.map((r: any) => (
+                    <View key={r.id} style={styles.tableRow}>
+                      <Text style={[styles.tableCol, styles.tableCell]}>
+                        {r.weekday}
+                      </Text>
+                      <Text style={[styles.tableCol, styles.tableCell]}>
+                        {r.typeOfDay || "N/A"}
+                      </Text>
+                      <Text
+                        style={[styles.tableCol, styles.tableCell]}
+                      >{`${r.totalHours} hrs ${r.totalMinutes} mins`}</Text>
+                      <Text style={[styles.tableCol, styles.tableCell]}>
+                        {r.tasks.length > 0
+                          ? r.tasks
+                              .map((t: any) => t.projectName || "N/A")
+                              .join(", ")
+                          : "N/A"}
+                      </Text>
+                      <Text style={[styles.tableCol, styles.tableCell]}>
+                        {r.tasks.length > 0
+                          ? r.tasks
+                              .map((t: any) => t.taskPerformed || "N/A")
+                              .join(", ")
+                          : "N/A"}
+                      </Text>
+                      <Text style={[styles.tableCol, styles.tableCell]}>
+                        {r.tasks.length > 0
+                          ? r.tasks.map((t: any) => t.taskStatus).join(", ")
+                          : "N/A"}
+                      </Text>
+                      <Text style={[styles.tableCol, styles.tableCell]}>
+                        {r.comment || "N/A"}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+                <View style={styles.section}>
+                  <Text style={{ fontSize: 14, marginTop: 10 }}>
+                    Supervisor&apos;s comments:
+                  </Text>
+                  <Text style={styles.text}>
+                    {timesheet.comments || "No comment."}
+                  </Text>
+                </View>
+              </View>
+            </Page>
+          </Document>
+        </PDFViewer>
+      </div>
+    );
+  };
 
   const columns: ColumnDef<TimesheetProps>[] = [
     {
@@ -240,138 +482,33 @@ export default function Timesheet() {
       enableSorting: true,
       cell: ({ row }) => {
         const timesheet = row.original;
-        const statusClass =
-          timesheet.Approval_Status === "Pending"
-            ? "text-yellow-500 font-semibold"
-            : timesheet.Approval_Status.includes("Rejected")
-            ? "text-red-500 font-semibold font-semibold"
-            : timesheet.Approval_Status.includes("Approved")
-            ? "text-green-700 font-semibold"
-            : "";
+
         return (
-          <DropdownMenu >
-            <DropdownMenuTrigger asChild>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <span className="cursor-pointer">
-                    <DotsHorizontalIcon className="h-4 w-4" />
-                  </span>
-                </DialogTrigger>
-                <DialogContent ref={modalRef}   className="w-[70%] text-black">
-                  <DialogHeader className="flex flex-row items-baseline justify-around">
-                    <DialogTitle>Timesheet Details</DialogTitle>
-                    <div className="grid text-xl">
-                      <div className="flex">
-                        Approval Status:
-                        <span className={statusClass}>
-                          {timesheet.Approval_Status}
-                        </span>
-                      </div>
-                    </div>
-                  </DialogHeader>
-                  <div >
-                    <table  className="generate w-full">
-                      <thead className="text-black">
-                        <tr>
-                          <th>Weekday</th>
-                          <th>Type Of Day</th>
-                          <th>Total Time</th>
-                          <th>Project Name</th>
-                          <th>Tasks Performed</th>
-                          <th>Task Status</th>
-                          <th>Comment</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {timesheet &&
-                          timesheet.tableRows &&
-                          timesheet.tableRows?.map((r) => (
-                            <tr
-                              key={r.id}
-                              className="border-b border-secondary"
-                            >
-                              <td className="text-black text-center">
-                                <p>{r.weekday}</p>
-                              </td>
-                              <td className="text-black text-center">
-                                <p>
-                                  {r.typeOfDay === "" ? "N/A" : r.typeOfDay}
-                                </p>
-                              </td>
-                              <td className="text-black text-center">
-                                <p>{`${r.totalHours} hrs ${r.totalMinutes} mins`}</p>
-                              </td>
-                              <td className="text-black text-center">
-                                {r.tasks && r.tasks.length > 0 ? (
-                                  r.tasks.map((t) => (
-                                    <div key={t.id}>
-                                      <p>
-                                        {t.projectName === ""
-                                          ? "N/A"
-                                          : t.projectName}
-                                      </p>
-                                    </div>
-                                  ))
-                                ) : (
-                                  <p>N/A</p>
-                                )}
-                              </td>
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-white rounded-xl">
+                <DropdownMenuLabel className="border-b border-primary">Actions</DropdownMenuLabel>
 
-                              <td className="text-black text-center">
-                                {r.tasks && r.tasks.length > 0 ? (
-                                  r.tasks.map((t) => (
-                                    <div key={t.id}>
-                                      <p>
-                                        {t.taskPerformed === ""
-                                          ? "N/A"
-                                          : t.taskPerformed}
-                                      </p>
-                                    </div>
-                                  ))
-                                ) : (
-                                  <p>N/A</p>
-                                )}
-                              </td>
-
-                              <td className="text-black text-center">
-                                {r.tasks && r.tasks.length > 0 ? (
-                                  r.tasks.map((t) => (
-                                    <div key={t.id}>
-                                      <p>{t.taskStatus}</p>
-                                    </div>
-                                  ))
-                                ) : (
-                                  <span>N/A</span>
-                                )}
-                              </td>
-                              <td className="text-black text-center">
-                                <p>{r.comment === "" ? "N/A" : r.comment}</p>
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-
-                    <div className="mt-4">
-                      <h2 className="font-semibold text-black">
-                        Supervisor&apos;s comments:
-                      </h2>
-                      <p className="text-black">
-                        {timesheet.comments === ""
-                          ? "No comment."
-                          : timesheet.comments}
-                      </p>
-                    </div>
-                  </div>
-                    <button onClick={generatePDF} className="grid justify-self-end items-center rounded-xl bg-secondary text-white py-2 px-4 font-medium">Generate PDF</button>
-                </DialogContent>
-              </Dialog>
-            </DropdownMenuTrigger>
-          </DropdownMenu>
+                <DropdownMenuItem
+                  onClick={() => handleViewTimesheet(timesheet)} className="cursor-pointer flex items-center gap-x-2"
+                >
+                  <FaEye/> View Timesheet
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleGeneratePDF(timesheet)} className="cursor-pointer flex items-center gap-x-2">
+                  <FaFilePdf/> Generate PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+         
         );
       },
-
-  
     },
   ];
 
@@ -1325,6 +1462,15 @@ export default function Timesheet() {
           </span>
         </div>
       </div>
+      {isDialogOpen && selectedTimesheet && (
+        <TimesheetDialog
+          timesheet={selectedTimesheet}
+          closeDialog={() => setDialogOpen(false)}
+        />
+      )}
+      {showPDF && (
+        <GeneratePDF timesheet={selectedTimesheet} onClose={handleClosePDF} />
+      )}
     </>
   );
 }
