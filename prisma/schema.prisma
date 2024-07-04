@@ -37,6 +37,7 @@ model User {
   tableRows      TableRow[]
   tableDetails   TableDetails[]
   department     Department?    @relation(fields: [departmentId], references: [id])
+  otp            OTP[]
 }
 
 model Documents {
@@ -140,4 +141,14 @@ model HelpDesk {
   ap           AP?      @relation("APHelpDesks", fields: [apId], references: [id], onDelete: Cascade)
   student      Student? @relation("StudentHelpDesks", fields: [studentId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
+}
+
+
+model OTP {
+  id            String   @id @default(uuid())
+  userId        String
+  code          String
+  expiryDate    DateTime
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
