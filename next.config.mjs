@@ -8,11 +8,6 @@ const nextConfig = {
       },
     ],
   },
-  resolve: {
-    alias: {
-      'react-pdf': 'react-pdf/dist/esm/entry.webpack'
-    }
-  }
 };
 
 export default nextConfig;
