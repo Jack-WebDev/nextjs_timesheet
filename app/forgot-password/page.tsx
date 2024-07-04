@@ -14,45 +14,54 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
-import { login } from "@/actions/auth/actions";
 import { toast } from "react-toastify";
-import { useUser } from "@/app/store";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const formSchema = z.object({
   email: z
     .string()
     .toLowerCase()
-    .email({ message: "Please add a valid email" })
-    .refine((email) => email.endsWith("@ndt.co.za"), {
+    .email({ message: "Please add a valid email" }).refine((email) => email.endsWith("@ndt.co.za"), {
       message: "Email must be a valid NDT email",
     }),
-  password: z.string(),
 });
 
-export function LoginForm() {
+export default function ResetPasswordForm() {
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const res = await axios.post("api/login", values);
-      const userData = await res.data;
-      useUser.setState(userData);
-      await login(userData);
+      setLoading(true);
+      const res = await axios.post("/api/forgot-password", values);
+
+      if (res.status === 200) {
+        toast.success("Your OTP has been sent to your email.");
+        setLoading(false);
+        router.push("/forgot-password/otp");
+      }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message);
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "An error occurred");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid bg-white w-[20%] h-[30vh] rounded-xl p-8"
+      >
         <FormField
           control={form.control}
           name="email"
@@ -63,7 +72,7 @@ export function LoginForm() {
                 <Input
                   placeholder="Enter your email"
                   {...field}
-                  className="rounded-xl hover:border-primary"
+                  className="rounded-xl hover:border-primary placeholder:text-gray-500"
                   type="email"
                 />
               </FormControl>
@@ -71,27 +80,9 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter your password"
-                  {...field}
-                  className="rounded-xl hover:border-primary"
-                  type="password"
-                />
-              </FormControl>
-              <FormMessage style={{ color: "red" }} />
-            </FormItem>
-          )}
-        />
-        <Link href={"/forgot-password"} className="relative top-[5px] left-[9.5rem] text-primary font-semibold text-sm">Forgot Password?</Link>
+
         <Button type="submit" className="login_btn w-full hover:bg-primary">
-          Let Me In
+          Send Reset Password Email
         </Button>
       </form>
     </Form>
