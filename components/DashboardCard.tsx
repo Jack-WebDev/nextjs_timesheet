@@ -13,7 +13,7 @@ export default function DashboardCard({ icon: Icon, total, title }: DashboardCar
     <Card className="border border-primary">
       <CardHeader>
         <CardTitle className="flex items-center gap-x-4 text-secondary font-bold">
-          <Icon fontSize="2rem" iconNode={[]} />
+          <Icon fontSize="2rem" iconNode={[]} fill="#dda83a" />
           {title}
         </CardTitle>
       </CardHeader>
