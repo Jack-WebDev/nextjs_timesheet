@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Loading from "../loading";
 import { useState } from "react";
+import Image from "next/image";
 
 const formSchema = z.object({
   otp: z
@@ -62,29 +63,46 @@ export default function ValidateOTPForm() {
     <>
       {loading && <Loading />}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid bg-white  h-[30vh] rounded-xl p-8">
-          <FormField
-            control={form.control}
-            name="otp"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>OPT Code</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your OPT Code"
-                    {...field}
-                    className="rounded-xl hover:border-primary placeholder:text-gray-500"
-                    type="text"
-                  />
-                </FormControl>
-                <FormMessage style={{ color: "red" }} />
-              </FormItem>
-            )}
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex justify-center gap-x-12 bg-white rounded-xl p-8"
+        >
+          <Image
+            src={"/13246824_5191077.svg"}
+            alt=""
+            width={400}
+            height={400}
           />
+          <div className="flex flex-col justify-center items-start gap-y-4">
+            <h1 className="text-3xl font-semibold text-secondary">
+              OTP Verification
+            </h1>
+            <p className="text-md text-gray-500">
+              Enter the OTP code we sent to your email address.
+            </p>
+            <FormField
+              control={form.control}
+              name="otp"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>OPT Code</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter your OPT Code"
+                      {...field}
+                      className="rounded-xl hover:border-primary placeholder:text-gray-500"
+                      type="text"
+                    />
+                  </FormControl>
+                  <FormMessage style={{ color: "red" }} />
+                </FormItem>
+              )}
+            />
 
-          <Button type="submit" className="login_btn w-full hover:bg-primary">
-            Reset Password
-          </Button>
+            <Button type="submit" className="login_btn w-full hover:bg-primary">
+              Reset Password
+            </Button>
+          </div>
         </form>
       </Form>
     </>
