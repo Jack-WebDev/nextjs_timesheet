@@ -45,7 +45,7 @@ const formSchema = z.object({
       message: "Email must be a valid NDT email",
     }),
   phoneNumber: z
-    .string()
+    .string().trim()
     .min(10, {
       message: "Phone Number must have 10 digits.",
     })
@@ -189,7 +189,7 @@ export default function LeaveForm() {
     setLeaveFor(event.target.value as "Days" | "Hours");
   };
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // setLoading(true);
+    setLoading(true);
     const formData = {
       fullName: values.fullName,
       email: values.email,
