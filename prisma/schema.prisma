@@ -32,13 +32,13 @@ model User {
   Position       String?        @default("N/A")
   StartDate      String?
   OfficeLocation String?
-  documents      Documents[]
   createdAt      DateTime       @default(now())
-  tableRows      TableRow[]
-  tableDetails   TableDetails[]
-  department     Department?    @relation(fields: [departmentId], references: [id])
-  otp            OTP[]
+  documents      Documents[]
   LeaveRequest   LeaveRequest[]
+  otp            OTP[]
+  tableDetails   TableDetails[]
+  tableRows      TableRow[]
+  department     Department?    @relation(fields: [departmentId], references: [id])
 }
 
 model Documents {
@@ -69,10 +69,10 @@ model Department {
 
 model Task {
   id            String   @id @default(uuid())
-  projectName   String?
   taskPerformed String
   taskStatus    String
   tableRowId    String
+  projectName   String?
   tableRow      TableRow @relation(fields: [tableRowId], references: [id], onDelete: Cascade)
 }
 
@@ -134,14 +134,14 @@ model HelpDesk {
   callDuration String
   campus       String
   query        String
-  callAgent    String
   resolve      String
   client       String
   problem      String
   status       String
+  callAgent    String
+  createdAt    DateTime @default(now())
   ap           AP?      @relation("APHelpDesks", fields: [apId], references: [id], onDelete: Cascade)
   student      Student? @relation("StudentHelpDesks", fields: [studentId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now())
 }
 
 model LeaveRequest {
@@ -152,6 +152,7 @@ model LeaveRequest {
   phoneNumber String
   position    String
   requestFor  String
+  leaveType   String
   reason      String
   date        String
   totalHours  Float?
@@ -164,7 +165,7 @@ model OTP {
   id         String   @id @default(uuid())
   userId     String
   code       String
-  expiryDate DateTime
   createdAt  DateTime @default(now())
+  expiryDate DateTime
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

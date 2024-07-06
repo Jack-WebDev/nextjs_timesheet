@@ -1,21 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import axios, { Axios, AxiosError } from "axios";
 import { useUser } from "@/app/store";
 
 type LeaveRequestProps = {
-  id: string;
-  fullName: string;
-  reason: string;
-  date: string;
-  totalHours?: number;
-  totalDays?: number;
-  requestFor: string;
-  email: string;
-  phoneNumber: string;
-  position: string;
-  userId: string;
+  userId: string,
+  fullName: string,
+  reason: string,
+  leaveType: string,
+  date: string,
+  totalHours: number,
+  totalDays: number,
+  requestFor: string,
+  id: string,
 };
 
 export default function useFetchDepartments() {
@@ -24,12 +22,17 @@ export default function useFetchDepartments() {
 
   useEffect(() => {
     const fetchLeaveRequests = async () => {
-      const res = await axios.get<LeaveRequestProps[]>("/api/leave");
-      const leaveRequests = res.data;
-      const filteredLeaveRequests = leaveRequests.filter(
-        (leaveRequest) => leaveRequest.userId === user.id
-      );
-      setLeaveRequests(filteredLeaveRequests);
+      try {
+        
+        const res = await axios.get<LeaveRequestProps[]>("/api/leave");
+        const leaveRequests = res.data;
+        const filteredLeaveRequests = leaveRequests.filter(
+          (leaveRequest) => leaveRequest.userId === user.id
+        );
+        setLeaveRequests(filteredLeaveRequests);
+      } catch (error) {
+        console.log(error as AxiosError);
+      }
     };
 
     if (user && user.id) {

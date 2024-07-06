@@ -55,7 +55,7 @@ const formSchema = z.object({
       message: "Phone Number must have 10 digits.",
     }),
 
-  requestFor: z.enum(["Days", "Hours"], {
+  requestFor: z.string({
     required_error: "You need to select a request.",
   }),
   reason: z.string().min(2, {
@@ -116,7 +116,7 @@ export default function LeaveForm() {
   const [startHour, setStartHour] = useState<string>("");
   const [endHour, setEndHour] = useState<string>("");
   const [selectedLeaveType, setSelectedLeaveType] = useState<string>("");
-  const [leaveFor, setLeaveFor] = useState<"Days" | "Hours">("Days");
+  const [requestFor, setRequestFor] = useState("Days");
   const [loading, setLoading] = useState(false);
   const user = useUser();
   const router = useRouter();
@@ -157,11 +157,18 @@ export default function LeaveForm() {
     endDate.setHours(endHours, endMinutes);
 
     const diff = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
-    return parseFloat(diff.toFixed(2));
+    const totalHours = Math.max(0, diff);
+    return parseFloat(totalHours.toFixed(2));
   };
 
   const totalHours =
     startHour && endHour ? calculateTotalHours(startHour, endHour) : 0;
+
+  const formattedHoursDate = `${
+    addDays(hoursDate ?? new Date(), 1)
+      .toISOString()
+      .split("T")[0]
+  }`;
 
   const formattedDate = `${
     addDays(date?.from ?? new Date(), 1)
@@ -177,7 +184,7 @@ export default function LeaveForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       phoneNumber: "",
-      requestFor: "Days",
+      requestFor: "",
       reason: "",
       date: formattedDate,
       fullName: fullName,
@@ -193,30 +200,33 @@ export default function LeaveForm() {
   };
 
   const handleLeaveForChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLeaveFor(event.target.value as "Days" | "Hours");
+    setRequestFor(event.target.value);
   };
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const session = await getSession();
     setLoading(true);
     const formData = {
       fullName: fullName,
       email: email,
       phoneNumber: values.phoneNumber,
       position: position,
-      requestFor: values.requestFor,
+      requestFor: requestFor,
+      leaveType: selectedLeaveType,
       reason: values.reason,
       date: values.date,
       totalHours: totalHours,
       totalDays: totalDays,
       userId: user.id,
     };
+
+    console.log(formData);
     try {
       await createLeaveRequest(formData);
       toast.success("Leave request has been created successfully.");
       router.refresh();
     } catch (error) {
       console.error("Error creating leave request:", error);
-    }
+    }finally {
+      setLoading(false);}
   }
 
   return (
@@ -322,7 +332,7 @@ export default function LeaveForm() {
                       <input
                         type="radio"
                         value="Days"
-                        checked={leaveFor === "Days"}
+                        checked={requestFor === "Days"}
                         onChange={handleLeaveForChange}
                         className="custom-radio-input"
                       />
@@ -334,7 +344,7 @@ export default function LeaveForm() {
                       <input
                         type="radio"
                         value="Hours"
-                        checked={leaveFor === "Hours"}
+                        checked={requestFor === "Hours"}
                         onChange={handleLeaveForChange}
                         className="custom-radio-input"
                       />
@@ -344,7 +354,7 @@ export default function LeaveForm() {
                 </div>
               </div>
               <div>
-                {leaveFor === "Days" ? (
+                {requestFor === "Days" ? (
                   <>
                     <div className="flex items-end gap-x-16">
                       <FormField
@@ -392,6 +402,7 @@ export default function LeaveForm() {
                                   onSelect={setDate}
                                   numberOfMonths={1}
                                   fromMonth={new Date()}
+                                  weekStartsOn={1}
                                 />
                               </PopoverContent>
                             </Popover>
@@ -458,6 +469,8 @@ export default function LeaveForm() {
                                   selected={hoursDate}
                                   onSelect={setHoursDate}
                                   initialFocus
+                                  fromDate={new Date()}
+                                  weekStartsOn={1}
                                 />
                               </PopoverContent>
                             </Popover>
@@ -559,29 +572,39 @@ export default function LeaveForm() {
             <div>
               <div className="flex justify-between items-center mx-8 mt-12">
                 <label htmlFor="">Leave For: </label>
-                <span className="font-bold text-xl">{leaveFor}</span>
+                <span className="font-bold text-xl">{requestFor}</span>
               </div>
               <div className="flex justify-between items-center mx-8 mt-12">
                 <label htmlFor="">Leave Type: </label>
                 <span className="font-bold text-xl">{selectedLeaveType}</span>
               </div>
-              <div className="flex justify-between items-center mx-8 mt-12">
-                <label htmlFor="">Leave Period: </label>
-                <span className="font-bold text-xl">{formattedDate}</span>
-              </div>
 
-              {leaveFor === "Days" ? (
-                <div className="flex justify-between items-center mx-8 mt-12">
-                  <label htmlFor="">Number of Working Days Taken: </label>
-                  <span className="font-bold text-xl">
-                    {calculateWorkingDays(date?.from, date?.to)}
-                  </span>
-                </div>
+              {requestFor === "Days" ? (
+                <>
+                  <div className="flex justify-between items-center mx-8 mt-12">
+                    <label htmlFor="">Leave Period: </label>
+                    <span className="font-bold text-xl">{formattedDate}</span>
+                  </div>
+                  <div className="flex justify-between items-center mx-8 mt-12">
+                    <label htmlFor="">Number of Working Days Taken: </label>
+                    <span className="font-bold text-xl">
+                      {calculateWorkingDays(date?.from, date?.to)}
+                    </span>
+                  </div>
+                </>
               ) : (
-                <div className="flex justify-between items-center mx-8 mt-12">
-                  <label htmlFor="">Total Hours Taken: </label>
-                  <span className="font-bold text-xl">{totalHours}</span>
-                </div>
+                <>
+                  <div className="flex justify-between items-center mx-8 mt-12">
+                    <label htmlFor="">Leave Day: </label>
+                    <span className="font-bold text-xl">
+                      {formattedHoursDate}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center mx-8 mt-12">
+                    <label htmlFor="">Total Hours Taken: </label>
+                    <span className="font-bold text-xl">{totalHours}</span>
+                  </div>
+                </>
               )}
             </div>
           </div>

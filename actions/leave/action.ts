@@ -8,6 +8,7 @@ type LeaveRequestProps = {
   totalHours?: number;
   totalDays?: number;
   requestFor: string;
+  leaveType: string;
   email: string;
   phoneNumber: string;
   position: string;
@@ -16,7 +17,7 @@ type LeaveRequestProps = {
 
 export const createLeaveRequest = async (data: LeaveRequestProps) => {
   try {
-    const res = await db.leaveRequest.create({
+    await db.leaveRequest.create({
       data: {
         fullName: data.fullName,
         reason: data.reason,
@@ -24,14 +25,13 @@ export const createLeaveRequest = async (data: LeaveRequestProps) => {
         totalHours: data.totalHours,
         totalDays: data.totalDays,
         requestFor: data.requestFor,
+        leaveType: data.leaveType,
         email: data.email,
         phoneNumber: data.phoneNumber,
         position: data.position,
         userId: data.userId,
       },
     });
-
-    console.log(res);
   } catch (error) {
     console.error("Error creating a leave request:", error);
     throw error;
