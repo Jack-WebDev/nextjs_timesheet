@@ -38,6 +38,7 @@ model User {
   tableDetails   TableDetails[]
   department     Department?    @relation(fields: [departmentId], references: [id])
   otp            OTP[]
+  LeaveRequest   LeaveRequest[]
 }
 
 model Documents {
@@ -143,12 +144,27 @@ model HelpDesk {
   createdAt    DateTime @default(now())
 }
 
+model LeaveRequest {
+  id          String   @id @default(uuid())
+  userId      String
+  fullName    String
+  email       String
+  phoneNumber String
+  position    String
+  requestFor  String
+  reason      String
+  date        String
+  totalHours  Float?
+  totalDays   Float?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
 model OTP {
-  id            String   @id @default(uuid())
-  userId        String
-  code          String
-  expiryDate    DateTime
-  createdAt     DateTime @default(now())
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid())
+  userId     String
+  code       String
+  expiryDate DateTime
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

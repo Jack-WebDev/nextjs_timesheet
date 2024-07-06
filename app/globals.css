@@ -197,3 +197,35 @@ select {
 .custom-class > *[data-ut-element="button"][data-state="uploading"]::after {
   background-color: var(--secondary-color);
 }
+
+.custom-radio-input {
+  appearance: none; /* Remove default appearance */
+  width: 18px;
+  height: 18px;
+  border: 2px solid #666; /* Border color */
+  border-radius: 50%; /* Circle shape */
+  position: relative;
+  cursor: pointer;
+}
+
+/* Custom circle inside the radio */
+.custom-radio-input::after {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  background-color: var(--primary-color); /* Circle color */
+  border-radius: 50%; /* Circle shape */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0; /* Hide initially */
+}
+
+/* Show the inner circle when the radio is checked */
+.custom-radio-input:checked::after {
+  opacity: 1;
+}
+
+
