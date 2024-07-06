@@ -1,6 +1,7 @@
 import { SessionOptions } from "iron-session";
 
 export type SessionProp = {
+	id: string;
 	Department?: string;
 	NDTEmail?: string;
 	Name?: string;
@@ -16,7 +17,8 @@ export const defaultSession: SessionProp = {
 	Name: "",
 	success: false,
 	isAdmin: true,
-	NDTEmail: ""
+	NDTEmail: "",
+	id: ""
 };
 
 export const sessionOptions: SessionOptions = {

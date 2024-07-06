@@ -26,35 +26,35 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, CircleHelp } from "lucide-react";
+import { CalendarIcon, CircleHelp, ScanEye } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { addDays, format, isWeekend } from "date-fns";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import Loading from "./loading";
+import Link from "next/link";
+import { useUser } from "@/app/store";
+import { getSession } from "@/actions/auth/actions";
+import { createLeaveRequest } from "@/actions/leave/action";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import useFetchLeaves from "@/hooks/useFetchLeaves";
 
 const formSchema = z.object({
-  fullName: z.string().min(2, {
-    message: "Full Name is required.",
-  }),
-  email: z
-    .string()
-    .email({ message: "Please add a valid email" })
-    .refine((email) => email.endsWith("@ndt.co.za"), {
-      message: "Email must be a valid NDT email",
-    }),
+  fullName: z.string().nullable(),
+  email: z.string().nullable(),
+  position: z.string().nullable(),
   phoneNumber: z
-    .string().trim()
+    .string()
+    .trim()
     .min(10, {
       message: "Phone Number must have 10 digits.",
     })
     .max(10, {
       message: "Phone Number must have 10 digits.",
     }),
-  position: z.string().min(2, {
-    message: "Position is required.",
-  }),
+
   requestFor: z.enum(["Days", "Hours"], {
     required_error: "You need to select a request.",
   }),
@@ -118,6 +118,13 @@ export default function LeaveForm() {
   const [selectedLeaveType, setSelectedLeaveType] = useState<string>("");
   const [leaveFor, setLeaveFor] = useState<"Days" | "Hours">("Days");
   const [loading, setLoading] = useState(false);
+  const user = useUser();
+  const router = useRouter();
+  const leaveRequests = useFetchLeaves();
+
+  const fullName = `${user.Name} ${user.Surname}`;
+  const email = user.NDTEmail;
+  const position = user.Position;
 
   const calculateWorkingDays = (startDate?: Date, endDate?: Date): number => {
     if (!startDate || !endDate) {
@@ -169,13 +176,13 @@ export default function LeaveForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: "",
-      email: "",
       phoneNumber: "",
-      position: "",
       requestFor: "Days",
       reason: "",
       date: formattedDate,
+      fullName: fullName,
+      email: email,
+      position: position,
     },
   });
 
@@ -188,28 +195,45 @@ export default function LeaveForm() {
   const handleLeaveForChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLeaveFor(event.target.value as "Days" | "Hours");
   };
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const session = await getSession();
     setLoading(true);
     const formData = {
-      fullName: values.fullName,
-      email: values.email,
+      fullName: fullName,
+      email: email,
       phoneNumber: values.phoneNumber,
-      position: values.position,
+      position: position,
       requestFor: values.requestFor,
       reason: values.reason,
       date: values.date,
       totalHours: totalHours,
       totalDays: totalDays,
+      userId: user.id,
     };
-    console.log(formData);
+    try {
+      await createLeaveRequest(formData);
+      toast.success("Leave request has been created successfully.");
+      router.refresh();
+    } catch (error) {
+      console.error("Error creating leave request:", error);
+    }
   }
 
   return (
     <div>
       {loading && <Loading />}
-      <div className="border-2 border-primary p-4 rounded-xl w-1/3">
-        <h3>Number of Annual Leave Days Left:</h3>
-        <span>23</span>
+      <div className="flex gap-x-8">
+        <div className="border-2 border-primary p-4 rounded-xl w-1/3">
+          <h3>Number of Annual Leave Days Left:</h3>
+          <span>N/A</span>
+        </div>
+        <Link
+          href={"/leave/allrequests"}
+          className="border-2 border-primary p-4 rounded-xl w-1/3"
+        >
+          <h3>View All Leave Requests</h3>
+          <span>{leaveRequests.length}</span>
+        </Link>
       </div>
       <Form {...form}>
         <form
@@ -226,12 +250,11 @@ export default function LeaveForm() {
                     <FormLabel className="text-xl">Full Name</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter your full name"
                         {...field}
-                        className="rounded-xl w-full placeholder:text-gray-500"
+                        className="rounded-xl w-full pointer-events-none"
+                        value={fullName}
                       />
                     </FormControl>
-                    <FormMessage style={{ color: "red" }} />
                   </FormItem>
                 )}
               />
@@ -243,13 +266,11 @@ export default function LeaveForm() {
                     <FormLabel className="text-xl">Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter your email"
                         {...field}
-                        className="rounded-xl w-full placeholder:text-gray-500"
-                        type="email"
+                        className="rounded-xl w-full pointer-events-none"
+                        value={email}
                       />
                     </FormControl>
-                    <FormMessage style={{ color: "red" }} />
                   </FormItem>
                 )}
               />
@@ -280,12 +301,11 @@ export default function LeaveForm() {
                     <FormLabel className="text-xl">Position</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter your position"
                         {...field}
-                        className="rounded-xl w-full placeholder:text-gray-500"
+                        className="rounded-xl w-full pointer-events-none"
+                        value={position}
                       />
                     </FormControl>
-                    <FormMessage style={{ color: "red" }} />
                   </FormItem>
                 )}
               />
