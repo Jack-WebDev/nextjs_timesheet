@@ -26,13 +26,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, CircleHelp } from "lucide-react";
+import { CalendarIcon, CircleHelp, ScanEye } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { addDays, format, isWeekend } from "date-fns";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import Loading from "./loading";
+import Link from "next/link";
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -207,9 +208,16 @@ export default function LeaveForm() {
   return (
     <div>
       {loading && <Loading />}
+      <div className="flex gap-x-8">
+        
       <div className="border-2 border-primary p-4 rounded-xl w-1/3">
         <h3>Number of Annual Leave Days Left:</h3>
         <span>23</span>
+      </div>
+      <Link href={"/leave/allrequests"} className="border-2 border-primary p-4 rounded-xl w-1/3">
+        <h3>View All Leave Requests</h3>
+        <span>20</span>
+      </Link>
       </div>
       <Form {...form}>
         <form
