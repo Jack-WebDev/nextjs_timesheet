@@ -61,11 +61,13 @@ type LeaveRequestProps = {
   userId: string;
   fullName: string;
   reason: string;
+  approvalStatus: string;
   leaveType: string;
   date: string;
   totalHours?: number;
   totalDays?: number;
   requestFor: string;
+  comments: string;
   id: string;
 };
 
@@ -77,11 +79,15 @@ export default function Timesheet() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [isDialogOpen, setDialogOpen] = useState(false);
-  const [selectedLeaveRequest, setSelectedLeaveRequest] =
-    useState<LeaveRequestProps | null>(null);
 
   const columns: ColumnDef<LeaveRequestProps>[] = [
+    {
+      accessorKey: "approvalStatus",
+      header: "Approval Status",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("approvalStatus")}</div>
+      ),
+    },
     {
       accessorKey: "leaveType",
       header: "Leave Type",
@@ -110,6 +116,14 @@ export default function Timesheet() {
       enableSorting: true,
       cell: ({ row }) => {
         const leaveRequest = row.original;
+        const statusClass =
+        leaveRequest.approvalStatus === "Pending"
+          ? "text-yellow-500 font-semibold"
+          : leaveRequest.approvalStatus.includes("Rejected")
+          ? "text-red-500 font-semibold font-semibold"
+          : leaveRequest.approvalStatus.includes("Approved")
+          ? "text-green-700 font-semibold"
+          : "";
 
         return (
           <>
@@ -125,7 +139,8 @@ export default function Timesheet() {
                     <DialogHeader className="flex flex-row items-baseline justify-around">
                       <DialogTitle>Leave Request Details</DialogTitle>
                       <div className="grid text-xl">
-                        <div className="flex">Approval Status:</div>
+                        <div className="flex gap-x-2">Approval Status: <span className={statusClass}>{leaveRequest.approvalStatus}</span></div>
+                        
                       </div>
                     </DialogHeader>
                     <div>
@@ -158,6 +173,10 @@ export default function Timesheet() {
                           </tr>
                         </tbody>
                       </table>
+                      <div className="w-[90%] mt-8 mx-auto">
+                        <h2>Supervisor&apos;s comments:</h2>
+                        <p>{leaveRequest.comments}</p>
+                      </div>
                     </div>
                   </DialogContent>
                 </Dialog>
@@ -247,7 +266,7 @@ export default function Timesheet() {
                       colSpan={columns.length}
                       className="h-24 text-center text-secondary font-semibold text-2xl"
                     >
-                      No timesheets to approve.
+                      No leave requests for now.
                     </TableCell>
                   </TableRow>
                 )}

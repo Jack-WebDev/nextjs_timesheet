@@ -145,20 +145,22 @@ model HelpDesk {
 }
 
 model LeaveRequest {
-  id          String   @id @default(uuid())
-  userId      String
-  fullName    String
-  email       String
-  phoneNumber String
-  position    String
-  requestFor  String
-  leaveType   String
-  reason      String
-  date        String
-  totalHours  Float?
-  totalDays   Float?
-  createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String   @id @default(uuid())
+  userId         String
+  fullName       String
+  email          String
+  phoneNumber    String
+  position       String
+  requestFor     String
+  leaveType      String
+  reason         String
+  date           String
+  approvalStatus String   @default("Pending")
+  comments       String   @default("No comments")
+  totalHours     Float?
+  totalDays      Float?
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model OTP {

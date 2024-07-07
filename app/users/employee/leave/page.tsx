@@ -35,7 +35,6 @@ import { Textarea } from "@/components/ui/textarea";
 import Loading from "./loading";
 import Link from "next/link";
 import { useUser } from "@/app/store";
-import { getSession } from "@/actions/auth/actions";
 import { createLeaveRequest } from "@/actions/leave/action";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
