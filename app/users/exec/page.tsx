@@ -2,12 +2,26 @@
 
 import Link from "next/link";
 
-import { FaCalendar, FaClock } from "react-icons/fa";
+import { FaCalendar, FaCalendarCheck, FaClock } from "react-icons/fa";
 import DashboardCard from "@/components/DashboardCard";
 import useFetchProjects from "@/hooks/useFetchProjects";
 import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 import { useEffect, useState } from "react";
 import { useUser } from "@/app/store";
+import axios from "axios";
+
+type LeaveRequestProps = {
+  userId: string;
+  fullName: string;
+  approvalStatus: string;
+  reason: string;
+  leaveType: string;
+  date: string;
+  totalHours?: number;
+  totalDays?: number;
+  requestFor: string;
+  id: string;
+};
 
 export default function Dashboard() {
   const projects = useFetchProjects();
@@ -15,6 +29,7 @@ export default function Dashboard() {
   const user = useUser();
   const totalProjects = projects.length;
   const [totalTimesheets, setTotalTimesheets] = useState<number>(0);
+  const [totalLeaveRequests, setTotalLeaveRequests] = useState<number>(0);
 
   useEffect(() => {
     if (timesheetData) {
@@ -39,6 +54,27 @@ export default function Dashboard() {
     }
   }, [timesheetData, user.Name, user.Surname]);
 
+  useEffect(() => {
+    const fetchLeaveRequests = async () => {
+      try {
+        const res = await axios.get<LeaveRequestProps[]>("/api/leave");
+        const leaveRequests = res.data;
+        console.log(leaveRequests)
+
+        const pendingLeaveRequests = leaveRequests.filter(
+          (leaveRequest) => leaveRequest.approvalStatus === "Pending"
+        );
+
+        setTotalLeaveRequests(pendingLeaveRequests.length);
+
+      } catch (error) {
+        console.error("Error fetching leave requests:", error);
+      }
+    };
+
+    fetchLeaveRequests();
+  }, []);
+
   return (
     <div className="grid grid-cols-2 gap-12">
       <Link href={"/users/exec/projects"}>
@@ -53,6 +89,13 @@ export default function Dashboard() {
           icon={FaClock}
           total={totalTimesheets}
           title="Pending Timesheet Approvals"
+        />
+      </Link>
+      <Link href={"/users/exec/leave"}>
+        <DashboardCard
+          icon={FaCalendarCheck}
+          total={totalLeaveRequests}
+          title="Pending Leave Requests Approvals"
         />
       </Link>
     </div>
