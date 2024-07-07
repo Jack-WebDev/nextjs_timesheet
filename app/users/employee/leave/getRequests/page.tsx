@@ -266,7 +266,7 @@ export default function Timesheet() {
                       colSpan={columns.length}
                       className="h-24 text-center text-secondary font-semibold text-2xl"
                     >
-                      No timesheets to approve.
+                      No leave requests for now.
                     </TableCell>
                   </TableRow>
                 )}
