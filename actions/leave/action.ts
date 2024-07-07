@@ -1,19 +1,7 @@
 "use server";
 import db from "@/database/index";
+import { LeaveRequestProps } from "@/types/leaveProps";
 
-type LeaveRequestProps = {
-  fullName: string;
-  reason: string;
-  date: string;
-  totalHours?: number;
-  totalDays?: number;
-  requestFor: string;
-  leaveType: string;
-  email: string;
-  phoneNumber: string;
-  position: string;
-  userId: string;
-};
 
 export const createLeaveRequest = async (data: LeaveRequestProps) => {
   try {

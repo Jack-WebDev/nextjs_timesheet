@@ -126,6 +126,7 @@ export default function LeaveForm() {
   const email = user.NDTEmail;
   const position = user.Position;
 
+
   const calculateWorkingDays = (startDate?: Date, endDate?: Date): number => {
     if (!startDate || !endDate) {
       return 0;
@@ -180,6 +181,7 @@ export default function LeaveForm() {
       .split("T")[0]
   }`;
 
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -212,21 +214,20 @@ export default function LeaveForm() {
       requestFor: requestFor,
       leaveType: selectedLeaveType,
       reason: values.reason,
-      date: values.date,
+      date: requestFor === "Days" ? formattedDate : formattedHoursDate,
       totalHours: totalHours,
       totalDays: totalDays,
       userId: user.id,
     };
-
-    console.log(formData);
     try {
       await createLeaveRequest(formData);
       toast.success("Leave request has been created successfully.");
       router.refresh();
     } catch (error) {
       console.error("Error creating leave request:", error);
-    }finally {
-      setLoading(false);}
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -238,7 +239,7 @@ export default function LeaveForm() {
           <span>N/A</span>
         </div>
         <Link
-          href={"/leave/allrequests"}
+          href={"/users/employee/leave/getRequests"}
           className="border-2 border-primary p-4 rounded-xl w-1/3"
         >
           <h3>View All Leave Requests</h3>
