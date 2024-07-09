@@ -120,6 +120,14 @@ export default function HelpDesk() {
 
   const columns: ColumnDef<HelpDesk>[] = [
     {
+      accessorKey: "date",
+      header: "Date",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("date")}</div>
+      ),
+    }
+    ,
+    {
       accessorKey: "client",
       header: "Client",
       cell: ({ row }) => (
