@@ -1009,6 +1009,8 @@ export default function Timesheet() {
             )}
           </div>
         </form>
+        <div className="h-[35vh] overflow-y-scroll">
+
         <table className="mt-8">
           <thead className="pb-2">
             <tr>
@@ -1229,6 +1231,7 @@ export default function Timesheet() {
             })}
           </tbody>
         </table>
+        </div>
         <Dialog>
           <DialogTrigger asChild>
             <Button
@@ -1338,7 +1341,7 @@ export default function Timesheet() {
         </Dialog>
       </div>
 
-      <h2 className="text-center text-5xl my-12 text-secondary font-medium">
+      {/* <h2 className="text-center text-5xl my-12 text-secondary font-medium">
         Your Timesheets
       </h2>
       <div className="timesheets-container w-[80%] mx-auto">
@@ -1470,7 +1473,7 @@ export default function Timesheet() {
       )}
       {showPDF && (
         <GeneratePDF timesheet={selectedTimesheet} onClose={handleClosePDF} />
-      )}
+      )} */}
     </>
   );
 }
