@@ -1009,6 +1009,8 @@ export default function Timesheet() {
             )}
           </div>
         </form>
+        <div className="h-[35vh] overflow-y-scroll">
+
         <table className="mt-8">
           <thead className="pb-2">
             <tr>
@@ -1229,6 +1231,7 @@ export default function Timesheet() {
             })}
           </tbody>
         </table>
+        </div>
         <Dialog>
           <DialogTrigger asChild>
             <Button
