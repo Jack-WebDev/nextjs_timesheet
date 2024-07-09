@@ -1341,7 +1341,7 @@ export default function Timesheet() {
         </Dialog>
       </div>
 
-      {/* <h2 className="text-center text-5xl my-12 text-secondary font-medium">
+      <h2 className="text-center text-5xl my-12 text-secondary font-medium">
         Your Timesheets
       </h2>
       <div className="timesheets-container w-[80%] mx-auto">
@@ -1473,7 +1473,7 @@ export default function Timesheet() {
       )}
       {showPDF && (
         <GeneratePDF timesheet={selectedTimesheet} onClose={handleClosePDF} />
-      )} */}
+      )}
     </>
   );
 }
