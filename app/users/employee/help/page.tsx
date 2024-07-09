@@ -69,7 +69,7 @@ export default function HelpDesk() {
     property: "",
     contactPerson: "",
     contactNo: "",
-    email: ""
+    email: "",
   });
   const [studentData, setStudentData] = useState<Student>({
     idNumber: "",
@@ -98,6 +98,7 @@ export default function HelpDesk() {
   const [totalTickets, setTotalTickets] = useState(0);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [hideButton, setHideButton] = useState(true);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -110,6 +111,11 @@ export default function HelpDesk() {
     );
     setFilteredTickets(filteredTickets);
     setTotalTickets(filteredTickets.length);
+    if (user.NDTEmail === "fundib@ndt.co.za") {
+      setHideButton(false);
+    } else {
+      setHideButton(true);
+    }
   }, [tickets, user.NDTEmail]);
 
   const columns: ColumnDef<HelpDesk>[] = [
@@ -150,7 +156,6 @@ export default function HelpDesk() {
         const ticket = row.original;
 
         if (!ticket) return null;
-
 
         return (
           <DropdownMenu>
@@ -242,7 +247,9 @@ export default function HelpDesk() {
                                     : "N/A"}
                                 </td>
                                 <td className="text-center">
-                                  {ticket.student ? ticket.student.email : "N/A"}
+                                  {ticket.student
+                                    ? ticket.student.email
+                                    : "N/A"}
                                 </td>
                                 <td className="text-center">
                                   {ticket.student
@@ -269,6 +276,7 @@ export default function HelpDesk() {
       },
     },
   ];
+
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -482,7 +490,7 @@ export default function HelpDesk() {
         client: helpDeskData.client,
         duration: duration,
         status: selectedResolution,
-        email: apData.email
+        email: apData.email,
       };
       console.log(formData);
       try {
@@ -543,6 +551,15 @@ export default function HelpDesk() {
   return (
     <>
       {loading && <Loading />}
+
+      <button
+        onClick={() => router.push("/users/employee/help/report")}
+        className={`${hideButton ? "hidden" : "inline-block"} p-4 rounded-xl text-white ${
+          isDarkMode ? "bg-[rgba(162,161,168,0.1)] text-white" : "bg-primary text-white"
+        }`}
+      >
+        Help Desk Report
+      </button>
 
       <div className="grid rounded-xl p-4 mt-8 border-2 border-primary">
         <div className="flex justify-around items-center mb-12">
@@ -692,7 +709,7 @@ export default function HelpDesk() {
                                   }
                                 />
                               </div>
-                            <div className="grid">
+                              <div className="grid">
                                 <label htmlFor="apField">Email:</label>
                                 <input
                                   type="email"
@@ -705,7 +722,6 @@ export default function HelpDesk() {
                                 />
                               </div>
                             </div>
-
                           </div>
                         </div>
                       </div>
