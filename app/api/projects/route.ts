@@ -1,6 +1,9 @@
 import { NextResponse, NextRequest } from "next/server";
 import db from "@/database/index";
 
+export const revalidate = 0;
+
+
 export async function GET() {
   try {
     const res = await db.project.findMany({
