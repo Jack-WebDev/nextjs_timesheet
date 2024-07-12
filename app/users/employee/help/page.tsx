@@ -48,6 +48,7 @@ import Loading from "../loading";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import {
+  ArrowUpDown,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -121,12 +122,19 @@ export default function HelpDesk() {
   const columns: ColumnDef<HelpDesk>[] = [
     {
       accessorKey: "date",
-      header: "Date",
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("date")}</div>
-      ),
-    }
-    ,
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Date
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => (<div className="capitalize">{row.getValue("date")}</div>),
+    },
     {
       accessorKey: "client",
       header: "Client",
@@ -284,7 +292,6 @@ export default function HelpDesk() {
       },
     },
   ];
-
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -562,8 +569,12 @@ export default function HelpDesk() {
 
       <button
         onClick={() => router.push("/users/employee/help/report")}
-        className={`${hideButton ? "hidden" : "inline-block"} p-4 rounded-xl text-white ${
-          isDarkMode ? "bg-[rgba(162,161,168,0.1)] text-white" : "bg-primary text-white"
+        className={`${
+          hideButton ? "hidden" : "inline-block"
+        } p-4 rounded-xl text-white ${
+          isDarkMode
+            ? "bg-[rgba(162,161,168,0.1)] text-white"
+            : "bg-primary text-white"
         }`}
       >
         Help Desk Report

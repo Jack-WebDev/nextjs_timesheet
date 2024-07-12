@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   MoreHorizontal,
   Eye,
+  ArrowUpDown,
 } from "lucide-react";
 
 import {
@@ -463,10 +464,18 @@ export default function Timesheet() {
     },
     {
       accessorKey: "projectName",
-      header: "Project(s)",
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("projectName")}</div>
-      ),
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Project(s)
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => (<div className="capitalize">{row.getValue("projectName")}</div>),
     },
     {
       accessorKey: "projectManager",
@@ -1212,9 +1221,7 @@ export default function Timesheet() {
 
                   <td className="text-center">
                     <textarea
-                      className={`px-4 py-2 border border-black rounded-xl ${
-                        isDarkMode ? "text-black" : "text-white"
-                      }`}
+                      className={`px-4 py-2 border border-black rounded-xl text-black`}
                       placeholder="Add a comment..."
                       value={row.comment}
                       onChange={(e) =>

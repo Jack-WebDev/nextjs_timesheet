@@ -31,7 +31,7 @@ import { useThemeStore, useUser } from "@/app/store";
 import ApproveTimesheet from "@/components/dialogUI/ApproveTimesheet";
 import { TimesheetProps } from "@/types/timesheetProps";
 import useFetchTimesheets from "@/hooks/useFetchTimesheets";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 export default function Timesheet() {
   const timesheetData = useFetchTimesheets();
@@ -56,10 +56,18 @@ export default function Timesheet() {
     },
     {
       accessorKey: "projectName",
-      header: "Project Name",
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("projectName")}</div>
-      ),
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Project(s)
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => (<div className="capitalize">{row.getValue("projectName")}</div>),
     },
     {
       accessorKey: "name",
