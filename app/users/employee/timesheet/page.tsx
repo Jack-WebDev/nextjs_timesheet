@@ -3,29 +3,6 @@
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { addDays, differenceInDays, eachDayOfInterval, format } from "date-fns";
 import { DateRange as DayPickerDateRange } from "react-day-picker";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import {
-  ChevronsRight,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronLeft,
-  MoreHorizontal,
-  Eye,
-  ArrowUpDown,
-} from "lucide-react";
-
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
 
 import {
   Dialog,
@@ -37,26 +14,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { Input } from "@/components/ui/input";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -76,29 +33,10 @@ import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 import useFetchProjects from "@/hooks/useFetchProjects";
 import useFetchUsers from "@/hooks/useFetchUsers";
 import { UserProps } from "@/types/userProps";
-import { FaEye, FaFilePdf, FaTrash } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Loading from "../loading";
 import { useRouter } from "next/navigation";
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
-import dynamic from "next/dynamic";
-const PDFViewer = dynamic(
-  () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
-  { ssr: false }
-);
-
-// Create styles
-const styles = StyleSheet.create({
-  viewer: { width: "100%", height: "50vh" },
-  page: { padding: 30 },
-  section: { marginBottom: 10 },
-  heading: { fontSize: 20, marginBottom: 10 },
-  text: { fontSize: 12, marginBottom: 5 },
-  table: { width: "auto", marginBottom: 20 },
-  tableRow: { flexDirection: "row" },
-  tableCol: { flex: 1 },
-  tableCell: { margin: 5, fontSize: 10 },
-});
 
 type FormDetails = {
   month: string;
@@ -188,9 +126,7 @@ export default function Timesheet() {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isAddingTask, setIsAddingTask] = useState(false);
-  const modalRef = useRef(null);
-  const [showPDF, setShowPDF] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   const [formDetails, setFormDetails] = useState<FormDetails>({
     month: "",
@@ -198,353 +134,6 @@ export default function Timesheet() {
     role: userZ.Position,
     projectManager: "",
     projectName: "",
-  });
-
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
-  const [isDialogOpen, setDialogOpen] = useState(false);
-  const [selectedTimesheet, setSelectedTimesheet] =
-    useState<TimesheetProps | null>(null);
-
-  const handleViewTimesheet = (timesheet: TimesheetProps) => {
-    setSelectedTimesheet(timesheet);
-    setDialogOpen(true);
-  };
-
-  const handleClosePDF = () => {
-    setShowPDF(false);
-  };
-
-  const handleGeneratePDF = (timesheet: TimesheetProps) => {
-    setSelectedTimesheet(timesheet);
-    setShowPDF(true);
-    
-  };
-
-  const TimesheetDialog = ({ timesheet, closeDialog }: any) => {
-    const statusClass =
-      timesheet.Approval_Status === "Pending"
-        ? "text-yellow-500 font-semibold"
-        : timesheet.Approval_Status.includes("Rejected")
-        ? "text-red-500 font-semibold font-semibold"
-        : timesheet.Approval_Status.includes("Approved")
-        ? "text-green-700 font-semibold"
-        : "";
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Dialog open={true} onOpenChange={closeDialog}>
-            <DialogTrigger asChild>
-              <span className="cursor-pointer">
-                <DotsHorizontalIcon className="h-4 w-4" />
-              </span>
-            </DialogTrigger>
-            <DialogContent ref={modalRef} className="w-[70%] text-black">
-              <DialogHeader className="flex flex-row items-baseline justify-around">
-                <DialogTitle>Timesheet Details</DialogTitle>
-                <div className="grid text-xl">
-                  <div className="flex">
-                    Approval Status:
-                    <span className={statusClass}>
-                      {timesheet.Approval_Status}
-                    </span>
-                  </div>
-                </div>
-              </DialogHeader>
-              <div>
-                <table className="generate w-full">
-                  <thead className="text-black">
-                    <tr>
-                      <th>Weekday</th>
-                      <th>Type Of Day</th>
-                      <th>Total Time</th>
-                      <th>Project Name</th>
-                      <th>Tasks Performed</th>
-                      <th>Task Status</th>
-                      <th>Comment</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {timesheet &&
-                      timesheet.tableRows &&
-                      timesheet.tableRows?.map((r: any) => (
-                        <tr key={r.id} className="border-b border-secondary">
-                          <td className="text-black text-center">
-                            <p>{r.weekday}</p>
-                          </td>
-                          <td className="text-black text-center">
-                            <p>{r.typeOfDay === "" ? "N/A" : r.typeOfDay}</p>
-                          </td>
-                          <td className="text-black text-center">
-                            <p>{`${r.totalHours} hrs ${r.totalMinutes} mins`}</p>
-                          </td>
-                          <td className="text-black text-center">
-                            {r.tasks && r.tasks.length > 0 ? (
-                              r.tasks.map((t: any) => (
-                                <div key={t.id}>
-                                  <p>
-                                    {t.projectName === ""
-                                      ? "N/A"
-                                      : t.projectName}
-                                  </p>
-                                </div>
-                              ))
-                            ) : (
-                              <p>N/A</p>
-                            )}
-                          </td>
-
-                          <td className="text-black text-center">
-                            {r.tasks && r.tasks.length > 0 ? (
-                              r.tasks.map((t: any) => (
-                                <div key={t.id}>
-                                  <p>
-                                    {t.taskPerformed === ""
-                                      ? "N/A"
-                                      : t.taskPerformed}
-                                  </p>
-                                </div>
-                              ))
-                            ) : (
-                              <p>N/A</p>
-                            )}
-                          </td>
-
-                          <td className="text-black text-center">
-                            {r.tasks && r.tasks.length > 0 ? (
-                              r.tasks.map((t: any) => (
-                                <div key={t.id}>
-                                  <p>{t.taskStatus}</p>
-                                </div>
-                              ))
-                            ) : (
-                              <span>N/A</span>
-                            )}
-                          </td>
-                          <td className="text-black text-center">
-                            <p>{r.comment === "" ? "N/A" : r.comment}</p>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-
-                <div className="mt-4">
-                  <h2 className="font-semibold text-black">
-                    Supervisor&apos;s comments:
-                  </h2>
-                  <p className="text-black">
-                    {timesheet.comments === ""
-                      ? "No comment."
-                      : timesheet.comments}
-                  </p>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </DropdownMenuTrigger>
-      </DropdownMenu>
-    );
-  };
-
-  const GeneratePDF = ({ timesheet, onClose }: any) => {
-    return (
-      <div className="absolute z-10 top-[100%] left-[20%] right-[20%] bottom-0">
-        <div className="w-full bg-gray-400 rounded-t-xl py-4 pl-4">
-
-        <Button variant={"default"} onClick={onClose} className="text-[1.5rem] font-semibold w-[20%] h-[5vh]">
-          Close PDF
-        </Button>
-        </div>
-        <PDFViewer style={styles.viewer}>
-          <Document>
-            <Page size="A4" style={styles.page}>
-              <View style={styles.section}>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text style={styles.heading}>Timesheet Details</Text>
-                  <View style={{ display: "flex", flexDirection: "row" }}>
-                    <Text style={styles.text}>Approval Status:</Text>
-                    <Text style={styles.text}>{timesheet.Approval_Status}</Text>
-                  </View>
-                </View>
-                <View style={styles.table}>
-                  <View
-                    style={[styles.tableRow, { backgroundColor: "#f0f0f0" }]}
-                  >
-                    <Text style={[styles.tableCol, styles.tableCell]}>
-                      Weekday
-                    </Text>
-                    <Text style={[styles.tableCol, styles.tableCell]}>
-                      Type Of Day
-                    </Text>
-                    <Text style={[styles.tableCol, styles.tableCell]}>
-                      Total Time
-                    </Text>
-                    <Text style={[styles.tableCol, styles.tableCell]}>
-                      Project Name
-                    </Text>
-                    <Text style={[styles.tableCol, styles.tableCell]}>
-                      Tasks Performed
-                    </Text>
-                    <Text style={[styles.tableCol, styles.tableCell]}>
-                      Task Status
-                    </Text>
-                    <Text style={[styles.tableCol, styles.tableCell]}>
-                      Comment
-                    </Text>
-                  </View>
-                  {timesheet?.tableRows?.map((r: any) => (
-                    <View key={r.id} style={styles.tableRow}>
-                      <Text style={[styles.tableCol, styles.tableCell]}>
-                        {r.weekday}
-                      </Text>
-                      <Text style={[styles.tableCol, styles.tableCell]}>
-                        {r.typeOfDay || "N/A"}
-                      </Text>
-                      <Text
-                        style={[styles.tableCol, styles.tableCell]}
-                      >{`${r.totalHours} hrs ${r.totalMinutes} mins`}</Text>
-                      <Text style={[styles.tableCol, styles.tableCell]}>
-                        {r.tasks.length > 0
-                          ? r.tasks
-                              .map((t: any) => t.projectName || "N/A")
-                              .join(", ")
-                          : "N/A"}
-                      </Text>
-                      <Text style={[styles.tableCol, styles.tableCell]}>
-                        {r.tasks.length > 0
-                          ? r.tasks
-                              .map((t: any) => t.taskPerformed || "N/A")
-                              .join(", ")
-                          : "N/A"}
-                      </Text>
-                      <Text style={[styles.tableCol, styles.tableCell]}>
-                        {r.tasks.length > 0
-                          ? r.tasks.map((t: any) => t.taskStatus).join(", ")
-                          : "N/A"}
-                      </Text>
-                      <Text style={[styles.tableCol, styles.tableCell]}>
-                        {r.comment || "N/A"}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-                <View style={styles.section}>
-                  <Text style={{ fontSize: 14, marginTop: 10 }}>
-                    Supervisor&apos;s comments:
-                  </Text>
-                  <Text style={styles.text}>
-                    {timesheet.comments || "No comment."}
-                  </Text>
-                </View>
-              </View>
-            </Page>
-          </Document>
-        </PDFViewer>
-      </div>
-    );
-  };
-
-  const columns: ColumnDef<TimesheetProps>[] = [
-    {
-      accessorKey: "Approval_Status",
-      header: "Approval Status",
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("Approval_Status")}</div>
-      ),
-    },
-    {
-      accessorKey: "projectName",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Project(s)
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => (<div className="capitalize">{row.getValue("projectName")}</div>),
-    },
-    {
-      accessorKey: "projectManager",
-      header: "Supervisor",
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("projectManager")}</div>
-      ),
-    },
-    {
-      accessorKey: "actions",
-      header: () => <div className="text-start">Actions</div>,
-      sortDescFirst: true,
-      enableSorting: true,
-      cell: ({ row }) => {
-        const timesheet = row.original;
-
-        return (
-          <>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white rounded-xl">
-                <DropdownMenuLabel className="border-b border-primary">Actions</DropdownMenuLabel>
-
-                <DropdownMenuItem
-                  onClick={() => handleViewTimesheet(timesheet)} className="cursor-pointer flex items-center gap-x-2"
-                >
-                  <FaEye/> View Timesheet
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleGeneratePDF(timesheet)} className="cursor-pointer flex items-center gap-x-2">
-                  <FaFilePdf/> Generate PDF
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-         
-        );
-      },
-    },
-  ];
-
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 5,
-  });
-
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    onPaginationChange: setPagination,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-      pagination,
-    },
   });
 
   useEffect(() => {
@@ -955,29 +544,6 @@ export default function Timesheet() {
               </PopoverContent>
             </Popover>
           </div>
-
-          {/* <div className="grid w-[60%]">
-            <label htmlFor="name" className="mb-1 text-[1.2rem]">
-              Project Name
-            </label>
-            <select
-              name="name"
-              className={`border border-primary p-2 rounded-xl h-[4vh] ${isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"}`}
-              value={chosenProject}
-              onChange={handleProjectChange}
-            >
-              <option value={""}>Select Project</option>
-              {projects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.Project_Name}
-                </option>
-              ))}
-            </select>
-
-            {errors.projectName && (
-              <p className="text-red-500 font-semibold">{errors.projectName}</p>
-            )}
-          </div> */}
           <div className="relative grid justify-start items-end h-[10vh]">
             <label className="text-[1.2rem]">Supervisor:</label>
             <input
@@ -1019,468 +585,351 @@ export default function Timesheet() {
           </div>
         </form>
         <div className="h-[35vh] overflow-y-scroll">
+          <table className="mt-8">
+            <thead className="pb-2">
+              <tr>
+                <th>Weekday</th>
+                <th>Type of Day </th>
+                <th>Total Time</th>
+                <th>Tasks Performed</th>
+                <th>Comment</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableData.map((row, rowIndex) => {
+                const allFieldsComplete = row.tasks.every(validateTask);
+                const typeOfDay = row.typeOfDay.trim() !== "";
 
-        <table className="mt-8">
-          <thead className="pb-2">
-            <tr>
-              <th>Weekday</th>
-              <th>Type of Day </th>
-              <th>Total Time</th>
-              <th>Tasks Performed</th>
-              <th>Comment</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableData.map((row, rowIndex) => {
-              const allFieldsComplete = row.tasks.every(validateTask);
-              const typeOfDay = row.typeOfDay.trim() !== "";
-
-              return (
-                <tr key={rowIndex} className="border-b border-secondary py-2">
-                  <td className="text-center">
-                    <input
-                      className="py-1 px-2 border border-primary bg-transparent rounded-xl pointer-events-none"
-                      type="date"
-                      value={row.weekday}
-                      onChange={(e) =>
-                        setTableData((prevData) => {
-                          const newData = [...prevData];
-                          newData[rowIndex].weekday = e.target.value;
-                          return newData;
-                        })
-                      }
-                      readOnly
-                    />
-                  </td>
-                  <td className="text-center">
-                    <select
-                      name=""
-                      id=""
-                      className={`w-[10vw] border border-primary p-2 rounded-xl ${
-                        isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"
-                      }`}
-                      value={row.typeOfDay}
-                      onChange={(e) =>
-                        setTableData((prevData) => {
-                          const newData = [...prevData];
-                          newData[rowIndex].typeOfDay = e.target.value;
-                          return newData;
-                        })
-                      }
-                    >
-                      <option value="">Select type of day</option>
-                      <option value="Public Holiday">Public Holiday</option>
-                      <option value="Normal Day">Work Day</option>
-                      <option value="Weekend">Weekend</option>
-                      <option value="Day-Off">Day-Off</option>
-                      <option value="Leave">Leave</option>
-                    </select>
-                  </td>
-                  <td className="text-center w-[10%]">
-                    <input
-                      className="pointer-events-none w-[100%] px-4 border border-primary bg-transparent"
-                      type="text"
-                      value={`${row.totalHours} hrs ${row.totalMinutes} mins`}
-                      readOnly
-                    />
-                  </td>
-
-                  <td className="grid text-center">
-                    {row.tasks.map((task, taskIndex) => (
-                      <div
-                        key={taskIndex}
-                        className="flex justify-center items-end mb-2 gap-x-4"
+                return (
+                  <tr key={rowIndex} className="border-b border-secondary py-2">
+                    <td className="text-center">
+                      <input
+                        className="py-1 px-2 border border-primary bg-transparent rounded-xl pointer-events-none"
+                        type="date"
+                        value={row.weekday}
+                        onChange={(e) =>
+                          setTableData((prevData) => {
+                            const newData = [...prevData];
+                            newData[rowIndex].weekday = e.target.value;
+                            return newData;
+                          })
+                        }
+                        readOnly
+                      />
+                    </td>
+                    <td className="text-center">
+                      <select
+                        name=""
+                        id=""
+                        className={`w-[10vw] border border-primary p-2 rounded-xl ${
+                          isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"
+                        }`}
+                        value={row.typeOfDay}
+                        onChange={(e) =>
+                          setTableData((prevData) => {
+                            const newData = [...prevData];
+                            newData[rowIndex].typeOfDay = e.target.value;
+                            return newData;
+                          })
+                        }
                       >
-                        <select
-                          className={`w-[8vw] h-[60%] border border-primary p-2 rounded-xl ${
-                            isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"
-                          }`}
-                          value={task.projectName}
-                          onChange={(e) =>
-                            handleChange(
-                              rowIndex,
-                              taskIndex,
-                              "projectName",
-                              e.target.value
-                            )
-                          }
+                        <option value="">Select type of day</option>
+                        <option value="Public Holiday">Public Holiday</option>
+                        <option value="Normal Day">Work Day</option>
+                        <option value="Weekend">Weekend</option>
+                        <option value="Day-Off">Day-Off</option>
+                        <option value="Leave">Leave</option>
+                      </select>
+                    </td>
+                    <td className="text-center w-[10%]">
+                      <input
+                        className="pointer-events-none w-[100%] px-4 border border-primary bg-transparent"
+                        type="text"
+                        value={`${row.totalHours} hrs ${row.totalMinutes} mins`}
+                        readOnly
+                      />
+                    </td>
+
+                    <td className="grid text-center">
+                      {row.tasks.map((task, taskIndex) => (
+                        <div
+                          key={taskIndex}
+                          className="flex justify-center items-end mb-2 gap-x-4"
                         >
-                          <option value={""}>Select Project</option>
-                          {projects.map((project) => (
-                            <option
-                              key={project.id}
-                              value={project.Project_Name}
-                            >
-                              {project.Project_Name}
-                            </option>
-                          ))}
-                        </select>
-                        <textarea
-                          className={`py-1 px-4 border border-black rounded-xl w-1/2 ${
-                            isDarkMode ? "text-black" : "text-black"
-                          }`}
-                          placeholder="Describe the task performed....."
-                          value={task.taskPerformed}
-                          onChange={(e) =>
-                            handleChange(
-                              rowIndex,
-                              taskIndex,
-                              "taskPerformed",
-                              e.target.value
-                            )
-                          }
-                        />
-                        <select
-                          className={`w-[8vw] h-[60%] border border-primary p-2 rounded-xl ${
-                            isDarkMode ? "bg-[rgba(0,0,0,0.3)]" : "bg-[#F5F5F5]"
-                          }`}
-                          value={task.taskStatus}
-                          onChange={(e) =>
-                            handleChange(
-                              rowIndex,
-                              taskIndex,
-                              "taskStatus",
-                              e.target.value
-                            )
-                          }
-                        >
-                          <option value="">Select status</option>
-                          <option value="In-Progress">In-Progress</option>
-                          <option value="Completed">Completed</option>
-                          <option value="Continuous">Continuous</option>
-                        </select>
-                        <div className="grid w-[13%] justify-items-center">
-                          <label htmlFor="hours">Hours</label>
-                          <input
-                            className={`py-1 px-2 border border-black rounded-xl w-full ${
-                              isDarkMode ? "text-black" : "text-black"
+                          <select
+                            className={`w-[8vw] h-[60%] border border-primary p-2 rounded-xl ${
+                              isDarkMode
+                                ? "bg-[rgba(0,0,0,0.3)]"
+                                : "bg-[#F5F5F5]"
                             }`}
-                            type="number"
-                            min={0}
-                            max={24}
-                            value={task.hours}
+                            value={task.projectName}
                             onChange={(e) =>
                               handleChange(
                                 rowIndex,
                                 taskIndex,
-                                "hours",
-                                parseInt(e.target.value, 10) || 0
+                                "projectName",
+                                e.target.value
                               )
                             }
-                            placeholder="Hours"
-                          />
-                        </div>
-                        <div className="grid w-[10%] justify-items-center">
-                          <label htmlFor="minutes">Minutes</label>
-                          <input
-                            className={`py-1 px-2 border border-black rounded-xl w-full ${
+                          >
+                            <option value={""}>Select Project</option>
+                            {projects.map((project) => (
+                              <option
+                                key={project.id}
+                                value={project.Project_Name}
+                              >
+                                {project.Project_Name}
+                              </option>
+                            ))}
+                          </select>
+                          <textarea
+                            className={`py-1 px-4 border border-black rounded-xl w-1/2 ${
                               isDarkMode ? "text-black" : "text-black"
                             }`}
-                            type="number"
-                            min={0}
-                            max={60}
-                            value={task.minutes}
+                            placeholder="Describe the task performed....."
+                            value={task.taskPerformed}
                             onChange={(e) =>
                               handleChange(
                                 rowIndex,
                                 taskIndex,
-                                "minutes",
-                                parseInt(e.target.value, 10) || 0
+                                "taskPerformed",
+                                e.target.value
                               )
                             }
-                            placeholder="Minutes"
+                          />
+                          <select
+                            className={`w-[8vw] h-[60%] border border-primary p-2 rounded-xl ${
+                              isDarkMode
+                                ? "bg-[rgba(0,0,0,0.3)]"
+                                : "bg-[#F5F5F5]"
+                            }`}
+                            value={task.taskStatus}
+                            onChange={(e) =>
+                              handleChange(
+                                rowIndex,
+                                taskIndex,
+                                "taskStatus",
+                                e.target.value
+                              )
+                            }
+                          >
+                            <option value="">Select status</option>
+                            <option value="In-Progress">In-Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Continuous">Continuous</option>
+                          </select>
+                          <div className="grid w-[13%] justify-items-center">
+                            <label htmlFor="hours">Hours</label>
+                            <input
+                              className={`py-1 px-2 border border-black rounded-xl w-full ${
+                                isDarkMode ? "text-black" : "text-black"
+                              }`}
+                              type="number"
+                              min={0}
+                              max={24}
+                              value={task.hours}
+                              onChange={(e) =>
+                                handleChange(
+                                  rowIndex,
+                                  taskIndex,
+                                  "hours",
+                                  parseInt(e.target.value, 10) || 0
+                                )
+                              }
+                              placeholder="Hours"
+                            />
+                          </div>
+                          <div className="grid w-[10%] justify-items-center">
+                            <label htmlFor="minutes">Minutes</label>
+                            <input
+                              className={`py-1 px-2 border border-black rounded-xl w-full ${
+                                isDarkMode ? "text-black" : "text-black"
+                              }`}
+                              type="number"
+                              min={0}
+                              max={60}
+                              value={task.minutes}
+                              onChange={(e) =>
+                                handleChange(
+                                  rowIndex,
+                                  taskIndex,
+                                  "minutes",
+                                  parseInt(e.target.value, 10) || 0
+                                )
+                              }
+                              placeholder="Minutes"
+                            />
+                          </div>
+
+                          <FaTrash
+                            onClick={() =>
+                              handleDeleteTask(rowIndex, taskIndex)
+                            }
+                            className="cursor-pointer text-red-600 text-[2.5rem] relative bottom-1 right-1"
                           />
                         </div>
+                      ))}
+                      <Button
+                        onClick={() => {
+                          setIsAddingTask(true);
+                          handleAddTask(rowIndex);
+                          setIsAddingTask(false);
+                        }}
+                        className={`grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold  mt-2 ${
+                          isDarkMode ? "hover:bg-white" : "hover:bg-transparent"
+                        } ${
+                          isAddingTask || !allFieldsComplete || !typeOfDay
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        disabled={
+                          isAddingTask || !allFieldsComplete || !typeOfDay
+                        }
+                      >
+                        Add Task
+                      </Button>
+                    </td>
 
-                        <FaTrash
-                          onClick={() => handleDeleteTask(rowIndex, taskIndex)}
-                          className="cursor-pointer text-red-600 text-[2.5rem] relative bottom-1 right-1"
-                        />
-                      </div>
-                    ))}
-                    <Button
-                      onClick={() => {
-                        setIsAddingTask(true);
-                        handleAddTask(rowIndex);
-                        setIsAddingTask(false);
-                      }}
-                      className={`grid w-fit justify-self-center rounded-xl text-white bg-secondary hover:text-secondary hover:font-semibold  mt-2 ${
-                        isDarkMode ? "hover:bg-white" : "hover:bg-transparent"
-                      } ${
-                        isAddingTask || !allFieldsComplete || !typeOfDay
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
-                      disabled={
-                        isAddingTask || !allFieldsComplete || !typeOfDay
-                      }
-                    >
-                      Add Task
-                    </Button>
-                  </td>
-
-                  <td className="text-center">
-                    <textarea
-                      className={`px-4 py-2 border border-black rounded-xl text-black`}
-                      placeholder="Add a comment..."
-                      value={row.comment}
-                      onChange={(e) =>
-                        setTableData((prevData) => {
-                          const newData = [...prevData];
-                          newData[rowIndex].comment = e.target.value;
-                          return newData;
-                        })
-                      }
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              variant="default"
-              className="mt-8 grid justify-self-end w-[15%]"
-            >
-              Submit
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="w-[70%]">
-            <DialogHeader>
-              <DialogTitle className="text-3xl text-secondary">
-                Are you ready to submit?
-              </DialogTitle>
-            </DialogHeader>
-            <div>
-              <table className="w-full">
-                <thead className="text-black">
-                  <tr>
-                    <th>Weekday</th>
-                    <th>Type Of Day</th>
-                    <th>Total Time</th>
-                    <th>Project Name</th>
-                    <th>Tasks Performed</th>
-                    <th>Task Status</th>
-                    <th>Comment</th>
+                    <td className="text-center">
+                      <textarea
+                        className={`px-4 py-2 border border-black rounded-xl text-black`}
+                        placeholder="Add a comment..."
+                        value={row.comment}
+                        onChange={(e) =>
+                          setTableData((prevData) => {
+                            const newData = [...prevData];
+                            newData[rowIndex].comment = e.target.value;
+                            return newData;
+                          })
+                        }
+                      />
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {tableData.length > 0
-                    ? tableData.map((r, index) => (
-                        <tr key={index} className="border-b border-secondary">
-                          <td className="text-black text-center">
-                            <p>{r.weekday}</p>
-                          </td>
-                          <td className="text-black text-center">
-                            <p>{r.typeOfDay === "" ? "N/A" : r.typeOfDay}</p>
-                          </td>
-                          <td className="text-black text-center">
-                            <p>{`${r.totalHours} hrs ${r.totalMinutes} mins`}</p>
-                          </td>
-                          <td className="text-black text-center">
-                            {r.tasks && r.tasks.length > 0 ? (
-                              r.tasks.map((t) => (
-                                <div key={t.id}>
-                                  <p>
-                                    {t.projectName === ""
-                                      ? "N/A"
-                                      : t.projectName}
-                                  </p>
-                                </div>
-                              ))
-                            ) : (
-                              <p>N/A</p>
-                            )}
-                          </td>
-                          <td className="text-black text-center">
-                            {r.tasks && r.tasks.length > 0 ? (
-                              r.tasks.map((t) => (
-                                <div key={t.id}>
-                                  <p>
-                                    {t.taskPerformed === ""
-                                      ? "N/A"
-                                      : t.taskPerformed}
-                                  </p>
-                                </div>
-                              ))
-                            ) : (
-                              <p>N/A</p>
-                            )}
-                          </td>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex justify-between items-baseline px-8">
+          <Button
+            variant={"secondary"}
+            className="rounded-xl text-white"
+            onClick={() =>
+              router.push("/users/employee/timesheet/timesheet-details")
+            }
+          >
+            View Your Timesheets
+          </Button>
 
-                          <td className="text-black text-center">
-                            {r.tasks && r.tasks.length > 0 ? (
-                              r.tasks.map((t) => (
-                                <div key={t.id}>
-                                  <p>{t.taskStatus}</p>
-                                </div>
-                              ))
-                            ) : (
-                              <span>N/A</span>
-                            )}
-                          </td>
-                          <td className="text-black text-center">
-                            <p>{r.comment === "" ? "N/A" : r.comment}</p>
-                          </td>
-                        </tr>
-                      ))
-                    : null}
-                </tbody>
-              </table>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button
-                  variant="outline"
-                  className={`${isDarkMode ? "text-black" : "text-black"}`}
-                >
-                  Cancel
-                </Button>
-              </DialogClose>{" "}
-              <Button type="submit" onClick={handleSubmit}>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="default"
+                className="mt-8 grid justify-self-end w-[15%]"
+              >
                 Submit
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <h2 className="text-center text-5xl my-12 text-secondary font-medium">
-        Your Timesheets
-      </h2>
-      <div className="timesheets-container w-[80%] mx-auto">
-        <div className="w-full p-4 rounded-xl border-2 border-primary">
-          <div className="flex items-center py-4">
-            <Input
-              placeholder="Filter by project name...."
-              value={
-                (table.getColumn("projectName")?.getFilterValue() as string) ??
-                ""
-              }
-              onChange={(event) =>
-                table
-                  .getColumn("projectName")
-                  ?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm px-4 py-1 border border-primary bg-transparent rounded-xl"
-            />
-          </div>
-
-          <div>
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead
-                          key={header.id}
-                          className="text-[1rem] font-medium"
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
+            </DialogTrigger>
+            <DialogContent className="w-[70%]">
+              <DialogHeader>
+                <DialogTitle className="text-3xl text-secondary">
+                  Are you ready to submit?
+                </DialogTitle>
+              </DialogHeader>
+              <div>
+                <table className="w-full">
+                  <thead className="text-black">
+                    <tr>
+                      <th>Weekday</th>
+                      <th>Type Of Day</th>
+                      <th>Total Time</th>
+                      <th>Project Name</th>
+                      <th>Tasks Performed</th>
+                      <th>Task Status</th>
+                      <th>Comment</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tableData.length > 0
+                      ? tableData.map((r, index) => (
+                          <tr key={index} className="border-b border-secondary">
+                            <td className="text-black text-center">
+                              <p>{r.weekday}</p>
+                            </td>
+                            <td className="text-black text-center">
+                              <p>{r.typeOfDay === "" ? "N/A" : r.typeOfDay}</p>
+                            </td>
+                            <td className="text-black text-center">
+                              <p>{`${r.totalHours} hrs ${r.totalMinutes} mins`}</p>
+                            </td>
+                            <td className="text-black text-center">
+                              {r.tasks && r.tasks.length > 0 ? (
+                                r.tasks.map((t) => (
+                                  <div key={t.id}>
+                                    <p>
+                                      {t.projectName === ""
+                                        ? "N/A"
+                                        : t.projectName}
+                                    </p>
+                                  </div>
+                                ))
+                              ) : (
+                                <p>N/A</p>
                               )}
-                        </TableHead>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                      className={`${
-                        isDarkMode
-                          ? "text-white"
-                          : "text-black odd:bg-white even:bg-slate-100 "
-                      }`}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center font-bold text-xl text-secondary"
-                    >
-                      No timesheets for now.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-        <div className="flex justify-center flex-col items-center gap-2 mt-12">
-          <div className="flex items-center gap-4">
-            <Button
-              variant={"default"}
-              className="border rounded p-1"
-              onClick={() => table.firstPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronsLeft />
-            </Button>
-            <Button
-              variant={"default"}
-              className="border rounded p-1"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronLeft />
-            </Button>
-            <Button
-              variant={"default"}
-              className="border rounded p-1"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <ChevronRight />
-            </Button>
-            <Button
-              variant={"default"}
-              className="border rounded p-1"
-              onClick={() => table.lastPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <ChevronsRight />
-            </Button>
-          </div>
-          <span className="flex items-center gap-1">
-            <div>Page</div>
-            <strong>
-              {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount().toLocaleString()}
-            </strong>
-          </span>
+                            </td>
+                            <td className="text-black text-center">
+                              {r.tasks && r.tasks.length > 0 ? (
+                                r.tasks.map((t) => (
+                                  <div key={t.id}>
+                                    <p>
+                                      {t.taskPerformed === ""
+                                        ? "N/A"
+                                        : t.taskPerformed}
+                                    </p>
+                                  </div>
+                                ))
+                              ) : (
+                                <p>N/A</p>
+                              )}
+                            </td>
+
+                            <td className="text-black text-center">
+                              {r.tasks && r.tasks.length > 0 ? (
+                                r.tasks.map((t) => (
+                                  <div key={t.id}>
+                                    <p>{t.taskStatus}</p>
+                                  </div>
+                                ))
+                              ) : (
+                                <span>N/A</span>
+                              )}
+                            </td>
+                            <td className="text-black text-center">
+                              <p>{r.comment === "" ? "N/A" : r.comment}</p>
+                            </td>
+                          </tr>
+                        ))
+                      : null}
+                  </tbody>
+                </table>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button
+                    variant="outline"
+                    className={`${isDarkMode ? "text-black" : "text-black"}`}
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>{" "}
+                <Button type="submit" onClick={handleSubmit}>
+                  Submit
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
-      {isDialogOpen && selectedTimesheet && (
-        <TimesheetDialog
-          timesheet={selectedTimesheet}
-          closeDialog={() => setDialogOpen(false)}
-        />
-      )}
-      {showPDF && (
-        <GeneratePDF timesheet={selectedTimesheet} onClose={handleClosePDF} />
-      )}
     </>
   );
 }
