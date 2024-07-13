@@ -131,9 +131,11 @@ export default function HelpDesk() {
             Date
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
-      cell: ({ row }) => (<div className="capitalize">{row.getValue("date")}</div>),
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("date")}</div>
+      ),
     },
     {
       accessorKey: "client",
@@ -141,6 +143,23 @@ export default function HelpDesk() {
       cell: ({ row }) => (
         <div className="capitalize">{row.getValue("client")}</div>
       ),
+    },
+    {
+      id: "client name",
+      header: "Client Name",
+      cell: ({ row }) => {
+        const client = row.original.client;
+        const student = row.original.student;
+        const ap = row.original.ap;
+
+        if (client === "Student" && student) {
+          return <div className="capitalize">{student.fullName}</div>;
+        } else if (client === "AP" && ap) {
+          return <div className="capitalize">{ap.property}</div>;
+        } else {
+          return <div className="capitalize">N/A</div>;
+        }
+      },
     },
     {
       accessorKey: "query",
@@ -295,7 +314,7 @@ export default function HelpDesk() {
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 8,
   });
 
   const table = useReactTable({
@@ -580,7 +599,7 @@ export default function HelpDesk() {
         Help Desk Report
       </button>
 
-      <div className="grid rounded-xl p-4 mt-8 border-2 border-primary">
+      <div className="grid rounded-xl p-4 border-2 border-primary">
         <div className="flex justify-around items-center mb-12">
           <div className="grid rounded-xl border-2 border-[rgba(162,161,168,0.2)]  px-4 py-2  w-[15%] ">
             <h2>Total tickets</h2>
@@ -1055,7 +1074,7 @@ export default function HelpDesk() {
           )}
         </div>
       </div>
-      <div className="mt-[10rem]">
+      <div className="mt-[5rem]">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
