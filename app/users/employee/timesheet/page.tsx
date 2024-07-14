@@ -37,6 +37,8 @@ import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Loading from "../loading";
 import { useRouter } from "next/navigation";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { Clock } from "lucide-react";
 
 type FormDetails = {
   month: string;
@@ -421,6 +423,9 @@ export default function Timesheet() {
   return (
     <>
       {loading && <Loading />}
+      <div className="mb-8">
+      <PageHeader title="Timesheets" Icon={Clock} />
+      </div>
       <div className="grid border-2 border-primary p-8 rounded-xl">
         <form className="grid grid-cols-3 border-b-2 border-secondary pb-8 gap-y-4 items-end">
           <div>

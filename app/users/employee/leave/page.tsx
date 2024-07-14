@@ -26,7 +26,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, CircleHelp, ScanEye } from "lucide-react";
+import { CalendarClock, CalendarIcon, CircleHelp } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { addDays, format, isWeekend } from "date-fns";
 import { useState } from "react";
@@ -39,6 +39,7 @@ import { createLeaveRequest } from "@/actions/leave/action";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import useFetchLeaves from "@/hooks/useFetchLeaves";
+import { PageHeader } from "@/components/shared/PageHeader";
 
 const formSchema = z.object({
   fullName: z.string().nullable(),
@@ -232,6 +233,9 @@ export default function LeaveForm() {
   return (
     <div>
       {loading && <Loading />}
+      <div className="mb-12">
+      <PageHeader title="Leaves" Icon={CalendarClock} />
+      </div>
       <div className="flex gap-x-8">
         <div className="border-2 border-primary p-4 rounded-xl w-1/3">
           <h3>Number of Annual Leave Days Left:</h3>

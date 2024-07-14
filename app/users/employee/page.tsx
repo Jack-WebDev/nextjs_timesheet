@@ -7,6 +7,8 @@ import DashboardCard from "@/components/DashboardCard";
 import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 import { useEffect, useState } from "react";
 import { useUser } from "@/app/store";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { LayoutDashboard } from "lucide-react";
 
 export default function Dashboard() {
   const timesheetData = useFetchTimesheets();
@@ -22,11 +24,9 @@ export default function Dashboard() {
           .trim()
           .toLowerCase();
 
-
         return (
- 
-          (formattedProjectManagerName === formattedUserFullName &&
-            timesheet.Approval_Status.includes("Pending"))
+          formattedProjectManagerName === formattedUserFullName &&
+          timesheet.Approval_Status.includes("Pending")
         );
       });
 
@@ -35,15 +35,17 @@ export default function Dashboard() {
   }, [timesheetData, user.Name, user.Surname]);
 
   return (
-    <div className="grid grid-cols-2 gap-12">
-
-      <Link href={"/users/employee/Approvals"}>
-        <DashboardCard
-          icon={FaCheck}
-          total={totalTimesheets}
-          title="Pending Approvals"
-        />
-      </Link>
-    </div>
+    <>
+      <PageHeader title="Dashboard" Icon={LayoutDashboard} />
+      <div className="grid grid-cols-2 gap-12 mt-12">
+        <Link href={"/users/employee/Approvals"}>
+          <DashboardCard
+            icon={FaCheck}
+            total={totalTimesheets}
+            title="Pending Approvals"
+          />
+        </Link>
+      </div>
+    </>
   );
 }
