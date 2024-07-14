@@ -36,7 +36,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <PageHeader title="Your Timesheets" Icon={LayoutDashboard} />
+      <PageHeader title="Dashboard" Icon={LayoutDashboard} />
       <div className="grid grid-cols-2 gap-12 mt-12">
         <Link href={"/users/employee/Approvals"}>
           <DashboardCard

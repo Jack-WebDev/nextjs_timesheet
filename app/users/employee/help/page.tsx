@@ -588,9 +588,9 @@ export default function HelpDesk() {
     <>
       {loading && <Loading />}
       <div className="mb-12">
-      <PageHeader title="Help Desk" Icon={Info} />
+        <PageHeader title="Help Desk" Icon={Info} />
       </div>
-        
+
       <button
         onClick={() => router.push("/users/employee/help/report")}
         className={`mb-8 ${
