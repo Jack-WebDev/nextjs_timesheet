@@ -34,6 +34,7 @@ import { TimesheetProps } from "@/types/timesheetProps";
 import useFetchTimesheets from "@/hooks/useFetchTimesheets";
 import useFetchLeaveRequest from "@/hooks/useFetchLeaves";
 import {
+  ArrowLeft,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -56,6 +57,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { useRouter } from "next/navigation";
 
 type LeaveRequestProps = {
   userId: string;
@@ -74,6 +76,7 @@ type LeaveRequestProps = {
 export default function Timesheet() {
   const data = useFetchLeaveRequest();
   const { isDarkMode } = useThemeStore();
+  const router = useRouter();
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -117,13 +120,13 @@ export default function Timesheet() {
       cell: ({ row }) => {
         const leaveRequest = row.original;
         const statusClass =
-        leaveRequest.approvalStatus === "Pending"
-          ? "text-yellow-500 font-semibold"
-          : leaveRequest.approvalStatus.includes("Rejected")
-          ? "text-red-500 font-semibold font-semibold"
-          : leaveRequest.approvalStatus.includes("Approved")
-          ? "text-green-700 font-semibold"
-          : "";
+          leaveRequest.approvalStatus === "Pending"
+            ? "text-yellow-500 font-semibold"
+            : leaveRequest.approvalStatus.includes("Rejected")
+            ? "text-red-500 font-semibold font-semibold"
+            : leaveRequest.approvalStatus.includes("Approved")
+            ? "text-green-700 font-semibold"
+            : "";
 
         return (
           <>
@@ -139,8 +142,12 @@ export default function Timesheet() {
                     <DialogHeader className="flex flex-row items-baseline justify-around">
                       <DialogTitle>Leave Request Details</DialogTitle>
                       <div className="grid text-xl">
-                        <div className="flex gap-x-2">Approval Status: <span className={statusClass}>{leaveRequest.approvalStatus}</span></div>
-                        
+                        <div className="flex gap-x-2">
+                          Approval Status:{" "}
+                          <span className={statusClass}>
+                            {leaveRequest.approvalStatus}
+                          </span>
+                        </div>
                       </div>
                     </DialogHeader>
                     <div>
@@ -160,16 +167,26 @@ export default function Timesheet() {
                         </thead>
                         <tbody>
                           <tr>
-                            <td className="text-center">{leaveRequest.leaveType}</td>
+                            <td className="text-center">
+                              {leaveRequest.leaveType}
+                            </td>
                             <td className="text-center">{leaveRequest.date}</td>
-                            <td className="text-center">{leaveRequest.requestFor}</td>
+                            <td className="text-center">
+                              {leaveRequest.requestFor}
+                            </td>
                             {leaveRequest.requestFor === "Days" ? (
-                              <td className="text-center">{leaveRequest.totalDays}</td>
+                              <td className="text-center">
+                                {leaveRequest.totalDays}
+                              </td>
                             ) : (
-                              <td className="text-center">{leaveRequest.totalHours}</td>
+                              <td className="text-center">
+                                {leaveRequest.totalHours}
+                              </td>
                             )}
 
-                            <td className="text-center">{leaveRequest.reason}</td>
+                            <td className="text-center">
+                              {leaveRequest.reason}
+                            </td>
                           </tr>
                         </tbody>
                       </table>
@@ -216,7 +233,8 @@ export default function Timesheet() {
 
   return (
     <>
-      <div className="timesheets-container w-[80%] mx-auto">
+      <ArrowLeft onClick={() => router.back()} className="cursor-pointer" />
+      <div className="timesheets-container w-[80%] mx-auto mt-12">
         <div className="w-full p-4 rounded-xl border-2 border-primary">
           <div>
             <Table className="rounded-xl">

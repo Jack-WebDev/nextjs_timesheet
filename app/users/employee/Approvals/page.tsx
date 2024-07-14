@@ -31,7 +31,8 @@ import { useThemeStore, useUser } from "@/app/store";
 import ApproveTimesheet from "@/components/dialogUI/ApproveTimesheet";
 import { TimesheetProps } from "@/types/timesheetProps";
 import useFetchTimesheets from "@/hooks/useFetchTimesheets";
-import { ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ArrowUpDown, Check, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { PageHeader } from "@/components/shared/PageHeader";
 
 export default function Timesheet() {
   const timesheetData = useFetchTimesheets();
@@ -133,7 +134,8 @@ export default function Timesheet() {
 
   return (
     <>
-      <div className="timesheets-container w-[80%] mx-auto">
+    <PageHeader title="Approvals" Icon={Check} />
+      <div className="timesheets-container w-[80%] mx-auto mt-12">
         <div className="w-full p-4 rounded-xl border-2 border-primary">
           <div className="flex items-center py-4">
             <Input

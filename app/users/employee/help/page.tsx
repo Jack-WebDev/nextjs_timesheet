@@ -53,7 +53,9 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Info,
 } from "lucide-react";
+import { PageHeader } from "@/components/shared/PageHeader";
 
 export default function HelpDesk() {
   const user = useUser();
@@ -585,10 +587,13 @@ export default function HelpDesk() {
   return (
     <>
       {loading && <Loading />}
-
+      <div className="mb-12">
+      <PageHeader title="Help Desk" Icon={Info} />
+      </div>
+        
       <button
         onClick={() => router.push("/users/employee/help/report")}
-        className={`${
+        className={`mb-8 ${
           hideButton ? "hidden" : "inline-block"
         } p-4 rounded-xl text-white ${
           isDarkMode
