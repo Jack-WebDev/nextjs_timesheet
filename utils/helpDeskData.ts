@@ -57,6 +57,8 @@ export const processHelpDeskData = (data: HelpDesk[]) => {
   const freshdeskCount = data.filter(d => d.status === 'FreshDesk').length;
   const totalTickets = data.length;
 
+
+
   return {
     shortestCall: formatDuration(shortestCall),
     longestCall: formatDuration(longestCall),
@@ -64,5 +66,6 @@ export const processHelpDeskData = (data: HelpDesk[]) => {
     averageTimeSpent: formatDuration(totalTimeSpent / totalTickets),
     resolvedPercentage: ((resolvedCount / totalTickets) * 100).toFixed(0),
     freshdeskPercentage: ((freshdeskCount / totalTickets) * 100).toFixed(0),
+
   };
 };
