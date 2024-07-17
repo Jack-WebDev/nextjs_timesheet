@@ -1,8 +1,17 @@
 "use client";
 
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { addDays, differenceInDays, eachDayOfInterval, format } from "date-fns";
+import {
+  addDays,
+  differenceInDays,
+  eachDayOfInterval,
+  format,
+  formatDate,
+  isValid,
+  parse,
+} from "date-fns";
 import { DateRange as DayPickerDateRange } from "react-day-picker";
+import { formatTime } from "@/utils/formatTimesheet";
 
 import {
   Dialog,
@@ -22,8 +31,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useDropzone } from "react-dropzone";
+import * as XLSX from "xlsx";
+import axios, { AxiosError } from "axios";
 import { useThemeStore, useUser } from "@/app/store";
 import { TimesheetProps } from "@/types/timesheetProps";
 import { Project } from "@/types/projectProps";
@@ -420,11 +431,109 @@ export default function Timesheet() {
     }
   };
 
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    const reader = new FileReader();
+
+    reader.onload = async (e: ProgressEvent<FileReader>) => {
+      const data = new Uint8Array(e.target!.result as ArrayBuffer);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const jsonData:any = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+      console.log(jsonData);
+
+      // Extract data from the JSON representation of the sheet
+      const month = jsonData[2][2] ;
+      const consultantName = jsonData[4][2];
+      const position = jsonData[5][2];
+      const clientName = jsonData[7][2];
+      const projectName = jsonData[8][2];
+      const weeklyPeriod = jsonData[10][1];
+
+      const weeklyDataStartRow = 13;
+      const weeklyDataEndRow = 19; // Adjust according to your sheet's structure
+
+      const date = [];
+      const timeFrom = [];
+      const timeTo = [];
+
+      const totalHours = [];
+      const performedTasks = [];
+      const consultantsComment = [];
+
+      const formatDate = (dateStr: any) => {
+        // Ensure dateStr is a string and not empty
+        if (typeof dateStr !== "string" || dateStr.trim() === "") {
+          return "Invalid Date";
+        }
+
+        // Attempt to parse the date in 'dd/MM/yyyy' format
+        let parsedDate = parse(dateStr, "dd/MM/yyyy", new Date());
+
+        // Check if parsing was successful and the date is valid
+        if (!isValid(parsedDate)) {
+          // Attempt to parse the date in 'MM/dd/yyyy' format if initial parse fails
+          parsedDate = parse(dateStr, "MM/dd/yyyy", new Date());
+        }
+
+        // Format the parsed date into 'dd-MMM-yyyy' format
+        return isValid(parsedDate)
+          ? format(parsedDate, "dd-MMM-yyyy")
+          : "Invalid Date";
+      };
+
+      for (let i = weeklyDataStartRow; i < weeklyDataEndRow; i++) {
+        if (jsonData[i] && jsonData[i].length > 0) {
+          date.push(formatDate(jsonData[i][1]));
+          timeFrom.push(formatTime(jsonData[i][2]));
+          timeTo.push(formatTime(jsonData[i][3]));
+          totalHours.push(jsonData[i][4]);
+          performedTasks.push(jsonData[i][6]);
+          consultantsComment.push(jsonData[i][7]);
+        }
+      }
+
+      const extractedData = {
+        month,
+        consultantName,
+        position,
+        clientName,
+        projectName,
+        weeklyPeriod,
+        date,
+        timeFrom,
+        timeTo,
+        totalHours,
+        performedTasks,
+        consultantsComment,
+      };
+
+      console.log(extractedData);
+      try {
+        const response = await axios.post(
+          "/api/timesheets/uploads",
+          extractedData
+        );
+        if(response.data === "success"){
+          toast.success("Timesheet submitted successfully");
+        }
+      } catch (error) {
+        console.error("Failed to save timesheet:", error as AxiosError);
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+  }, []);
+
+  const { getRootProps, getInputProps } = useDropzone({ onDrop,maxFiles:1 });
+
   return (
     <>
       {loading && <Loading />}
       <div className="mb-8">
-      <PageHeader title="Timesheets" Icon={Clock} />
+        <PageHeader title="Timesheets" Icon={Clock} />
       </div>
       <div className="grid border-2 border-primary p-8 rounded-xl">
         <form className="grid grid-cols-3 border-b-2 border-secondary pb-8 gap-y-4 items-end">
@@ -825,6 +934,19 @@ export default function Timesheet() {
           >
             View Your Timesheets
           </Button>
+
+          <div
+            {...getRootProps()}
+            style={{
+              border: `2px dashed var(--primary-color)`,
+              padding: "20px",
+              borderRadius: "10px",
+              textAlign: "center",
+            }}
+          >
+            <input {...getInputProps()} />
+            <p>Drag and drop an Excel file here, or click to select one</p>
+          </div>
 
           <Dialog>
             <DialogTrigger asChild>
