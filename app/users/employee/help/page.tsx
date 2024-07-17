@@ -35,6 +35,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { useNextjsAudioToTextRecognition } from "nextjs-audio-to-text-recognition";
+
 import { useEffect, useState } from "react";
 import { type HelpDesk } from "@/types/helpDeskProps";
 import { AP } from "@/types/apProps";
@@ -54,6 +56,8 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Info,
+  Play,
+  StopCircle,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 
@@ -95,6 +99,11 @@ export default function HelpDesk() {
     callAgent: user.NDTEmail,
   });
 
+  const { isListening, transcript, startListening, stopListening } =
+    useNextjsAudioToTextRecognition({ lang: "en-US", continuous: true });
+  const [liveTranscript, setLiveTranscript] = useState("");
+  const [finalTranscript, setFinalTranscript] = useState("");
+
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [duration, setDuration] = useState<string>("");
@@ -120,6 +129,25 @@ export default function HelpDesk() {
       setHideButton(true);
     }
   }, [tickets, user.NDTEmail]);
+
+  useEffect(() => {
+    if (transcript) {
+      setLiveTranscript(transcript);
+    }
+  }, [transcript]);
+
+  const handleStopListening = () => {
+    setFinalTranscript(liveTranscript);
+    setHelpDeskData((prevData) => ({
+      ...prevData,
+      resolve: liveTranscript,
+    }));
+    stopListening();
+  };
+
+  const handleChange = (e: any) => {
+    setFinalTranscript(e.target.value);
+  };
 
   const columns: ColumnDef<HelpDesk>[] = [
     {
@@ -1075,6 +1103,35 @@ export default function HelpDesk() {
                   )}
                 </>
               )}
+
+              <div className="grid justify-center">
+                <div className="flex items-center justify-center gap-x-2 mb-4">
+                  <button
+                    onClick={startListening}
+                    disabled={isListening}
+                    className="flex items-center gap-x-2 bg-green-500 px-4 py-2 text-white rounded-xl"
+                  >
+                    <Play /> Record
+                  </button>
+                  <button
+                    onClick={handleStopListening}
+                    disabled={!isListening}
+                    className="flex items-center gap-x-2 bg-red-500 px-4 py-2 text-white rounded-xl"
+                  >
+                    <StopCircle /> Stop
+                  </button>
+                </div>
+                <div>
+                  <textarea
+                    value={liveTranscript}
+                    disabled={isListening}
+                    placeholder="Transcript will appear here....."
+                    className={`border border-primary rounded-xl py-2 px-4 ${
+                      isDarkMode ? "text-black" : "text-black"
+                    }`}
+                  />
+                </div>
+              </div>
             </>
           )}
         </div>
