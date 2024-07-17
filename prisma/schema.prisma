@@ -97,7 +97,7 @@ model TableRow {
   typeOfDay      String
   totalHours     Float
   totalMinutes   Float
-  comment        String
+  comment        String?
   userId         String
   tableDetailsId String
   tableDetails   TableDetails @relation(fields: [tableDetailsId], references: [id], onDelete: Cascade)
