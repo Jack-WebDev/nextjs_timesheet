@@ -510,7 +510,7 @@ export default function Timesheet() {
         consultantsComment,
       };
 
-      console.log(extractedData);
+      // console.log(extractedData);
       try {
         const response = await axios.post(
           "/api/timesheets/uploads",
@@ -946,6 +946,7 @@ export default function Timesheet() {
           >
             <input {...getInputProps()} />
             <p>Drag and drop an Excel file here, or click to select one</p>
+            <p className="text-center underline font-bold">Drop one file at a time</p>
           </div>
 
           <Dialog>
