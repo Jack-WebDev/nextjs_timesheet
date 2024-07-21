@@ -9,6 +9,7 @@ import {
   formatDate,
   isValid,
   parse,
+  startOfDay,
 } from "date-fns";
 import { DateRange as DayPickerDateRange } from "react-day-picker";
 import { formatTime } from "@/utils/formatTimesheet";
@@ -662,6 +663,7 @@ export default function Timesheet() {
                   weekStartsOn={1}
                   showOutsideDays={true}
                   disableNavigation={true}
+                  toDate={startOfDay(new Date())}
                 />
               </PopoverContent>
             </Popover>
