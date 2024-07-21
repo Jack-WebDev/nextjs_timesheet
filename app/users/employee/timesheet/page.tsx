@@ -443,17 +443,24 @@ export default function Timesheet() {
       const jsonData:any = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
       console.log(jsonData);
-
+      function cleanArray(arr: any[]): any[] {
+        return arr
+          .filter(item => item !== undefined && item !== null && item !== '' && !(Array.isArray(item) && item.length === 0))
+          .map(item => (Array.isArray(item) ? cleanArray(item) : item));
+      }
       // Extract data from the JSON representation of the sheet
-      const month = jsonData[2][2] ;
-      const consultantName = jsonData[4][2];
-      const position = jsonData[5][2];
-      const clientName = jsonData[7][2];
-      const projectName = jsonData[8][2];
+      const cleanedData = cleanArray(jsonData);
+      console.log(cleanedData)
+
+      const month = jsonData[2][1] ;
+      const consultantName = jsonData[4][1];
+      const position = jsonData[5][1];
+      const clientName = jsonData[7][1];
+      const projectName = jsonData[8][1];
       const weeklyPeriod = jsonData[10][1];
 
       const weeklyDataStartRow = 13;
-      const weeklyDataEndRow = 19; // Adjust according to your sheet's structure
+      const weeklyDataEndRow = 18; // Adjust according to your sheet's structure
 
       const date = [];
       const timeFrom = [];
@@ -485,12 +492,13 @@ export default function Timesheet() {
       };
 
       for (let i = weeklyDataStartRow; i < weeklyDataEndRow; i++) {
+
         if (jsonData[i] && jsonData[i].length > 0) {
           date.push(formatDate(jsonData[i][1]));
           timeFrom.push(formatTime(jsonData[i][2]));
           timeTo.push(formatTime(jsonData[i][3]));
           totalHours.push(jsonData[i][4]);
-          performedTasks.push(jsonData[i][6]);
+          performedTasks.push(jsonData[i][5]);
           consultantsComment.push(jsonData[i][7]);
         }
       }
@@ -510,7 +518,7 @@ export default function Timesheet() {
         consultantsComment,
       };
 
-      // console.log(extractedData);
+      console.log(extractedData);
       try {
         const response = await axios.post(
           "/api/timesheets/uploads",
