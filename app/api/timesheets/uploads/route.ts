@@ -65,11 +65,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
     try {
       const detailsID = await db.tableDetails.create({
         data: {
-          month: month,
-          weeklyPeriod: weeklyPeriod,
+          month: month || "N/A",
+          weeklyPeriod: weeklyPeriod || "N/A",
           name: fullName,
           projectManager: "Seleke Masemola",
-          projectName: projectName,
+          projectName: projectName || "N/A",
           role: position || "N/A",
           Approval_Status: "Pending",
           userId: userID,
@@ -85,8 +85,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
         console.log(date[i]);
         const tableRow = await db.tableRow.create({
           data: {
-            weekday: date[i],
-            totalHours: parseFloat(totalHours[i]),
+            weekday: date[i] || "N/A",
+            totalHours: parseFloat(totalHours[i]) || 0,
             comment: consultantsComment[i] || "N/A",
             typeOfDay: "N/A",
             totalMinutes: 0,
@@ -100,9 +100,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
           console.log("Tasks performed:", performedTasks[i]);
           await db.task.create({
             data: {
-              taskPerformed: performedTasks[i],
+              taskPerformed: performedTasks[i] || "N/A",
               taskStatus: "N/A",
-              projectName: projectName,
+              projectName: projectName || "N/A",
               tableRowId: tableRow.id, // Connect task to the created tableRow
             },
           });
