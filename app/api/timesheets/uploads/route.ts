@@ -87,7 +87,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           data: {
             weekday: date[i],
             totalHours: parseFloat(totalHours[i]),
-            comment: consultantsComment[i],
+            comment: consultantsComment[i] || "N/A",
             typeOfDay: "N/A",
             totalMinutes: 0,
             userId: userID,
