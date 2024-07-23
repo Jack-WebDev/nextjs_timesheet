@@ -2,7 +2,6 @@
 import db from "@/database/index";
 import { LeaveRequestProps } from "@/types/leaveProps";
 
-
 export const createLeaveRequest = async (data: LeaveRequestProps) => {
   try {
     await db.leaveRequest.create({
@@ -10,7 +9,7 @@ export const createLeaveRequest = async (data: LeaveRequestProps) => {
         fullName: data.fullName,
         reason: data.reason,
         date: data.date,
-        totalHours: data.totalHours,
+        documents: data.documents,
         totalDays: data.totalDays,
         requestFor: data.requestFor,
         leaveType: data.leaveType,

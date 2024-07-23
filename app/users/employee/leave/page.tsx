@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/popover";
 import { CalendarClock, CalendarIcon, CircleHelp } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { addDays, format, isWeekend } from "date-fns";
+import { addDays, format, isWeekend, startOfDay } from "date-fns";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,6 +40,8 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import useFetchLeaves from "@/hooks/useFetchLeaves";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { UploadDropzone } from "@/utils/uploadthing";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
   fullName: z.string().nullable(),
@@ -113,19 +115,18 @@ const leaveTypes = [
 export default function LeaveForm() {
   const [date, setDate] = useState<DayPickerDateRange | undefined>(undefined);
   const [hoursDate, setHoursDate] = useState<Date>();
-  const [startHour, setStartHour] = useState<string>("");
-  const [endHour, setEndHour] = useState<string>("");
+
   const [selectedLeaveType, setSelectedLeaveType] = useState<string>("");
   const [requestFor, setRequestFor] = useState("Days");
   const [loading, setLoading] = useState(false);
   const user = useUser();
   const router = useRouter();
   const leaveRequests = useFetchLeaves();
+  const [documents, setDocuments] = useState<string[]>([]);
 
   const fullName = `${user.Name} ${user.Surname}`;
   const email = user.NDTEmail;
   const position = user.Position;
-
 
   const calculateWorkingDays = (startDate?: Date, endDate?: Date): number => {
     if (!startDate || !endDate) {
@@ -147,23 +148,14 @@ export default function LeaveForm() {
 
   const totalDays = calculateWorkingDays(date?.from, date?.to);
 
-  const calculateTotalHours = (start: string, end: string): number => {
-    const [startHours, startMinutes] = start.split(":").map(Number);
-    const [endHours, endMinutes] = end.split(":").map(Number);
-
-    const startDate = new Date();
-    const endDate = new Date();
-
-    startDate.setHours(startHours, startMinutes);
-    endDate.setHours(endHours, endMinutes);
-
-    const diff = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
-    const totalHours = Math.max(0, diff);
-    return parseFloat(totalHours.toFixed(2));
+  const handleDateSelect = (selectedDate:any) => {
+    const today = new Date();
+    if (selectedDate.from < today) {
+      // Prevent selecting dates in the past
+      return;
+    }
+    setDate(selectedDate);
   };
-
-  const totalHours =
-    startHour && endHour ? calculateTotalHours(startHour, endHour) : 0;
 
   const formattedHoursDate = `${
     addDays(hoursDate ?? new Date(), 1)
@@ -180,7 +172,6 @@ export default function LeaveForm() {
       .toISOString()
       .split("T")[0]
   }`;
-
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -215,9 +206,9 @@ export default function LeaveForm() {
       leaveType: selectedLeaveType,
       reason: values.reason,
       date: requestFor === "Days" ? formattedDate : formattedHoursDate,
-      totalHours: totalHours,
       totalDays: totalDays,
       userId: user.id,
+      documents: documents,
     };
     try {
       await createLeaveRequest(formData);
@@ -234,7 +225,7 @@ export default function LeaveForm() {
     <div>
       {loading && <Loading />}
       <div className="mb-12">
-      <PageHeader title="Leaves" Icon={CalendarClock} />
+        <PageHeader title="Leaves" Icon={CalendarClock} />
       </div>
       <div className="flex gap-x-8">
         <div className="border-2 border-primary p-4 rounded-xl w-1/3">
@@ -347,12 +338,12 @@ export default function LeaveForm() {
                     <label className="flex items-center gap-x-2">
                       <input
                         type="radio"
-                        value="Hours"
-                        checked={requestFor === "Hours"}
+                        value="Half-Day"
+                        checked={requestFor === "Half-Day"}
                         onChange={handleLeaveForChange}
                         className="custom-radio-input"
                       />
-                      Hours
+                      Half-Day
                     </label>
                   </div>
                 </div>
@@ -403,9 +394,9 @@ export default function LeaveForm() {
                                   mode="range"
                                   defaultMonth={date?.from}
                                   selected={date}
-                                  onSelect={setDate}
+                                  onSelect={handleDateSelect}
                                   numberOfMonths={1}
-                                  fromMonth={new Date()}
+                                  fromMonth={new Date()} // Set the first month shown to today
                                   weekStartsOn={1}
                                 />
                               </PopoverContent>
@@ -483,26 +474,6 @@ export default function LeaveForm() {
                           </FormItem>
                         )}
                       />
-
-                      <div className="flex items-end gap-x-2">
-                        <div>
-                          <input
-                            type="time"
-                            value={startHour}
-                            onChange={(e) => setStartHour(e.target.value)}
-                            className="bg-transparent border border-primary px-2"
-                          />
-                        </div>
-                        <span className="mx-4">Until</span>
-                        <div>
-                          <input
-                            type="time"
-                            value={endHour}
-                            onChange={(e) => setEndHour(e.target.value)}
-                            className="bg-transparent border border-primary px-2"
-                          />
-                        </div>
-                      </div>
                     </div>
                   </>
                 )}
@@ -544,6 +515,38 @@ export default function LeaveForm() {
                   </div>
                 </div>
               </div>
+              {selectedLeaveType === "Sick Leave" ? (
+                <div className="grid gap-4 my-8">
+                  <div>
+                    <Label htmlFor="name" className="mb-1">
+                      Attach Documents
+                    </Label>
+                    <UploadDropzone
+                      appearance={{
+                        label: "text-primary hover:text-secondary",
+                        button: "bg-primary text-white rounded-xl",
+                      }}
+                      className=" border border-primary rounded-xl cursor-pointer custom-class"
+                      endpoint="imageUploader"
+                      onClientUploadComplete={(res) => {
+                        // Do something with the response
+                        setDocuments((prevDocs) => [...prevDocs, res[0].url]);
+                        toast.success("Upload Completed");
+                      }}
+                      onUploadError={(error: Error) => {
+                        // Do something with the error.
+                        toast.error(`ERROR! ${error.message}`);
+                      }}
+                    />
+                  </div>
+
+                  {documents.map((docs, index) => (
+                    <ol key={index} className="list-disc">
+                      <li className=" ml-8">{docs}</li>
+                    </ol>
+                  ))}
+                </div>
+              ) : null}
               <FormField
                 control={form.control}
                 name="reason"
@@ -565,6 +568,7 @@ export default function LeaveForm() {
                 )}
               />{" "}
             </div>
+
             <Button type="submit" className="rounded-xl text-white mt-8">
               Request Leave
             </Button>
@@ -603,10 +607,6 @@ export default function LeaveForm() {
                     <span className="font-bold text-xl">
                       {formattedHoursDate}
                     </span>
-                  </div>
-                  <div className="flex justify-between items-center mx-8 mt-12">
-                    <label htmlFor="">Total Hours Taken: </label>
-                    <span className="font-bold text-xl">{totalHours}</span>
                   </div>
                 </>
               )}

@@ -157,8 +157,8 @@ model LeaveRequest {
   date           String
   approvalStatus String   @default("Pending")
   comments       String   @default("No comments")
-  totalHours     Float?
   totalDays      Float?
+  documents      String[]
   createdAt      DateTime @default(now())
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
