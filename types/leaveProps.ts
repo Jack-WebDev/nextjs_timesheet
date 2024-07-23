@@ -2,7 +2,7 @@ export type LeaveRequestProps = {
   fullName: string;
   reason: string;
   date: string;
-  totalHours?: number;
+  documents: string[];
   totalDays?: number;
   requestFor: string;
   leaveType: string;
