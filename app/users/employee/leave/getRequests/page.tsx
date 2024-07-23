@@ -160,7 +160,7 @@ export default function Timesheet() {
                             {leaveRequest.requestFor === "Days" ? (
                               <th>Total Days</th>
                             ) : (
-                              <th>Total Hours</th>
+                              null
                             )}
                             <th>Reason</th>
                           </tr>
@@ -179,9 +179,7 @@ export default function Timesheet() {
                                 {leaveRequest.totalDays}
                               </td>
                             ) : (
-                              <td className="text-center">
-                                {leaveRequest.totalHours}
-                              </td>
+                              null
                             )}
 
                             <td className="text-center">
