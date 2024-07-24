@@ -478,21 +478,16 @@ export default function Timesheet() {
       const consultantsComment = [];
 
       const formatDate = (dateStr: any) => {
-        // Ensure dateStr is a string and not empty
         if (typeof dateStr !== "string" || dateStr.trim() === "") {
           return "Invalid Date";
         }
 
-        // Attempt to parse the date in 'dd/MM/yyyy' format
         let parsedDate = parse(dateStr, "dd/MM/yyyy", new Date());
 
-        // Check if parsing was successful and the date is valid
         if (!isValid(parsedDate)) {
-          // Attempt to parse the date in 'MM/dd/yyyy' format if initial parse fails
           parsedDate = parse(dateStr, "MM/dd/yyyy", new Date());
         }
 
-        // Format the parsed date into 'dd-MMM-yyyy' format
         return isValid(parsedDate)
           ? format(parsedDate, "dd-MMM-yyyy")
           : "Invalid Date";
