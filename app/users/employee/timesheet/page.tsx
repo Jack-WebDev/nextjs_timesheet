@@ -441,27 +441,33 @@ export default function Timesheet() {
       const workbook = XLSX.read(data, { type: "array" });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
-      const jsonData:any = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      const jsonData: any = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
       console.log(jsonData);
       function cleanArray(arr: any[]): any[] {
         return arr
-          .filter(item => item !== undefined && item !== null && item !== '' && !(Array.isArray(item) && item.length === 0))
-          .map(item => (Array.isArray(item) ? cleanArray(item) : item));
+          .filter(
+            (item) =>
+              item !== undefined &&
+              item !== null &&
+              item !== "" &&
+              !(Array.isArray(item) && item.length === 0)
+          )
+          .map((item) => (Array.isArray(item) ? cleanArray(item) : item));
       }
       // Extract data from the JSON representation of the sheet
       const cleanedData = cleanArray(jsonData);
-      console.log(cleanedData)
+      console.log(cleanedData);
 
-      const month = jsonData[2][1] ;
-      const consultantName = jsonData[4][1];
-      const position = jsonData[5][1];
-      const clientName = jsonData[7][1];
-      const projectName = jsonData[8][1];
-      const weeklyPeriod = jsonData[10][1];
+      const month = cleanedData[1][1];
+      const consultantName = cleanedData[2][1];
+      const position = cleanedData[3][1];
+      const clientName = cleanedData[4][1];
+      const projectName = cleanedData[5][1];
+      const weeklyPeriod = cleanedData[7][0];
 
-      const weeklyDataStartRow = 13;
-      const weeklyDataEndRow = 18; // Adjust according to your sheet's structure
+      const weeklyDataStartRow = 9;
+      const weeklyDataEndRow = 14; // Adjust according to your sheet's structure
 
       const date = [];
       const timeFrom = [];
@@ -493,14 +499,13 @@ export default function Timesheet() {
       };
 
       for (let i = weeklyDataStartRow; i < weeklyDataEndRow; i++) {
-
-        if (jsonData[i] && jsonData[i].length > 0) {
-          date.push(formatDate(jsonData[i][1]));
-          timeFrom.push(formatTime(jsonData[i][2]));
-          timeTo.push(formatTime(jsonData[i][3]));
-          totalHours.push(jsonData[i][4]);
-          performedTasks.push(jsonData[i][5]);
-          consultantsComment.push(jsonData[i][7]);
+        if (cleanedData[i] && cleanedData[i].length > 0) {
+          date.push(formatDate(cleanedData[i][0]));
+          timeFrom.push(formatTime(cleanedData[i][1]));
+          timeTo.push(formatTime(cleanedData[i][2]));
+          totalHours.push(cleanedData[i][3]);
+          performedTasks.push(cleanedData[i][4]);
+          consultantsComment.push(cleanedData[i][5]);
         }
       }
 
@@ -525,7 +530,7 @@ export default function Timesheet() {
           "/api/timesheets/uploads",
           extractedData
         );
-        if(response.data === "success"){
+        if (response.data === "success") {
           toast.success("Timesheet submitted successfully");
         }
       } catch (error) {
@@ -536,7 +541,7 @@ export default function Timesheet() {
     reader.readAsArrayBuffer(file);
   }, []);
 
-  const { getRootProps, getInputProps } = useDropzone({ onDrop,maxFiles:1 });
+  const { getRootProps, getInputProps } = useDropzone({ onDrop, maxFiles: 1 });
 
   return (
     <>
@@ -956,7 +961,9 @@ export default function Timesheet() {
           >
             <input {...getInputProps()} />
             <p>Drag and drop an Excel file here, or click to select one</p>
-            <p className="text-center underline font-bold">Drop one file at a time</p>
+            <p className="text-center underline font-bold">
+              Drop one file at a time
+            </p>
           </div>
 
           <Dialog>
