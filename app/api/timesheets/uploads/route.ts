@@ -49,23 +49,25 @@ export async function POST(req: NextRequest, res: NextResponse) {
       performedTasks,
       consultantsComment,
     } = await reqBody;
-    // console.log(
-    //   month,
-    //   consultantName,
-    //   position,
-    //   clientName,
-    //   projectName,
-    //   weeklyPeriod,
-    //   date,
-    //   totalHours,
-    //   performedTasks,
-    //   consultantsComment
-    // );
+    console.log(
+      month,
+      consultantName,
+      position,
+      clientName,
+      projectName,
+      weeklyPeriod,
+      date,
+      totalHours,
+      performedTasks,
+      consultantsComment
+    );
 
+    console.log("first");
     try {
+      console.log("second");
       const detailsID = await db.tableDetails.create({
         data: {
-          month: month || "N/A",
+          month: "N/A",
           weeklyPeriod: weeklyPeriod || "N/A",
           name: fullName,
           projectManager: "Seleke Masemola",
@@ -76,7 +78,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         },
       });
 
-      // console.log(detailsID);
+      console.log(detailsID);
 
       // console.log(date);
 
@@ -86,10 +88,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const tableRow = await db.tableRow.create({
           data: {
             weekday: date[i] || "N/A",
-            totalHours: parseFloat(totalHours[i]) || 0,
+            totalHours: parseFloat(totalHours[i].split(":")[0]) || 0,
             comment: consultantsComment[i] || "N/A",
             typeOfDay: "N/A",
-            totalMinutes: 0,
+            totalMinutes: parseFloat(totalHours[i].split(":")[1]) || 0,
             userId: userID,
             tableDetailsId: detailsID.id,
           },
@@ -112,7 +114,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     } catch (error) {
       console.error("Error inserting data:", error);
     }
-
+    return NextResponse.json("success", { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: error }, { status: 500 });
   }
