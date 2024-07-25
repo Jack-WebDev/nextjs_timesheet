@@ -66,8 +66,6 @@ export default function HelpDesk() {
   const tickets = useFetchTickets();
   const { isDarkMode } = useThemeStore();
   const [data, setFilteredTickets] = useState<HelpDesk[]>([]);
-  const [ap, setAP] = useState<AP[]>([]);
-  const [student, setStudent] = useState<Student[]>([]);
   const [isFormVisible, setFormVisible] = useState(false);
   const [isDoneProcessing, setIsProcessing] = useState(false);
   const [isCallEnded, setCallEnded] = useState(false);
@@ -110,7 +108,7 @@ export default function HelpDesk() {
   const [totalTickets, setTotalTickets] = useState(0);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const [hideButton, setHideButton] = useState(true);
+  const [hideButton, setHideButton] = useState(false);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -123,7 +121,7 @@ export default function HelpDesk() {
     );
     setFilteredTickets(filteredTickets);
     setTotalTickets(filteredTickets.length);
-    if (user.NDTEmail === "fundib@ndt.co.za") {
+    if (user.NDTEmail === "fundib@ndt.co.za" || user.NDTEmail === "jack@ndt.co.za") {
       setHideButton(false);
     } else {
       setHideButton(true);
