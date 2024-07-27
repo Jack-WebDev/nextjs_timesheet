@@ -65,7 +65,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     try {
       const detailsID = await db.tableDetails.create({
         data: {
-          month: "N/A",
+          month: month,
           weeklyPeriod: weeklyPeriod || "N/A",
           name: fullName,
           projectManager: "Seleke Masemola",
@@ -79,7 +79,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       for (let i = 0; i < date.length; i++) {
         const hoursString =
           typeof totalHours[i] === "string" ? totalHours[i] : "0:0";
-
         const tableRow = await db.tableRow.create({
           data: {
             weekday: date[i] || "N/A",
