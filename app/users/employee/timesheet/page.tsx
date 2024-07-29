@@ -970,7 +970,7 @@ export default function Timesheet() {
                 Submit
               </Button>
             </DialogTrigger>
-            <DialogContent className="w-[70%] h-full overflow-auto">
+            <DialogContent className="w-[70%] h-[40%] overflow-auto">
               <DialogHeader>
                 <DialogTitle className="text-3xl text-secondary">
                   Are you ready to submit?
