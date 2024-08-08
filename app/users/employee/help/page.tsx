@@ -121,7 +121,7 @@ export default function HelpDesk() {
     );
     setFilteredTickets(filteredTickets);
     setTotalTickets(filteredTickets.length);
-    if (user.NDTEmail === "fundib@ndt.co.za" || user.NDTEmail === "jack@ndt.co.za") {
+    if (user.NDTEmail === "fundib@ndt.co.za" || user.NDTEmail === "jack@ndt.co.za" || user.NDTEmail === "franklinm@ndt.co.za") {
       setHideButton(false);
     } else {
       setHideButton(true);
