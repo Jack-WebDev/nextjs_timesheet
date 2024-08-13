@@ -62,7 +62,22 @@ export async function POST(req: NextRequest, res: NextResponse) {
       consultantsComment
     );
 
+    console.log("hhdhd")
+
     try {
+      const timesheetExists = await db.tableDetails.findFirst({
+        where: {
+          userId: userID,
+          weeklyPeriod: weeklyPeriod,
+        },
+      });
+
+      console.log(timesheetExists);
+
+
+      if(timesheetExists){
+        return NextResponse.json("Timesheet already exists", { status: 400 });
+      }
       const detailsID = await db.tableDetails.create({
         data: {
           month: month,

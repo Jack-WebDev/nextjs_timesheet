@@ -433,110 +433,127 @@ export default function Timesheet() {
   };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    const reader = new FileReader();
+    if (acceptedFiles.length === 0) {
+      toast.error("Please upload valid Excel files");
+      return;
+    }
 
-    reader.onload = async (e: ProgressEvent<FileReader>) => {
-      const data = new Uint8Array(e.target!.result as ArrayBuffer);
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const jsonData: any = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    acceptedFiles.forEach((file) => {
+      const reader = new FileReader();
 
-      console.log(jsonData);
-      function cleanArray(arr: any[]): any[] {
-        return arr
-          .filter(
-            (item) =>
-              item !== undefined &&
-              item !== null &&
-              item !== "" &&
-              !(Array.isArray(item) && item.length === 0)
-          )
-          .map((item) => (Array.isArray(item) ? cleanArray(item) : item));
-      }
-      // Extract data from the JSON representation of the sheet
-      const cleanedData = cleanArray(jsonData);
-      console.log(cleanedData);
+      reader.onload = async (e: ProgressEvent<FileReader>) => {
+        const data = new Uint8Array(e.target!.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        if (!sheetName) {
+          toast.error("Please upload a valid excel file");
+          return;
+        }
+        const sheet = workbook.Sheets[sheetName];
+        if (!sheet) {
+          toast.error("Please upload a valid excel file");
+          return;
+        }
+        const jsonData: any = XLSX.utils.sheet_to_json(sheet, {
+          header: 1,
+          raw: false,
+          dateNF: "mm/dd/yyyy",
+        });
 
-      const month = cleanedData[1][1];
-      const consultantName = cleanedData[2][1];
-      const position = cleanedData[3][1];
-      const clientName = cleanedData[4][1];
-      const projectName = cleanedData[5][1];
-      const weeklyPeriod = cleanedData[7][0];
+        console.log(jsonData);
+        function cleanArray(arr: any[]): any[] {
+          return arr
+            .filter(
+              (item) =>
+                item !== undefined &&
+                item !== null &&
+                item !== "" &&
+                !(Array.isArray(item) && item.length === 0)
+            )
+            .map((item) => (Array.isArray(item) ? cleanArray(item) : item));
+        }
+        const cleanedData = cleanArray(jsonData);
+        console.log(cleanedData);
 
-      const weeklyDataStartRow = 9;
-      const weeklyDataEndRow = 14; // Adjust according to your sheet's structure
+        const month = cleanedData[1][1];
+        const consultantName = cleanedData[2][1];
+        const position = cleanedData[3][1];
+        const clientName = cleanedData[4][1];
+        const projectName = cleanedData[5][1];
+        const weeklyPeriod = cleanedData[7][0];
 
-      const date = [];
-      const timeFrom = [];
-      const timeTo = [];
+        const weeklyDataStartRow = 9;
+        const weeklyDataEndRow = 14; // Adjust according to your sheet's structure
 
-      const totalHours = [];
-      const performedTasks = [];
-      const consultantsComment = [];
+        const date = [];
+        const timeFrom = [];
+        const timeTo = [];
 
-      const formatDate = (dateStr: any) => {
-        if (typeof dateStr !== "string" || dateStr.trim() === "") {
-          return "Invalid Date";
+        const totalHours = [];
+        const performedTasks = [];
+        const consultantsComment = [];
+
+        for (let i = weeklyDataStartRow; i < weeklyDataEndRow; i++) {
+          if (cleanedData[i] && cleanedData[i].length > 0) {
+            date.push(cleanedData[i][0]);
+            timeFrom.push(formatTime(cleanedData[i][1]));
+            timeTo.push(formatTime(cleanedData[i][2]));
+            totalHours.push(cleanedData[i][3]);
+            performedTasks.push(cleanedData[i][4]);
+            consultantsComment.push(cleanedData[i][5]);
+          }
         }
 
-        let parsedDate = parse(dateStr, "dd/MM/yyyy", new Date());
+        const extractedData = {
+          month,
+          consultantName,
+          position,
+          clientName,
+          projectName,
+          weeklyPeriod,
+          date,
+          timeFrom,
+          timeTo,
+          totalHours,
+          performedTasks,
+          consultantsComment,
+        };
 
-        if (!isValid(parsedDate)) {
-          parsedDate = parse(dateStr, "MM/dd/yyyy", new Date());
+        console.log(extractedData);
+        try {
+          const response = await axios.post(
+            "/api/timesheets/uploads",
+            extractedData
+          );
+          if (response.status === 201) {
+            toast.success("Timesheet submitted successfully");
+          }
+        } catch (error) {
+          if (axios.isAxiosError(error)) {
+            const axiosError = error as AxiosError;
+            let errorMessage: any = axiosError.response?.data;
+
+            if (typeof errorMessage === "object") {
+              errorMessage = JSON.stringify(errorMessage);
+            }
+
+            toast.error(errorMessage);
+          } else {
+            toast.error("An unexpected error occurred.");
+          }
+          console.error("Error submitting timesheet:", error);
         }
-
-        return isValid(parsedDate)
-          ? format(parsedDate, "dd-MMM-yyyy")
-          : "Invalid Date";
       };
 
-      for (let i = weeklyDataStartRow; i < weeklyDataEndRow; i++) {
-        if (cleanedData[i] && cleanedData[i].length > 0) {
-          date.push(formatDate(cleanedData[i][0]));
-          timeFrom.push(formatTime(cleanedData[i][1]));
-          timeTo.push(formatTime(cleanedData[i][2]));
-          totalHours.push(cleanedData[i][3]);
-          performedTasks.push(cleanedData[i][4]);
-          consultantsComment.push(cleanedData[i][5]);
-        }
-      }
-
-      const extractedData = {
-        month,
-        consultantName,
-        position,
-        clientName,
-        projectName,
-        weeklyPeriod,
-        date,
-        timeFrom,
-        timeTo,
-        totalHours,
-        performedTasks,
-        consultantsComment,
-      };
-
-      console.log(extractedData);
-      try {
-        const response = await axios.post(
-          "/api/timesheets/uploads",
-          extractedData
-        );
-        if (response.data === "success") {
-          toast.success("Timesheet submitted successfully");
-        }
-      } catch (error) {
-        console.error("Failed to save timesheet:", error as AxiosError);
-      }
-    };
-
-    reader.readAsArrayBuffer(file);
+      reader.readAsArrayBuffer(file);
+    });
   }, []);
 
-  const { getRootProps, getInputProps } = useDropzone({ onDrop, maxFiles: 1 });
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    multiple: true, // Allow multiple file uploads
+    maxFiles: 10,
+  });
 
   return (
     <>
